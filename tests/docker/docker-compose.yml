@@ -1,0 +1,90 @@
+version: '3.8'
+
+networks:
+  env-sync-test:
+    name: env-sync-test
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24
+
+services:
+  alpha:
+    build:
+      context: ../..
+      dockerfile: tests/docker/Dockerfile
+      args:
+        ENV_SYNC_BIN: ${ENV_SYNC_BIN:-target/env-sync}
+    hostname: alpha.local
+    container_name: env-sync-alpha
+    networks:
+      env-sync-test:
+        ipv4_address: 172.20.0.2
+        aliases:
+          - alpha.local
+    volumes:
+      - ./ssh-keys:/mnt/ssh-keys:ro
+      - alpha-data:/home/envsync/.config/env-sync
+    environment:
+      - ENV_SYNC_DEBUG=1
+      - CONTAINER_NAME=alpha
+    cap_add:
+      - NET_ADMIN
+      - SYS_PTRACE
+    privileged: true
+
+  beta:
+    build:
+      context: ../..
+      dockerfile: tests/docker/Dockerfile
+      args:
+        ENV_SYNC_BIN: ${ENV_SYNC_BIN:-target/env-sync}
+    hostname: beta.local
+    container_name: env-sync-beta
+    networks:
+      env-sync-test:
+        ipv4_address: 172.20.0.3
+        aliases:
+          - beta.local
+    volumes:
+      - ./ssh-keys:/mnt/ssh-keys:ro
+      - beta-data:/home/envsync/.config/env-sync
+    environment:
+      - ENV_SYNC_DEBUG=1
+      - CONTAINER_NAME=beta
+    cap_add:
+      - NET_ADMIN
+      - SYS_PTRACE
+    privileged: true
+
+  gamma:
+    build:
+      context: ../..
+      dockerfile: tests/docker/Dockerfile
+      args:
+        ENV_SYNC_BIN: ${ENV_SYNC_BIN:-target/env-sync}
+    hostname: gamma.local
+    container_name: env-sync-gamma
+    networks:
+      env-sync-test:
+        ipv4_address: 172.20.0.4
+        aliases:
+          - gamma.local
+    volumes:
+      - ./ssh-keys:/mnt/ssh-keys:ro
+      - gamma-data:/home/envsync/.config/env-sync
+    environment:
+      - ENV_SYNC_DEBUG=1
+      - CONTAINER_NAME=gamma
+    cap_add:
+      - NET_ADMIN
+      - SYS_PTRACE
+    privileged: true
+
+volumes:
+  alpha-data:
+    name: env-sync-test_alpha-data
+  beta-data:
+    name: env-sync-test_beta-data
+  gamma-data:
+    name: env-sync-test_gamma-data
