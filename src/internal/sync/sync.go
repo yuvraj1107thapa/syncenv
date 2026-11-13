@@ -636,7 +636,7 @@ func maybeReencryptLocal() {
 		return
 	}
 
-	tempFile, err := os.CreateTemp("", "env-sync-reencrypt")
+	tempFile, err := os.CreateTemp(filepath.Dir(config.SecretsFile()), ".env-sync-reencrypt-")
 	if err != nil {
 		return
 	}
@@ -750,7 +750,7 @@ func copyFile(src, dst string) error {
 	if err := os.MkdirAll(filepath.Dir(dst), 0o700); err != nil {
 		return err
 	}
-	return os.WriteFile(dst, data, 0o600)
+	return secrets.WriteFileAtomic(dst, data, 0o600)
 }
 
 func refreshPublicKeysMetadata(file string) error {

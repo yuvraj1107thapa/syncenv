@@ -285,10 +285,15 @@ verify_secret() {
     local container="$1"
     local key="$2"
     local expected="$3"
-    local actual
+    local actual attempt
 
-    actual=$(get_secret "$container" "$key")
-    [[ "$actual" = "$expected" ]]
+    # Retry briefly: background sync on the container may be rewriting the file.
+    for attempt in 1 2 3; do
+        actual=$(get_secret "$container" "$key")
+        [[ "$actual" = "$expected" ]] && return 0
+        sleep 1
+    done
+    return 1
 }
 
 # ─────────────────────────────────────────────────────────────

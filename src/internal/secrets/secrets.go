@@ -52,7 +52,7 @@ func InitSecretsFile(file string, initTimestamp string) error {
 	if err := os.MkdirAll(filepath.Dir(file), 0o700); err != nil {
 		return err
 	}
-	if err := os.WriteFile(file, []byte(content), 0o600); err != nil {
+	if err := WriteFileAtomic(file, []byte(content), 0o600); err != nil {
 		return err
 	}
 	if err := metadata.UpdateChecksum(file); err != nil {
@@ -101,7 +101,7 @@ func UpdateMetadata(file string, newVersion string) error {
 	}
 
 	updated := strings.Join(lines, "\n")
-	if err := os.WriteFile(file, []byte(updated), 0o600); err != nil {
+	if err := WriteFileAtomic(file, []byte(updated), 0o600); err != nil {
 		return err
 	}
 
@@ -179,7 +179,7 @@ func SetSecretsContent(file string, content string) error {
 	builder.WriteString(footer)
 	builder.WriteString("\n")
 
-	if err := os.WriteFile(file, []byte(builder.String()), 0o600); err != nil {
+	if err := WriteFileAtomic(file, []byte(builder.String()), 0o600); err != nil {
 		return err
 	}
 
@@ -445,4 +445,37 @@ func execCommand(name string, arg ...string) (string, error) {
 
 func sortStrings(values []string) {
 	sort.Strings(values)
+}
+
+// WriteFileAtomic writes data to path via a temp file in the same directory
+// followed by a rename, so concurrent readers (daemon, cron sync, `env-sync show`)
+// never observe a truncated or half-written secrets file.
+func WriteFileAtomic(path string, data []byte, perm os.FileMode) error {
+	dir := filepath.Dir(path)
+	tmp, err := os.CreateTemp(dir, ".env-sync-tmp-")
+	if err != nil {
+		return err
+	}
+	tmpPath := tmp.Name()
+	cleanup := func() { _ = os.Remove(tmpPath) }
+
+	if _, err := tmp.Write(data); err != nil {
+		_ = tmp.Close()
+		cleanup()
+		return err
+	}
+	if err := tmp.Chmod(perm); err != nil {
+		_ = tmp.Close()
+		cleanup()
+		return err
+	}
+	if err := tmp.Close(); err != nil {
+		cleanup()
+		return err
+	}
+	if err := os.Rename(tmpPath, path); err != nil {
+		cleanup()
+		return err
+	}
+	return nil
 }
