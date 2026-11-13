@@ -27,3 +27,6 @@ Thumbs.db
 test/
 tmp/
 *.test
+
+# Generated test SSH keys (created by tests/utils/generate-ssh-keys.sh)
+tests/docker/ssh-keys/
