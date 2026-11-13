@@ -8,10 +8,10 @@ import (
 )
 
 // GetUsername returns the current OS user login name.
-// ENV_SYNC_USER overrides the OS user (useful for tests and for
+// SYNCENV_USER overrides the OS user (useful for tests and for
 // simulating multiple users on one machine).
 func GetUsername() string {
-	if override := strings.TrimSpace(os.Getenv("ENV_SYNC_USER")); override != "" {
+	if override := strings.TrimSpace(os.Getenv("SYNCENV_USER")); override != "" {
 		if clean := SanitizeInstancePart(override); clean != "" {
 			return clean
 		}

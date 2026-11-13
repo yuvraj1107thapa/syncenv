@@ -2,7 +2,7 @@ package main
 
 import (
 	"bufio"
-	"envsync/internal/config"
+	"syncenv/internal/config"
 	"os"
 	"path/filepath"
 	"strings"

@@ -1,9 +1,9 @@
 {
   "$schema": "https://wails.io/schemas/config.v2.json",
-  "name": "env-sync",
+  "name": "syncenv",
   "build:dir": "build",
   "frontend:dir": "frontend",
-  "outputfilename": "env-sync-gui",
+  "outputfilename": "syncenv-gui",
   "frontend:install": "npm ci",
   "frontend:build": "npm run build",
   "frontend:dev:watcher": "npm run dev",
@@ -12,7 +12,7 @@
   "nsisType": "multiple",
   "info": {
     "companyName": "yuvraj1107thapa",
-    "productName": "env-sync",
+    "productName": "syncenv",
     "productVersion": "3.0.1",
     "copyright": "Copyright (c) Yuvraj Thapa",
     "comments": "Distributed secrets synchronization for local networks"

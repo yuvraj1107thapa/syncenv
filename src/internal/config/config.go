@@ -6,13 +6,13 @@ import (
 	"strings"
 )
 
-// SyncMode represents the operation mode for env-sync.
+// SyncMode represents the operation mode for syncenv.
 type SyncMode string
 
 const (
 	Version              = "4.0.0"
 	DefaultPort          = "5739"
-	Service              = "_envsync._tcp"
+	Service              = "_syncenv._tcp"
 	DefaultInitTimestamp = "1970-01-01T00:00:00Z"
 
 	// Operation modes
@@ -31,7 +31,7 @@ var (
 func SetVerbose(enabled bool) {
 	verboseMode = enabled
 	if enabled {
-		_ = os.Setenv("ENV_SYNC_VERBOSE", "true")
+		_ = os.Setenv("SYNCENV_VERBOSE", "true")
 	}
 }
 
@@ -40,7 +40,7 @@ func IsVerbose() bool {
 	if verboseMode {
 		return true
 	}
-	return strings.EqualFold(os.Getenv("ENV_SYNC_VERBOSE"), "true")
+	return strings.EqualFold(os.Getenv("SYNCENV_VERBOSE"), "true")
 }
 
 func HomeDir() string {
@@ -53,8 +53,8 @@ func HomeDir() string {
 	return "."
 }
 
-func EnvSyncPort() string {
-	if port := os.Getenv("ENV_SYNC_PORT"); port != "" {
+func SyncEnvPort() string {
+	if port := os.Getenv("SYNCENV_PORT"); port != "" {
 		return port
 	}
 	return LocalPort()
@@ -67,9 +67,9 @@ func PortFile() string {
 }
 
 // ExplicitPort reports whether the port was explicitly pinned via
-// ENV_SYNC_PORT. Explicit ports are never auto-bumped.
+// SYNCENV_PORT. Explicit ports are never auto-bumped.
 func ExplicitPort() bool {
-	return os.Getenv("ENV_SYNC_PORT") != ""
+	return os.Getenv("SYNCENV_PORT") != ""
 }
 
 // LocalPort returns this user's service port: explicit env override,
@@ -113,7 +113,7 @@ func isValidPort(port string) bool {
 }
 
 func InitTimestamp() string {
-	if ts := os.Getenv("ENV_SYNC_INIT_TIMESTAMP"); ts != "" {
+	if ts := os.Getenv("SYNCENV_INIT_TIMESTAMP"); ts != "" {
 		return ts
 	}
 	return DefaultInitTimestamp
@@ -124,7 +124,7 @@ func SecretsFile() string {
 }
 
 func ConfigDir() string {
-	return filepath.Join(HomeDir(), ".config", "env-sync")
+	return filepath.Join(HomeDir(), ".config", "syncenv")
 }
 
 func BackupDir() string {

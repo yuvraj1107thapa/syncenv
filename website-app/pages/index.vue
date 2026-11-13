@@ -1,17 +1,17 @@
 <script setup lang="ts">
 useHead({
-  title: 'env-sync | Sync .env secrets across machines — no server needed',
+  title: 'syncenv | Sync .env secrets across machines — no server needed',
   meta: [
-    { name: 'description', content: 'env-sync is a peer-to-peer .env secrets synchronization tool for local networks. Auto-discover peers with mDNS, sync over SSH or mTLS, and keep every machine in sync — no central server required.' },
-    { property: 'og:title', content: 'env-sync | Sync .env secrets across machines — no server needed' },
-    { property: 'og:description', content: 'env-sync is a peer-to-peer .env secrets synchronization tool for local networks. Auto-discover peers with mDNS, sync over SSH or mTLS, and keep every machine in sync — no central server required.' },
-    { property: 'og:url', content: 'https://envsync.yuvrajthapa.com/' },
+    { name: 'description', content: 'syncenv is a peer-to-peer .env secrets synchronization tool for local networks. Auto-discover peers with mDNS, sync over SSH or mTLS, and keep every machine in sync — no central server required.' },
+    { property: 'og:title', content: 'syncenv | Sync .env secrets across machines — no server needed' },
+    { property: 'og:description', content: 'syncenv is a peer-to-peer .env secrets synchronization tool for local networks. Auto-discover peers with mDNS, sync over SSH or mTLS, and keep every machine in sync — no central server required.' },
+    { property: 'og:url', content: 'https://syncenv.yuvrajthapa.com/' },
     { property: 'og:type', content: 'website' },
-    { name: 'twitter:title', content: 'env-sync | Sync .env secrets across machines — no server needed' },
-    { name: 'twitter:description', content: 'env-sync is a peer-to-peer .env secrets synchronization tool for local networks. Auto-discover peers with mDNS, sync over SSH or mTLS, and keep every machine in sync — no central server required.' },
+    { name: 'twitter:title', content: 'syncenv | Sync .env secrets across machines — no server needed' },
+    { name: 'twitter:description', content: 'syncenv is a peer-to-peer .env secrets synchronization tool for local networks. Auto-discover peers with mDNS, sync over SSH or mTLS, and keep every machine in sync — no central server required.' },
   ],
   link: [
-    { rel: 'canonical', href: 'https://envsync.yuvrajthapa.com/' },
+    { rel: 'canonical', href: 'https://syncenv.yuvrajthapa.com/' },
   ],
 })
 </script>
@@ -21,7 +21,7 @@ useHead({
   <section class="hero">
     <div>
       <h1>Stop copying <span class="highlight">.env</span> files<br/>between machines</h1>
-      <p>env-sync keeps secrets in sync across every machine on your local network — automatically. No central server, no cloud dependency, no manual copy-paste.</p>
+      <p>syncenv keeps secrets in sync across every machine on your local network — automatically. No central server, no cloud dependency, no manual copy-paste.</p>
       <p>
         <span class="badge"><i class="fa-brands fa-osi"></i> Open Source</span>
         <span class="badge"><i class="fa-solid fa-satellite-dish"></i> mDNS Auto-Discovery</span>
@@ -31,31 +31,31 @@ useHead({
       <div class="cta-row">
         <NuxtLink class="btn btn-primary" to="/download"><i class="fa-solid fa-download"></i> Download now</NuxtLink>
         <NuxtLink class="btn btn-secondary" to="/installation">Get started — it's free</NuxtLink>
-        <a class="btn btn-secondary" href="https://github.com/yuvraj1107thapa/envsync"><i class="fa-brands fa-github"></i> View on GitHub</a>
+        <a class="btn btn-secondary" href="https://github.com/yuvraj1107thapa/syncenv"><i class="fa-brands fa-github"></i> View on GitHub</a>
       </div>
       <div class="ph-badge-row">
         <a
           class="ph-badge-link"
-          href="https://www.producthunt.com/products/env-sync?embed=true&amp;utm_source=badge-featured&amp;utm_medium=badge&amp;utm_campaign=badge-env-sync"
+          href="https://www.producthunt.com/products/syncenv?embed=true&amp;utm_source=badge-featured&amp;utm_medium=badge&amp;utm_campaign=badge-syncenv"
           target="_blank"
           rel="noopener noreferrer"
         >
-          <img class="ph-badge-img" alt="env-sync - sync your .env files easily between devices in home network | Product Hunt" width="250" height="54" src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1108652&amp;theme=dark&amp;t=1774583676449">
+          <img class="ph-badge-img" alt="syncenv - sync your .env files easily between devices in home network | Product Hunt" width="250" height="54" src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1108652&amp;theme=dark&amp;t=1774583676449">
         </a>
       </div>
     </div>
-    <img src="/assets/cover.png" alt="env-sync peer-to-peer secrets synchronization across local machines" />
+    <img src="/assets/cover.png" alt="syncenv peer-to-peer secrets synchronization across local machines" />
   </section>
 
   <!-- Install snippet -->
   <section class="panel" style="max-width:720px;margin:0 auto 2.5rem;">
     <pre><code># install in 10 seconds
-curl -fsSL https://envsync.yuvrajthapa.com/install.sh | bash -s -- --user
+curl -fsSL https://syncenv.yuvrajthapa.com/install.sh | bash -s -- --user
 
 # start syncing
-env-sync init
-env-sync add OPENAI_API_KEY="sk-..."
-env-sync sync</code></pre>
+syncenv init
+syncenv add OPENAI_API_KEY="sk-..."
+syncenv sync</code></pre>
   </section>
 
   <!-- Trust bar -->
@@ -79,7 +79,7 @@ env-sync sync</code></pre>
     </article>
     <article class="panel step">
       <h3><i class="fa-solid fa-key"></i> Initialize</h3>
-      <p>Run <code>env-sync init</code> to set up keys and choose your security mode.</p>
+      <p>Run <code>syncenv init</code> to set up keys and choose your security mode.</p>
     </article>
     <article class="panel step">
       <h3><i class="fa-solid fa-rotate"></i> Sync</h3>
@@ -87,10 +87,10 @@ env-sync sync</code></pre>
     </article>
   </div>
 
-  <!-- Why env-sync -->
+  <!-- Why syncenv -->
   <div class="section-heading">
     <h2>Built for teams that work offline-first</h2>
-    <p>Unlike cloud-based secret managers, env-sync works entirely on your local network — even without an internet connection.</p>
+    <p>Unlike cloud-based secret managers, syncenv works entirely on your local network — even without an internet connection.</p>
   </div>
   <div class="features">
     <article class="panel feature">
@@ -128,7 +128,7 @@ env-sync sync</code></pre>
   <!-- Mode comparison table -->
   <div class="section-heading">
     <h2>Choose your security model</h2>
-    <p>env-sync gives you explicit control over trust boundaries. Pick the mode that fits your team.</p>
+    <p>syncenv gives you explicit control over trust boundaries. Pick the mode that fits your team.</p>
   </div>
   <section class="panel">
     <table>
@@ -146,33 +146,33 @@ env-sync sync</code></pre>
 
   <!-- Comparison callout -->
   <div class="section-heading">
-    <h2>How does env-sync compare?</h2>
-    <p>env-sync fills the gap that centralized tools leave open — secrets on local machines that drift apart.</p>
+    <h2>How does syncenv compare?</h2>
+    <p>syncenv fills the gap that centralized tools leave open — secrets on local machines that drift apart.</p>
   </div>
   <div class="grid">
     <article class="panel comparison-card">
       <div class="vs-badge">vs</div>
-      <h2><NuxtLink to="/comparisons/vault-vs-envsync">HashiCorp Vault</NuxtLink></h2>
+      <h2><NuxtLink to="/comparisons/vault-vs-syncenv">HashiCorp Vault</NuxtLink></h2>
       <p>Enterprise secrets platform vs lightweight peer sync.</p>
     </article>
     <article class="panel comparison-card">
       <div class="vs-badge">vs</div>
-      <h2><NuxtLink to="/comparisons/infisical-vs-envsync">Infisical</NuxtLink></h2>
+      <h2><NuxtLink to="/comparisons/infisical-vs-syncenv">Infisical</NuxtLink></h2>
       <p>Open-source secrets platform vs decentralized LAN mesh.</p>
     </article>
     <article class="panel comparison-card">
       <div class="vs-badge">vs</div>
-      <h2><NuxtLink to="/comparisons/doppler-vs-envsync">Doppler</NuxtLink></h2>
+      <h2><NuxtLink to="/comparisons/doppler-vs-syncenv">Doppler</NuxtLink></h2>
       <p>Cloud secrets operations vs offline-first sync.</p>
     </article>
     <article class="panel comparison-card">
       <div class="vs-badge">vs</div>
-      <h2><NuxtLink to="/comparisons/dotenvx-vs-envsync">dotenvx</NuxtLink></h2>
+      <h2><NuxtLink to="/comparisons/dotenvx-vs-syncenv">dotenvx</NuxtLink></h2>
       <p>Encrypted dotenv runtime injection vs peer synchronization.</p>
     </article>
     <article class="panel comparison-card">
       <div class="vs-badge">vs</div>
-      <h2><NuxtLink to="/comparisons/sops-vs-envsync">SOPS</NuxtLink></h2>
+      <h2><NuxtLink to="/comparisons/sops-vs-syncenv">SOPS</NuxtLink></h2>
       <p>Git-native encrypted files vs always-on machine sync.</p>
     </article>
   </div>
@@ -182,7 +182,7 @@ env-sync sync</code></pre>
     <h2>Ready to stop sharing .env files over Slack?</h2>
     <p>Get peer-to-peer secret sync running in under a minute. Open source, self-hosted, no accounts needed.</p>
     <div class="cta-row" style="justify-content:center;">
-      <NuxtLink class="btn btn-primary" to="/installation">Install env-sync</NuxtLink>
+      <NuxtLink class="btn btn-primary" to="/installation">Install syncenv</NuxtLink>
       <NuxtLink class="btn btn-secondary" to="/usage">Read the usage guide</NuxtLink>
     </div>
   </section>

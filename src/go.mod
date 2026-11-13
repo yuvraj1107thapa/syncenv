@@ -1,4 +1,4 @@
-module envsync
+module syncenv
 
 go 1.24.0
 

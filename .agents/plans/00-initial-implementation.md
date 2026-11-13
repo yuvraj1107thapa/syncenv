@@ -24,7 +24,7 @@ To add a 4th machine (e.g., `surface.local`):
 
 ### File Format: `.secrets.env`
 ```bash
-# === ENV_SYNC_METADATA ===
+# === SYNCENV_METADATA ===
 # VERSION: 1.2.3
 # TIMESTAMP: 2025-02-07T15:30:45Z
 # HOST: beelink.local
@@ -36,7 +36,7 @@ OPENAI_API_KEY="sk-xxx"
 ANTHROPIC_API_KEY="sk-xxx"
 AWS_ACCESS_KEY_ID="AKIA..."
 
-# === ENV_SYNC_FOOTER ===
+# === SYNCENV_FOOTER ===
 # VERSION: 1.2.3
 # TIMESTAMP: 2025-02-07T15:30:45Z
 # HOST: beelink.local
@@ -45,34 +45,34 @@ AWS_ACCESS_KEY_ID="AKIA..."
 
 ### Components
 
-#### 1. `env-sync-discover` - Peer Discovery
+#### 1. `syncenv-discover` - Peer Discovery
 - Uses `avahi-browse` (Linux) / `dns-sd` (macOS) / custom solution (Windows)
-- Discovers all `_envsync._tcp` services on local network
+- Discovers all `_syncenv._tcp` services on local network
 - Returns list of available peers with their hostnames and ports
 - Includes self-detection and filtering
 
-#### 2. `env-sync-serve` - HTTP Server
+#### 2. `syncenv-serve` - HTTP Server
 - Lightweight HTTP server for serving secrets file
-- Runs on port 5739 (ENV-SYNC in T9)
+- Runs on port 5739 (SYNCENV in T9)
 - Serves `.secrets.env` with proper headers
 - Includes version info in response headers
 - Implements simple authentication token (optional)
 
-#### 3. `env-sync-client` - Sync Client
+#### 3. `syncenv-client` - Sync Client
 - Compares local version with all discovered peers
 - Fetches from peer with newest version
 - Implements conflict resolution (latest timestamp wins)
 - Validates checksums after download
 - Creates backups before overwriting
 
-#### 4. `env-sync` - Main CLI
+#### 4. `syncenv` - Main CLI
 - Orchestrates discover → compare → sync workflow
 - Triggers: bash startup, cron (30min), manual
 - Commands:
-  - `env-sync` - Run sync
-  - `env-sync status` - Show local version and peers
-  - `env-sync init` - Initialize secrets file
-  - `env-sync serve` - Start HTTP server
+  - `syncenv` - Run sync
+  - `syncenv status` - Show local version and peers
+  - `syncenv init` - Initialize secrets file
+  - `syncenv serve` - Start HTTP server
 
 #### 5. Shell Integration
 - Auto-run on bash/zsh startup (non-blocking, background)
@@ -96,7 +96,7 @@ AWS_ACCESS_KEY_ID="AKIA..."
 ### Backup Strategy
 - Keep last 5 versions: `.secrets.env.backup.1` through `.secrets.env.backup.5`
 - Rotate backups on each sync
-- Allow manual restore: `env-sync restore [backup_number]`
+- Allow manual restore: `syncenv restore [backup_number]`
 
 ## Cross-Platform Support
 
@@ -152,10 +152,10 @@ HTTP endpoints for plaintext transfer (not recommended):
 ```
 GET /secrets.env
   Response Headers:
-    X-EnvSync-Version: 1.2.3
-    X-EnvSync-Timestamp: 2025-02-07T15:30:45Z
-    X-EnvSync-Host: beelink.local
-    X-EnvSync-Checksum: sha256:abc123...
+    X-SyncEnv-Version: 1.2.3
+    X-SyncEnv-Timestamp: 2025-02-07T15:30:45Z
+    X-SyncEnv-Host: beelink.local
+    X-SyncEnv-Checksum: sha256:abc123...
   Response Body: Raw .secrets.env content
 
 GET /health
@@ -165,7 +165,7 @@ GET /health
 **Warning**: Only use HTTP mode on completely trusted networks. Displays large security warning when used.
 
 ### mDNS Service Registration
-- Service Type: `_envsync._tcp`
+- Service Type: `_syncenv._tcp`
 - Port: 5739
 - TXT Records:
   - `version=1.2.3`
@@ -175,18 +175,18 @@ GET /health
 ## Directory Structure
 
 ```
-~/.config/env-sync/
+~/.config/syncenv/
 ├── config          # Configuration file
 ├── .secrets.env    # The secrets file
 ├── .secrets.env.backup.1..5  # Backups
 └── logs/           # Sync logs
 
-/opt/env-sync/ (or /usr/local/env-sync/)
+/opt/syncenv/ (or /usr/local/syncenv/)
 ├── bin/
-│   ├── env-sync           # Main CLI
-│   ├── env-sync-discover  # Discovery tool
-│   ├── env-sync-client    # Sync client
-│   └── env-sync-serve     # HTTP server
+│   ├── syncenv           # Main CLI
+│   ├── syncenv-discover  # Discovery tool
+│   ├── syncenv-client    # Sync client
+│   └── syncenv-serve     # HTTP server
 ├── lib/
 │   └── common.sh          # Shared functions
 └── systemd/               # Service files (Linux)
@@ -197,31 +197,31 @@ GET /health
 ### 1. Bash/Zsh Startup
 ```bash
 # In .bashrc/.zshrc
-if command -v env-sync &> /dev/null; then
-    (env-sync --background &)
+if command -v syncenv &> /dev/null; then
+    (syncenv --background &)
 fi
 ```
 
 ### 2. Cron Job (30 minutes)
 ```bash
 # Run sync every 30 minutes
-*/30 * * * * /usr/local/bin/env-sync --quiet
+*/30 * * * * /usr/local/bin/syncenv --quiet
 ```
 
 ### 3. Manual Trigger
 ```bash
-env-sync  # Immediate foreground sync
+syncenv  # Immediate foreground sync
 ```
 
 ## Implementation Phases
 
 ### Phase 1: Core Sync (MVP)
 - [ ] File format with metadata header/footer
-- [ ] HTTP server (env-sync-serve)
-- [ ] HTTP client (env-sync-client)
+- [ ] HTTP server (syncenv-serve)
+- [ ] HTTP client (syncenv-client)
 - [ ] Version comparison logic
 - [ ] Backup system
-- [ ] env-sync CLI with sync/status/init commands
+- [ ] syncenv CLI with sync/status/init commands
 
 ### Phase 2: Discovery
 - [ ] mDNS service registration
@@ -271,20 +271,20 @@ env-sync  # Immediate foreground sync
 sudo apt install avahi-daemon avahi-utils curl  # Linux
 # Or just use built-in tools on macOS
 
-# 2. Download and install env-sync
-curl -fsSL https://github.com/user/env-sync/raw/main/install.sh | bash
+# 2. Download and install syncenv
+curl -fsSL https://github.com/user/syncenv/raw/main/install.sh | bash
 
 # 3. Initialize (creates .secrets.env with metadata)
-env-sync init
+syncenv init
 
 # 4. Add your secrets
 nano ~/.secrets.env
 
 # 5. Start the service
-env-sync serve --daemon
+syncenv serve --daemon
 
 # 6. Run first sync (optional - will auto-sync anyway)
-env-sync
+syncenv
 ```
 
 **Result:**

@@ -26,7 +26,7 @@ func main() {
 	logSvc := &LogService{}
 
 	err := wails.Run(&options.App{
-		Title:     "env-sync",
+		Title:     "syncenv",
 		Width:     1200,
 		Height:    800,
 		MinWidth:  900,

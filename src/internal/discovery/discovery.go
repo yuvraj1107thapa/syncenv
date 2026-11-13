@@ -13,12 +13,12 @@ import (
 	"sync"
 	"time"
 
-	"envsync/internal/config"
-	"envsync/internal/keys"
-	"envsync/internal/logging"
-	"envsync/internal/secrets"
-	httptransport "envsync/internal/transport/http"
-	sshtransport "envsync/internal/transport/ssh"
+	"syncenv/internal/config"
+	"syncenv/internal/keys"
+	"syncenv/internal/logging"
+	"syncenv/internal/secrets"
+	httptransport "syncenv/internal/transport/http"
+	sshtransport "syncenv/internal/transport/ssh"
 )
 
 type Options struct {
@@ -30,7 +30,7 @@ type Options struct {
 	ShowPubkeys bool
 }
 
-// Peer is a discovered env-sync instance. Instance is the raw mDNS
+// Peer is a discovered syncenv instance. Instance is the raw mDNS
 // instance name ("user@host" for new advertisers, bare hostname for
 // legacy ones). PeerID is the canonical ID ("user@shorthost" or legacy
 // short host). Host is dialable ("beelink.local"), Port is the advertised
@@ -84,12 +84,12 @@ func Discover(opts Options) ([]string, error) {
 	return names, nil
 }
 
-// DiscoverPeers discovers env-sync instances with structured identity
+// DiscoverPeers discovers syncenv instances with structured identity
 // (user, host, port). Display() values are backward compatible with the
 // old Discover() string list.
 func DiscoverPeers(opts Options) ([]Peer, error) {
 	if !opts.Quiet {
-		logging.Log("INFO", fmt.Sprintf("Discovering env-sync peers (timeout: %ds)...", int(opts.Timeout.Seconds())))
+		logging.Log("INFO", fmt.Sprintf("Discovering syncenv peers (timeout: %ds)...", int(opts.Timeout.Seconds())))
 	}
 
 	var peers []Peer
@@ -125,7 +125,7 @@ func DiscoverPeers(opts Options) ([]Peer, error) {
 	}
 
 	if len(peers) == 0 {
-		logging.Log("WARN", "No env-sync peers found on local network")
+		logging.Log("WARN", "No syncenv peers found on local network")
 		fmt.Println()
 		return peers, nil
 	}
@@ -170,7 +170,7 @@ func DiscoverPeers(opts Options) ([]Peer, error) {
 		}
 		if collected > 0 {
 			logging.Log("SUCCESS", fmt.Sprintf("Collected %d public key(s)", collected))
-			logging.Log("INFO", "Run 'env-sync' to sync with new recipients")
+			logging.Log("INFO", "Run 'syncenv' to sync with new recipients")
 		}
 	}
 
@@ -222,7 +222,7 @@ func isSelfPeer(p Peer) bool {
 		if !strings.EqualFold(p.Host, localHost) {
 			return false
 		}
-		if p.Port == "" || p.Port == config.EnvSyncPort() {
+		if p.Port == "" || p.Port == config.SyncEnvPort() {
 			return true
 		}
 	}
@@ -268,7 +268,7 @@ func discoverAvahiPeers(timeout time.Duration) ([]Peer, error) {
 // parseAvahiPeers parses `avahi-browse -t -r -p` output.
 // Resolved lines look like:
 //
-//	=;eth0;IPv4;alice@beelink;_envsync._tcp;local;beelink.local;192.168.1.5;5740;...
+//	=;eth0;IPv4;alice@beelink;_syncenv._tcp;local;beelink.local;192.168.1.5;5740;...
 func parseAvahiPeers(output string) []Peer {
 	peers := []Peer{}
 	for _, line := range strings.Split(output, "\n") {
@@ -367,7 +367,7 @@ func discoverDnssdPeers(timeout time.Duration) ([]Peer, error) {
 // dns-sd -B output format:
 //
 //	Timestamp     A/R    Flags  if Domain               Service Type         Instance Name
-//	3:26:33.519  Add        3  14 local.               _envsync._tcp.       alice@beelink
+//	3:26:33.519  Add        3  14 local.               _syncenv._tcp.       alice@beelink
 //
 // NOTE: the instance name is the last field but may itself contain spaces,
 // so this takes everything after the service-type column instead of just
@@ -471,7 +471,7 @@ func resolveDnssdPeers(instances []string, timeout time.Duration) []Peer {
 	return peers
 }
 
-// resolveDnssdInstance runs `dns-sd -L <instance> _envsync._tcp local.`
+// resolveDnssdInstance runs `dns-sd -L <instance> _syncenv._tcp local.`
 // and parses the SRV host/port. Returns ("", "") on failure.
 func resolveDnssdInstance(instance string, timeout time.Duration) (string, string) {
 	if _, err := exec.LookPath("dns-sd"); err != nil {
@@ -556,7 +556,7 @@ func FetchPubkey(host string) string {
 }
 
 func fetchPubkey(host string) string {
-	args := []string{"ssh", "-n", "-o", "ConnectTimeout=3", "-o", "StrictHostKeyChecking=" + sshtransport.HostKeyCheckingMode(), host, "cat ~/.config/env-sync/keys/age_key.pub"}
+	args := []string{"ssh", "-n", "-o", "ConnectTimeout=3", "-o", "StrictHostKeyChecking=" + sshtransport.HostKeyCheckingMode(), host, "cat ~/.config/syncenv/keys/age_key.pub"}
 	logging.LogCommand(args...)
 	cmd := exec.Command(args[0], args[1:]...)
 	output, err := cmd.Output()

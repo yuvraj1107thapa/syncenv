@@ -11,11 +11,11 @@ import (
 	"strings"
 	"time"
 
-	"envsync/internal/config"
-	"envsync/internal/crypto/age"
-	"envsync/internal/logging"
-	"envsync/internal/metadata"
-	"envsync/internal/secrets"
+	"syncenv/internal/config"
+	"syncenv/internal/crypto/age"
+	"syncenv/internal/logging"
+	"syncenv/internal/metadata"
+	"syncenv/internal/secrets"
 )
 
 type cacheEntry struct {
@@ -124,7 +124,7 @@ func DecryptSecretsFile(inputFile string, outputFile string) error {
 	if err != nil {
 		return err
 	}
-	if strings.Contains(text, "ENVSYNC_UPDATED_AT=") {
+	if strings.Contains(text, "SYNCENV_UPDATED_AT=") {
 		decrypted := make([]string, 0)
 		linePattern := regexp.MustCompile(`^([A-Za-z_][A-Za-z0-9_]*)="(.*)"\s*#`)
 		failedKeys := make([]string, 0)

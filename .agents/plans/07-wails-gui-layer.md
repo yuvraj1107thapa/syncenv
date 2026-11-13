@@ -2,7 +2,7 @@
 
 ## Problem Statement
 
-env-sync currently operates exclusively via CLI. While this is powerful for automation and shell
+syncenv currently operates exclusively via CLI. While this is powerful for automation and shell
 integration, a desktop GUI would make the tool more accessible for visual management of secrets,
 peer status monitoring, and mode configuration. The GUI should cover **all** CLI functionalities
 while providing a richer visual experience.
@@ -22,26 +22,26 @@ operate on the exact same configuration, secrets files, keys, peer registry, and
 Users can freely switch between them, or use both simultaneously.
 
 **Shared State (on disk — single source of truth):**
-- `~/.config/env-sync/secrets` — Secrets file (read/written by both CLI and GUI)
-- `~/.config/env-sync/keys/` — AGE keys and cached peer public keys
-- `~/.config/env-sync/peer/` — Peer registry and membership log
-- `~/.config/env-sync/requests/` — Pending access requests
-- `~/.config/env-sync/backups/` — Backup files
-- `~/.config/env-sync/config` — Mode and configuration
+- `~/.config/syncenv/secrets` — Secrets file (read/written by both CLI and GUI)
+- `~/.config/syncenv/keys/` — AGE keys and cached peer public keys
+- `~/.config/syncenv/peer/` — Peer registry and membership log
+- `~/.config/syncenv/requests/` — Pending access requests
+- `~/.config/syncenv/backups/` — Backup files
+- `~/.config/syncenv/config` — Mode and configuration
 
 **What this means in practice:**
-- `env-sync add MY_KEY="value"` on CLI → immediately visible when GUI refreshes its Secrets view
-- Approving a peer in GUI → CLI's `env-sync peer list` reflects the change instantly
-- `env-sync sync` on CLI → GUI's Dashboard shows updated status on next poll
-- Cron job installed via GUI → same crontab entry that `env-sync cron --show` displays
-- Backups created by GUI restore → same backups available to `env-sync restore`
+- `syncenv add MY_KEY="value"` on CLI → immediately visible when GUI refreshes its Secrets view
+- Approving a peer in GUI → CLI's `syncenv peer list` reflects the change instantly
+- `syncenv sync` on CLI → GUI's Dashboard shows updated status on next poll
+- Cron job installed via GUI → same crontab entry that `syncenv cron --show` displays
+- Backups created by GUI restore → same backups available to `syncenv restore`
 - No database, no daemon state, no IPC — everything is file-based, so interop is automatic
 
 **Installation model:**
-- Both binaries can be installed side-by-side: `env-sync` (CLI) + `env-sync-gui` (GUI)
+- Both binaries can be installed side-by-side: `syncenv` (CLI) + `syncenv-gui` (GUI)
 - `make install` installs CLI, `make install-gui` installs GUI — independent targets
 - Neither requires the other — CLI-only, GUI-only, or both are all valid setups
-- The background server/daemon (`env-sync serve --daemon`) is shared: if the CLI starts it,
+- The background server/daemon (`syncenv serve --daemon`) is shared: if the CLI starts it,
   the GUI sees it as running; if the GUI stops it, the CLI reflects that
 - Same `install.sh` can offer both: `./install.sh --cli`, `./install.sh --gui`, `./install.sh --all`
 
@@ -62,8 +62,8 @@ Users can freely switch between them, or use both simultaneously.
 
 ```
 src/
-├── cmd/env-sync/main.go          # Existing CLI entry point (unchanged)
-├── cmd/env-sync-gui/             # NEW: GUI entry point
+├── cmd/syncenv/main.go          # Existing CLI entry point (unchanged)
+├── cmd/syncenv-gui/             # NEW: GUI entry point
 │   ├── main.go                   #   Wails app initialization
 │   ├── app.go                    #   Main App struct (bound to frontend)
 │   ├── sync_service.go           #   Sync operations service
@@ -211,10 +211,10 @@ Every CLI command maps to a GUI feature. Nothing is left behind.
 - On Linux: Ensure `libgtk-3-dev`, `libwebkit2gtk-4.0-dev` are available
 
 #### Step 1.2: Initialize Wails Project Structure
-- Run `wails init -n env-sync-gui -t vue-ts` in a temporary location
+- Run `wails init -n syncenv-gui -t vue-ts` in a temporary location
 - Copy the generated structure into `src/` adapting to project layout:
   - `frontend/` → `src/frontend/`
-  - `main.go`, `app.go` → `src/cmd/env-sync-gui/`
+  - `main.go`, `app.go` → `src/cmd/syncenv-gui/`
   - `wails.json` → `src/wails.json`
 - Update `src/go.mod` to add `github.com/wailsapp/wails/v2` dependency
 - Update `wails.json` paths to match project layout
@@ -236,8 +236,8 @@ Every CLI command maps to a GUI feature. Nothing is left behind.
   - `build-gui`: Runs `wails build` from `src/` directory
   - `dev-gui`: Runs `wails dev` for development with hot-reload
   - `install-gui`: Install GUI binary alongside CLI binary
-- The GUI binary should be named `env-sync-gui` (separate from CLI `env-sync`)
-- Both binaries coexist in `/usr/local/bin/`: `env-sync` + `env-sync-gui`
+- The GUI binary should be named `syncenv-gui` (separate from CLI `syncenv`)
+- Both binaries coexist in `/usr/local/bin/`: `syncenv` + `syncenv-gui`
 - Update `install.sh` to support `--cli`, `--gui`, and `--all` flags
 - Update `.gitignore` for `frontend/node_modules/`, `frontend/dist/`, `frontend/wailsjs/`
 
@@ -267,7 +267,7 @@ func (a *App) IsInitialized() bool             // Check if secrets file exists
 ```
 
 #### Step 2.2: Status Service (`status_service.go`)
-Maps to: `env-sync status`
+Maps to: `syncenv status`
 
 ```go
 type StatusService struct{}
@@ -501,7 +501,7 @@ func (l *LogService) GetLogFile() string
 ```
 
 #### Step 2.13: Wire Up main.go
-Register all services in `src/cmd/env-sync-gui/main.go`:
+Register all services in `src/cmd/syncenv-gui/main.go`:
 
 ```go
 func main() {
@@ -519,7 +519,7 @@ func main() {
     logSvc := &LogService{}
 
     err := wails.Run(&options.App{
-        Title:  "env-sync",
+        Title:  "syncenv",
         Width:  1200,
         Height: 800,
         MinWidth: 900,
@@ -632,7 +632,7 @@ with any frontend-specific additions.
 Layout:
 ```
 ┌──────────────────────────────────────────────┐
-│  env-sync Dashboard                          │
+│  syncenv Dashboard                          │
 ├──────────┬──────────┬──────────┬────────────┤
 │ Secrets  │ Server   │ Peers    │ Last Sync  │
 │ 12 keys  │ ● Online │ 3 found │ 5 min ago  │
@@ -845,12 +845,12 @@ Layout:
 │                                              │
 │  Paths                                       │
 │  ┌────────────────────────────────────────┐  │
-│  │ Secrets:  ~/.config/env-sync/secrets   │  │
-│  │ Backups:  ~/.config/env-sync/backups/  │  │
-│  │ Keys:     ~/.config/env-sync/keys/     │  │
+│  │ Secrets:  ~/.config/syncenv/secrets   │  │
+│  │ Backups:  ~/.config/syncenv/backups/  │  │
+│  │ Keys:     ~/.config/syncenv/keys/     │  │
 │  └────────────────────────────────────────┘  │
 │                                              │
-│  About: env-sync v3.0.0                      │
+│  About: syncenv v3.0.0                      │
 └──────────────────────────────────────────────┘
 ```
 
@@ -893,7 +893,7 @@ Components:
 #### Step 5.1: First-Run Wizard
 If `IsInitialized()` returns false, show an onboarding wizard:
 
-1. **Welcome** — "Welcome to env-sync" with brief description
+1. **Welcome** — "Welcome to syncenv" with brief description
 2. **Mode Selection** — Choose security mode with explanations
 3. **Initialize** — Create secrets file (optionally encrypted)
 4. **Key Setup** — Generate/show AGE key (if encrypted mode)
@@ -974,21 +974,21 @@ All async operations show:
 ```makefile
 # Existing CLI targets (unchanged)
 build:
-	cd $(SRC_DIR) && $(GO) build -o $(TARGET_DIR)/env-sync ./cmd/env-sync
+	cd $(SRC_DIR) && $(GO) build -o $(TARGET_DIR)/syncenv ./cmd/syncenv
 
 # New GUI targets (coexist alongside CLI)
 build-gui:
-	cd $(SRC_DIR) && wails build -o $(TARGET_DIR)/env-sync-gui
+	cd $(SRC_DIR) && wails build -o $(TARGET_DIR)/syncenv-gui
 
 dev-gui:
 	cd $(SRC_DIR) && wails dev
 
 # Install both or individually
 install: build
-	install -m 755 $(TARGET_DIR)/env-sync $(PREFIX)/bin/env-sync
+	install -m 755 $(TARGET_DIR)/syncenv $(PREFIX)/bin/syncenv
 
 install-gui: build-gui
-	install -m 755 $(TARGET_DIR)/env-sync-gui $(PREFIX)/bin/env-sync-gui
+	install -m 755 $(TARGET_DIR)/syncenv-gui $(PREFIX)/bin/syncenv-gui
 
 install-all: install install-gui
 
@@ -1005,8 +1005,8 @@ build-all: build build-gui
 #### Step 8.3: App Metadata
 - Application icon (all platforms)
 - `wails.json` configuration:
-  - App name: "env-sync"
-  - Output filename: "env-sync-gui"
+  - App name: "syncenv"
+  - Output filename: "syncenv-gui"
   - Frontend build commands
   - Author info
 
@@ -1024,11 +1024,11 @@ build-all: build build-gui
 
 ## Key Design Decisions
 
-1. **Dual-interface, shared state**: `env-sync` (CLI) and `env-sync-gui` (GUI) are two independent binaries that operate on the **exact same** config files, secrets, keys, and peer registry. You can use either, or both — the choice is purely about which management interface you prefer.
+1. **Dual-interface, shared state**: `syncenv` (CLI) and `syncenv-gui` (GUI) are two independent binaries that operate on the **exact same** config files, secrets, keys, and peer registry. You can use either, or both — the choice is purely about which management interface you prefer.
 2. **No API server between CLI and GUI**: Both link the same `internal/` Go packages. The GUI uses Wails bindings (in-process Go calls), while the CLI uses direct function calls. No IPC, no socket, no REST.
-3. **File-based interop**: All state lives on disk in `~/.config/env-sync/`. Changes made by the CLI are immediately visible to the GUI on refresh, and vice versa. No migration, no sync between the two.
+3. **File-based interop**: All state lives on disk in `~/.config/syncenv/`. Changes made by the CLI are immediately visible to the GUI on refresh, and vice versa. No migration, no sync between the two.
 4. **Independent installation**: `make install` for CLI, `make install-gui` for GUI. Neither depends on the other. Users can install just one or both.
-5. **Shared daemon**: The background server (`env-sync serve --daemon`) is a single process. Whether started from CLI or GUI, the same server instance serves peers. Both interfaces can start/stop/restart it.
+5. **Shared daemon**: The background server (`syncenv serve --daemon`) is a single process. Whether started from CLI or GUI, the same server instance serves peers. Both interfaces can start/stop/restart it.
 6. **Vue 3 + Composition API + TypeScript**: Modern, type-safe frontend
 7. **Pinia stores**: Centralized state management with Wails binding integration
 8. **Wails v2**: Stable, production-ready (upgrade to v3 when it stabilizes)

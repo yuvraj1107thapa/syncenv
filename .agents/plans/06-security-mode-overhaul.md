@@ -88,7 +88,7 @@ This plan separates trust models into explicit operation modes and introduces a 
   - capabilities (`read`, `request_reencrypt`, etc).
 
 ### 5.1.1 TLS Trust Anchor Policy (important)
-- **No global env-sync root certificate will be shipped in code/binaries.**
+- **No global syncenv root certificate will be shipped in code/binaries.**
 - Rationale: a shared product-wide root creates unnecessary global trust and high blast radius if compromised.
 - Trust is **deployment-local** in Mode C:
   - default: local trust bootstrap via invite + explicit approval + pinned peer identity/cert fingerprint,
@@ -97,7 +97,7 @@ This plan separates trust models into explicit operation modes and introduces a 
 
 ### 5.1.2 How a new secure network bootstraps (HostA -> HostB)
 **When HostA is first created (network genesis):**
-1. Operator runs `env-sync mode set secure-peer`.
+1. Operator runs `syncenv mode set secure-peer`.
 2. HostA generates:
    - transport identity keypair + self-signed TLS cert,
    - AGE keypair,
@@ -106,12 +106,12 @@ This plan separates trust models into explicit operation modes and introduces a 
 4. At this point HostA trusts only itself; there is no shared/global root.
 
 **When HostB joins later:**
-1. On HostA, operator creates a one-time short-lived invite (`env-sync peer invite --expires <duration>`), producing:
+1. On HostA, operator creates a one-time short-lived invite (`syncenv peer invite --expires <duration>`), producing:
    - enrollment token,
    - HostA transport fingerprint (or pinned cert reference),
    - optional pairing code for human verification.
 2. Operator transfers invite details to HostB via an out-of-band channel (chat, terminal copy, QR, etc).
-3. On HostB, operator runs `env-sync mode set secure-peer` (HostB generates its own transport cert + AGE key).
+3. On HostB, operator runs `syncenv mode set secure-peer` (HostB generates its own transport cert + AGE key).
 4. HostB discovers HostA via mDNS and sends `peer request` with token + HostB identity + HostB AGE public key.
 5. HostA validates token, records HostB as `pending` (or auto-approves if policy allows), then operator approves HostB.
 6. After approval, both hosts persist each other's transport identity as pinned trust material and store AGE public keys.
@@ -139,16 +139,16 @@ This plan separates trust models into explicit operation modes and introduces a 
   - event timestamps + expiry windows,
   - last-applied event cursor persisted locally.
 
-**Optional deployment profile:** a local per-group CA can replace pure pinning, but CA root distribution still happens per deployment (not from env-sync vendor/binary).
+**Optional deployment profile:** a local per-group CA can replace pure pinning, but CA root distribution still happens per deployment (not from syncenv vendor/binary).
 
 ### 5.2 Discovery
-- Continue `_envsync._tcp` mDNS.
+- Continue `_syncenv._tcp` mDNS.
 - Advertise minimal metadata only (avoid leaking sensitive details in TXT records).
 - In secure mode, discovery only tells “reachable peer candidate”, not trust.
 
 ### 5.3 Pairing / Initial Registration
 - Pairing flow (first contact):
-  1. Host A creates short-lived enrollment token (`env-sync peer invite`).
+  1. Host A creates short-lived enrollment token (`syncenv peer invite`).
   2. Host B calls Host A pairing endpoint with token + Host B identity + AGE pubkey.
   3. Host A marks request pending or auto-approves by policy.
   4. On approval, both persist each other in peer registry and enable mTLS trust.
@@ -190,14 +190,14 @@ Keep backward compatibility by mapping current behavior to `trusted-owner-ssh` u
 ## 7) CLI and UX Plan
 
 ### New/updated commands
-- `env-sync mode get|set <mode>`
-- `env-sync peer invite`
-- `env-sync peer request --to <host> --token <token>`
-- `env-sync peer approve <peer>`
-- `env-sync peer revoke <peer>`
-- `env-sync peer list`
-- `env-sync peer trust show <peer>`
-- `env-sync mode set <mode> [--yes] [--prune-old-material]`
+- `syncenv mode get|set <mode>`
+- `syncenv peer invite`
+- `syncenv peer request --to <host> --token <token>`
+- `syncenv peer approve <peer>`
+- `syncenv peer revoke <peer>`
+- `syncenv peer list`
+- `syncenv peer trust show <peer>`
+- `syncenv mode set <mode> [--yes] [--prune-old-material]`
 
 ### Existing command behavior updates
 - `sync`: route by configured mode

@@ -9,12 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **Multi-user support on the same device**: two OS users on one machine can now run env-sync side by side
+- **Multi-user support on the same device**: two OS users on one machine can now run syncenv side by side
   - Canonical per-user peer IDs (`user@host`) used as mDNS instance name, TLS certificate CN, and peer registry ID
-  - Per-user service ports: the second user transparently bumps to a free port and persists it (`~/.config/env-sync/port`)
+  - Per-user service ports: the second user transparently bumps to a free port and persists it (`~/.config/syncenv/port`)
   - mDNS discovery returns structured peers with per-user ports (`DiscoverPeers`, `PortForPeer`/`PortMap`)
   - Transports (SSH/HTTP/mTLS) accept `host`, `host:port`, and `user@host[:port]` dial strings
-  - `ENV_SYNC_USER` / `ENV_SYNC_HOSTNAME` overrides for tests and multi-machine simulation
+  - `SYNCENV_USER` / `SYNCENV_HOSTNAME` overrides for tests and multi-machine simulation
   - `serve -p/--port` pins an explicit port that is never auto-bumped
 - **New `internal/secrets/peerid.go`**: `LocalPeerID`, `NormalizePeerID`, `ParseEndpoint`/`Endpoint` (Dial/SSHDial/SplitDial/IsSelf), mDNS-safe sanitizers
 
@@ -40,10 +40,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Invitation-based onboarding with enrollment tokens
   - Membership event propagation for offline peer synchronization
 - **Mode Management Commands**:
-  - `env-sync mode get/set <mode>` - View and change security modes
-  - `env-sync peer invite` - Create enrollment invitations
-  - `env-sync peer request-access` - Request access to a network
-  - `env-sync peer approve/revoke/list` - Manage peer authorizations
+  - `syncenv mode get/set <mode>` - View and change security modes
+  - `syncenv peer invite` - Create enrollment invitations
+  - `syncenv peer request-access` - Request access to a network
+  - `syncenv peer approve/revoke/list` - Manage peer authorizations
 - **Non-destructive Mode Switching**: Mode changes preserve existing keys and data by default
 - **Peer Trust Store**: Persistent storage of peer identities and certificates
 
@@ -73,7 +73,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Single Static Binary**: Everything compiled into one executable
 - **Improved Performance**: Faster sync operations and better resource usage
 - **Service Management**: Native OS service integration (systemd/launchd)
-- **Cron Integration**: Built-in cron job management with `env-sync cron` commands
+- **Cron Integration**: Built-in cron job management with `syncenv cron` commands
 
 ### Changed
 

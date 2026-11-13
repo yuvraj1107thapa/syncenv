@@ -2,10 +2,10 @@ package main
 
 import (
 	"encoding/json"
-	"envsync/internal/config"
-	"envsync/internal/keys"
-	"envsync/internal/metadata"
-	"envsync/internal/secrets"
+	"syncenv/internal/config"
+	"syncenv/internal/keys"
+	"syncenv/internal/metadata"
+	"syncenv/internal/secrets"
 	"fmt"
 	"strings"
 )
@@ -73,7 +73,7 @@ func (s *SecretsService) Add(key, value string) error {
 		finalValue = value
 	}
 
-	newLine := fmt.Sprintf("%s=\"%s\" # ENVSYNC_UPDATED_AT=%s", key, finalValue, timestamp)
+	newLine := fmt.Sprintf("%s=\"%s\" # SYNCENV_UPDATED_AT=%s", key, finalValue, timestamp)
 
 	lines := strings.Split(content, "\n")
 	found := false
@@ -273,8 +273,8 @@ func parseSecrets(content string, encrypted bool) ([]SecretEntry, error) {
 		valuePart := parts[1]
 
 		updatedAt := ""
-		if idx := strings.Index(valuePart, "ENVSYNC_UPDATED_AT="); idx != -1 {
-			updatedAt = strings.TrimSpace(valuePart[idx+len("ENVSYNC_UPDATED_AT="):])
+		if idx := strings.Index(valuePart, "SYNCENV_UPDATED_AT="); idx != -1 {
+			updatedAt = strings.TrimSpace(valuePart[idx+len("SYNCENV_UPDATED_AT="):])
 			if hashIdx := strings.LastIndex(valuePart[:idx], "#"); hashIdx != -1 {
 				valuePart = strings.TrimSpace(valuePart[:hashIdx])
 			}

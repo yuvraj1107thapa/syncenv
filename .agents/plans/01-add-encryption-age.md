@@ -1,4 +1,4 @@
-# env-sync V1.0 - AGE Encryption Implementation Plan
+# syncenv V1.0 - AGE Encryption Implementation Plan
 
 ## Overview
 
@@ -25,7 +25,7 @@ Adding at-rest encryption using AGE to the distributed secrets sync system, whil
 
 ### Individual Machine Keys
 Each machine generates its own AGE key pair on first run:
-- **Private Key**: `~/.config/env-sync/keys/age_key` (chmod 600)
+- **Private Key**: `~/.config/syncenv/keys/age_key` (chmod 600)
 - **Public Key**: Embedded in mDNS TXT records for auto-discovery
 
 ### Encryption Strategy
@@ -48,7 +48,7 @@ When Machine D joins:
 ### File Format (Encrypted)
 
 ```bash
-# === ENV_SYNC_METADATA ===
+# === SYNCENV_METADATA ===
 # VERSION: 1.2.3
 # TIMESTAMP: 2025-02-07T15:30:45Z
 # HOST: beelink.local
@@ -62,7 +62,7 @@ When Machine D joins:
 YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSB...+500 chars...
 -----END AGE ENCRYPTED FILE-----
 
-# === ENV_SYNC_FOOTER ===
+# === SYNCENV_FOOTER ===
 # VERSION: 1.2.3
 # TIMESTAMP: 2025-02-07T15:30:45Z
 # HOST: beelink.local
@@ -78,7 +78,7 @@ YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSB...+500 chars...
 Each machine advertises its public key in mDNS service:
 
 ```
-Service: _envsync._tcp
+Service: _syncenv._tcp
 Port: 5739
 TXT Records:
   - version=1.2.3
@@ -102,11 +102,11 @@ If mDNS unavailable or pubkey too large:
 
 ```bash
 # Machine A requests pubkey from Machine B
-env-sync key request B.local
+syncenv key request B.local
 # B responds with pubkey (encrypted over SSH)
 
 # Or manual
-env-sync key import --from hostname.local
+syncenv key import --from hostname.local
 ```
 
 ### Public Key Cache
@@ -114,7 +114,7 @@ env-sync key import --from hostname.local
 Each machine maintains a cache of known pubkeys:
 
 ```
-~/.config/env-sync/keys/
+~/.config/syncenv/keys/
 ├── age_key                  # This machine's private key
 ├── age_key.pub              # This machine's public key
 ├── known_hosts/
@@ -148,17 +148,17 @@ Each machine maintains a cache of known pubkeys:
 **On surface.local ONLY:**
 
 ```bash
-# 1. Install env-sync
+# 1. Install syncenv
 curl -fsSL .../install.sh | bash
 
 # 2. Initialize (generates AGE key pair automatically)
-env-sync init --encrypted
+syncenv init --encrypted
 
 # 3. Discover peers (automatically collects pubkeys)
-env-sync discover --collect-keys
+syncenv discover --collect-keys
 
 # 4. Sync (will fail initially - see below)
-env-sync
+syncenv
 ```
 
 **What Happens:**
@@ -178,16 +178,16 @@ env-sync
    ```bash
    # On D: SSH into an existing machine and trigger sync
    # This adds D's pubkey to recipients and re-encrypts immediately
-   env-sync key request-access --trigger beelink.local
+   syncenv key request-access --trigger beelink.local
    
    # Or trigger on all online machines
-   env-sync key request-access --trigger-all
+   syncenv key request-access --trigger-all
    ```
    
    **How it works:**
    - D SSHes into beelink.local (must have SSH access)
-   - Runs `env-sync key add --pubkey D_pubkey` on beelink
-   - Triggers `env-sync` on beelink to re-encrypt and sync
+   - Runs `syncenv key add --pubkey D_pubkey` on beelink
+   - Triggers `syncenv` on beelink to re-encrypt and sync
    - File is now encrypted to [A, B, C, D]
    - D can immediately sync and decrypt
    
@@ -199,10 +199,10 @@ env-sync
    **Option B: Automatic Request (For Unattended Approval)**
    ```bash
    # D requests existing machines to re-encrypt
-   env-sync key request-access --from A.local --from B.local --from C.local
+   syncenv key request-access --from A.local --from B.local --from C.local
    
    # Or simpler - request from all discovered peers
-   env-sync key request-access --all
+   syncenv key request-access --all
    ```
    
    On A/B/C, a notification appears:
@@ -217,12 +217,12 @@ env-sync
    **Option C: Manual**
    ```bash
    # On D, show pubkey
-   env-sync key show
+   syncenv key show
    # Copy pubkey
    
    # On any existing machine (A, B, or C)
-   env-sync key add --pubkey "age1xyz..."
-   env-sync  # Re-encrypt and sync
+   syncenv key add --pubkey "age1xyz..."
+   syncenv  # Re-encrypt and sync
    
    # Now D can sync and decrypt
    ```
@@ -253,14 +253,14 @@ env-sync
 
 ### During Sync
 ```bash
-env-sync  # Automatic
+syncenv  # Automatic
 ```
 
 Flow:
 1. Discover peers and fetch latest secrets file
 2. Detect `ENCRYPTED: true` in metadata
 3. Check if local machine is in `RECIPIENTS` list
-4. Decrypt using `age -d -i ~/.config/env-sync/keys/age_key`
+4. Decrypt using `age -d -i ~/.config/syncenv/keys/age_key`
 5. Validate decrypted content
 6. Compare versions, merge if needed
 7. Re-encrypt for all known recipients
@@ -270,13 +270,13 @@ Flow:
 
 ```bash
 # In .bashrc/.zshrc
-if command -v env-sync &> /dev/null; then
+if command -v syncenv &> /dev/null; then
     # Load secrets (decrypts automatically if encrypted)
-    eval "$(env-sync load)"
+    eval "$(syncenv load)"
 fi
 ```
 
-New `env-sync load` command:
+New `syncenv load` command:
 - Reads `~/.secrets.env`
 - If encrypted, decrypts to stdout
 - Exports as environment variables
@@ -292,47 +292,47 @@ export AWS_ACCESS_KEY_ID="AKIA..."
 
 ```bash
 # Crontab entry
-*/30 * * * * env-sync sync --quiet && eval "$(env-sync load --quiet)"
+*/30 * * * * syncenv sync --quiet && eval "$(syncenv load --quiet)"
 ```
 
 Or:
 ```bash
 # New auto-load flag
-*/30 * * * * env-sync sync --quiet --auto-load
+*/30 * * * * syncenv sync --quiet --auto-load
 ```
 
 ## Component Updates
 
-### 1. `env-sync-init`
+### 1. `syncenv-init`
 
 New options:
 ```bash
-env-sync init                    # Plaintext (backward compat)
-env-sync init --encrypted        # Generate AGE key, encrypted by default
-env-sync init --encrypt-existing # Encrypt existing plaintext secrets
+syncenv init                    # Plaintext (backward compat)
+syncenv init --encrypted        # Generate AGE key, encrypted by default
+syncenv init --encrypt-existing # Encrypt existing plaintext secrets
 ```
 
 Actions:
 - Check if AGE installed
-- Generate key pair: `age-keygen -o ~/.config/env-sync/keys/age_key`
-- Extract pubkey: `age-keygen -y ~/.config/env-sync/keys/age_key`
+- Generate key pair: `age-keygen -o ~/.config/syncenv/keys/age_key`
+- Extract pubkey: `age-keygen -y ~/.config/syncenv/keys/age_key`
 - If encrypting existing: encrypt current secrets to [local_pubkey]
 
-### 2. `env-sync-discover`
+### 2. `syncenv-discover`
 
 New options:
 ```bash
-env-sync discover                # Standard discovery
-env-sync discover --pubkeys      # Show discovered pubkeys
-env-sync discover --collect-keys # Update pubkey cache
+syncenv discover                # Standard discovery
+syncenv discover --pubkeys      # Show discovered pubkeys
+syncenv discover --collect-keys # Update pubkey cache
 ```
 
 Enhancements:
 - Parse `age_pubkey` from mDNS TXT records
-- Update `~/.config/env-sync/keys/cache/pubkey_cache.json`
+- Update `~/.config/syncenv/keys/cache/pubkey_cache.json`
 - Show which machines have encryption enabled
 
-### 3. `env-sync-client`
+### 3. `syncenv-client`
 
 Encryption handling:
 ```bash
@@ -353,37 +353,37 @@ New encryption logic during sync:
 4. Encrypt to all recipients: `age -r pubkey1 -r pubkey2 ...`
 5. Save encrypted result
 
-### 4. `env-sync-key` (NEW COMMAND)
+### 4. `syncenv-key` (NEW COMMAND)
 
 Key management CLI:
 
 ```bash
 # Show this machine's key
-env-sync key show               # Show pubkey
-env-sync key show --private     # ⚠️ Show private key (careful!)
+syncenv key show               # Show pubkey
+syncenv key show --private     # ⚠️ Show private key (careful!)
 
 # Import/Export
-env-sync key export             # Export pubkey to stdout
-env-sync key export --qr        # Export as QR code
-env-sync key import <pubkey>    # Import someone's pubkey
-env-sync key import --from hostname.local  # Import from peer
+syncenv key export             # Export pubkey to stdout
+syncenv key export --qr        # Export as QR code
+syncenv key import <pubkey>    # Import someone's pubkey
+syncenv key import --from hostname.local  # Import from peer
 
 # List known keys
-env-sync key list               # List cached pubkeys
-env-sync key list --local       # List only local machine's key
+syncenv key list               # List cached pubkeys
+syncenv key list --local       # List only local machine's key
 
 # Request access (new machine joining)
 # Method 1: Remote trigger (SSH into existing machine and trigger sync)
-env-sync key request-access --trigger hostname.local    # Trigger specific host
-env-sync key request-access --trigger-all               # Trigger all online hosts
+syncenv key request-access --trigger hostname.local    # Trigger specific host
+syncenv key request-access --trigger-all               # Trigger all online hosts
 
 # Method 2: Send request and wait for approval
-env-sync key request-access --from hostname.local
-env-sync key request-access --all  # Request from all discovered
+syncenv key request-access --from hostname.local
+syncenv key request-access --all  # Request from all discovered
 
 # Grant access (existing machine approving)
-env-sync key grant-access --to hostname.local --pubkey "age1..."
-env-sync key approve-requests   # Interactive approval of pending requests
+syncenv key grant-access --to hostname.local --pubkey "age1..."
+syncenv key approve-requests   # Interactive approval of pending requests
 
 # Remote trigger implementation:
 # 1. SSH into target machine
@@ -392,11 +392,11 @@ env-sync key approve-requests   # Interactive approval of pending requests
 # 4. D can now sync the encrypted file
 
 # Remove/Revoke
-env-sync key remove hostname.local  # Remove from recipients
-env-sync key revoke hostname.local  # Remove and re-encrypt without them
+syncenv key remove hostname.local  # Remove from recipients
+syncenv key revoke hostname.local  # Remove and re-encrypt without them
 ```
 
-### 5. `env-sync-serve` (HTTP Mode)
+### 5. `syncenv-serve` (HTTP Mode)
 
 New endpoint:
 ```
@@ -408,21 +408,21 @@ POST /request-access
   Response: {"status": "pending", "message": "Request sent to admin"}
 ```
 
-### 6. `env-sync-load` (NEW COMMAND)
+### 6. `syncenv-load` (NEW COMMAND)
 
 Load secrets for shell integration:
 
 ```bash
-env-sync load                    # Decrypt and output export statements
-env-sync load --format json      # Output as JSON
-env-sync load --format env       # Output as .env format (default)
-env-sync load --key KEY_NAME     # Load only specific key
+syncenv load                    # Decrypt and output export statements
+syncenv load --format json      # Output as JSON
+syncenv load --format env       # Output as .env format (default)
+syncenv load --key KEY_NAME     # Load only specific key
 ```
 
 Example integration:
 ```bash
 # In .bashrc
-eval "$(env-sync load 2>/dev/null)"
+eval "$(syncenv load 2>/dev/null)"
 ```
 
 ## Backward Compatibility
@@ -432,10 +432,10 @@ eval "$(env-sync load 2>/dev/null)"
 **Phase 1: Opt-in Encryption**
 ```bash
 # Existing plaintext setup continues working
-env-sync  # Works with plaintext files
+syncenv  # Works with plaintext files
 
 # User opts into encryption
-env-sync init --encrypt-existing
+syncenv init --encrypt-existing
 ```
 
 **Phase 2: Mixed Mode Support**
@@ -459,7 +459,7 @@ Encrypted files use metadata flag:
 Older clients see:
 - Unknown metadata field (ignored)
 - Binary content after header (treated as corrupt)
-- Error: "Please upgrade env-sync to support encrypted files"
+- Error: "Please upgrade syncenv to support encrypted files"
 
 ## Implementation Phases
 
@@ -468,13 +468,13 @@ Older clients see:
 - [ ] Generate AGE keys on init
 - [ ] Encrypt/decrypt functions in common.sh
 - [ ] Update secrets file format
-- [ ] `env-sync key` command
-- [ ] `env-sync load` command
+- [ ] `syncenv key` command
+- [ ] `syncenv load` command
 
 ### Phase 2: Public Key Distribution (Week 2-3)
 - [ ] mDNS TXT record with pubkey
 - [ ] Pubkey cache system
-- [ ] `env-sync discover --collect-keys`
+- [ ] `syncenv discover --collect-keys`
 - [ ] Key listing and management
 
 ### Phase 3: Sync Integration (Week 3-4)
@@ -484,11 +484,11 @@ Older clients see:
 - [ ] Version compatibility checks
 
 ### Phase 4: New Machine Onboarding (Week 4)
-- [ ] `env-sync key request-access` command
+- [ ] `syncenv key request-access` command
   - [ ] `--trigger hostname` to SSH in and trigger sync remotely
   - [ ] `--trigger-all` to trigger on all online hosts
   - [ ] `--from` and `--all` for manual approval workflow
-- [ ] `env-sync key grant-access` command
+- [ ] `syncenv key grant-access` command
 - [ ] Interactive approval workflow
 - [ ] Auto-discovery and caching
 - [ ] Remote trigger implementation (SSH command execution)
@@ -514,7 +514,7 @@ Older clients see:
 ## File Locations
 
 ```
-~/.config/env-sync/
+~/.config/syncenv/
 ├── config                          # Config file
 ├── .secrets.env                    # Encrypted secrets
 ├── .secrets.env.backup.1..5        # Encrypted backups
@@ -548,7 +548,7 @@ Older clients see:
 3. **Rotation Strategy**
    - Keys don't expire (AGE design)
    - To rotate: generate new key, add to recipients, remove old
-   - `env-sync key rotate` command
+   - `syncenv key rotate` command
 
 ### Recovery Scenarios
 
@@ -567,7 +567,7 @@ Older clients see:
 - If malicious machine joins:
   - It can decrypt future secrets
   - Cannot decrypt old versions (backups)
-- Revoke: `env-sync key revoke rogue.local`
+- Revoke: `syncenv key revoke rogue.local`
 - Re-encrypt without rogue's pubkey
 
 ## Testing Strategy
@@ -596,36 +596,36 @@ Older clients see:
 ### Existing Users (v0.x → v1.0)
 
 ```bash
-# 1. Upgrade env-sync
+# 1. Upgrade syncenv
 curl -fsSL .../install.sh | bash
 
 # 2. Check age is installed
 which age || echo "Install age first"
 
 # 3. Encrypt existing secrets
-env-sync init --encrypt-existing
+syncenv init --encrypt-existing
 
 # 4. Share pubkey with peers
-env-sync key export
+syncenv key export
 # Send pubkey to other machines
 
 # 5. Import peer pubkeys
-env-sync key import --from beelink.local
-env-sync key import --from mbp16.local
+syncenv key import --from beelink.local
+syncenv key import --from mbp16.local
 
 # 6. Sync (re-encrypts to all recipients)
-env-sync
+syncenv
 
 # 7. Update .bashrc to use load command
-echo 'eval "$(env-sync load 2>/dev/null)"' >> ~/.bashrc
+echo 'eval "$(syncenv load 2>/dev/null)"' >> ~/.bashrc
 ```
 
 ### New Users
 
 ```bash
 # Same as before, just with encryption
-env-sync init  # Now generates keys automatically
-env-sync       # Sync with encryption
+syncenv init  # Now generates keys automatically
+syncenv       # Sync with encryption
 ```
 
 ## Success Criteria
@@ -647,7 +647,7 @@ env-sync       # Sync with encryption
    - **Decision**: Interactive with `--auto-approve` flag for trusted networks
 
 2. **Key Backup**: Should we support passphrase-protected key backup?
-   - Yes: Add `env-sync key backup --passphrase "..."`
+   - Yes: Add `syncenv key backup --passphrase "..."`
    - Store encrypted key backup in cloud/drive
 
 3. **Multiple Keys**: Should machines support multiple AGE keys?

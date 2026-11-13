@@ -4,7 +4,7 @@ import (
 	"os"
 	"testing"
 
-	"envsync/internal/config"
+	"syncenv/internal/config"
 )
 
 func TestGetModeDefaultWhenNoFile(t *testing.T) {

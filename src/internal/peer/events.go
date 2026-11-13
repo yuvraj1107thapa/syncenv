@@ -12,9 +12,9 @@ import (
 	"os"
 	"time"
 
-	"envsync/internal/config"
-	"envsync/internal/logging"
-	"envsync/internal/secrets"
+	"syncenv/internal/config"
+	"syncenv/internal/logging"
+	"syncenv/internal/secrets"
 )
 
 // MembershipEvent represents a signed event in the append-only membership log.

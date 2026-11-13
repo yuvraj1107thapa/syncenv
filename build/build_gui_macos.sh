@@ -18,16 +18,16 @@ for arch in amd64 arm64; do
   wails build -clean -platform "darwin/${arch}"
 
   install -m 755 \
-    "build/bin/env-sync.app/Contents/MacOS/env-sync-gui" \
-    "$DIST_DIR/env-sync-gui-macos-${arch}"
+    "build/bin/syncenv.app/Contents/MacOS/syncenv-gui" \
+    "$DIST_DIR/syncenv-gui-macos-${arch}"
 
   stage_dir="$(mktemp -d)"
-  cp -R build/bin/env-sync.app "$stage_dir/env-sync.app"
+  cp -R build/bin/syncenv.app "$stage_dir/syncenv.app"
   hdiutil create \
-    -volname "env-sync" \
+    -volname "syncenv" \
     -srcfolder "$stage_dir" \
     -ov \
     -format UDZO \
-    "$DIST_DIR/env-sync-gui-macos-${arch}.dmg"
+    "$DIST_DIR/syncenv-gui-macos-${arch}.dmg"
   rm -rf "$stage_dir"
 done

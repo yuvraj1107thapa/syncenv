@@ -67,7 +67,7 @@ async function initialize() {
     }
 
     step.value = totalSteps
-    toast.success('env-sync initialized successfully!')
+    toast.success('syncenv initialized successfully!')
   } catch (e) {
     toast.error('Initialization failed: ' + e)
   } finally {
@@ -100,7 +100,7 @@ onMounted(async () => {
       <!-- Step 1: Welcome -->
       <div v-if="step === 1" class="wizard-step">
         <div class="wizard-icon">🔐</div>
-        <h1 class="wizard-title">Welcome to env-sync</h1>
+        <h1 class="wizard-title">Welcome to syncenv</h1>
         <p class="wizard-desc">
           Sync your secrets across machines on your local network.
           No cloud, no servers — just peer-to-peer.
@@ -125,7 +125,7 @@ onMounted(async () => {
       <!-- Step 2: Mode Selection -->
       <div v-if="step === 2" class="wizard-step">
         <h2 class="wizard-title">Choose Security Mode</h2>
-        <p class="wizard-desc">How will you use env-sync?</p>
+        <p class="wizard-desc">How will you use syncenv?</p>
         <div class="mode-options">
           <label
             v-for="opt in modeOptions"
@@ -185,7 +185,7 @@ onMounted(async () => {
       <div v-if="step === 4" class="wizard-step">
         <div class="wizard-icon">✅</div>
         <h2 class="wizard-title">All Set!</h2>
-        <p class="wizard-desc">env-sync is configured and ready to use.</p>
+        <p class="wizard-desc">syncenv is configured and ready to use.</p>
 
         <div class="done-summary card" v-if="localKey">
           <div class="info-row">

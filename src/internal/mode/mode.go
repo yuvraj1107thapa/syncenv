@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"envsync/internal/config"
-	"envsync/internal/logging"
+	"syncenv/internal/config"
+	"syncenv/internal/logging"
 )
 
 // GetMode reads the current sync mode from the mode config file.

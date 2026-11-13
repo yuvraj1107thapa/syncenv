@@ -19,7 +19,7 @@ load 'test_helper'
 
 @test "modeA: Verify mode is dev-plaintext-http on all containers" {
     for container in $CONTAINER_ALPHA $CONTAINER_BETA $CONTAINER_GAMMA; do
-        run container_exec "$container" env-sync mode get
+        run container_exec "$container" syncenv mode get
         [ "$status" -eq 0 ]
         [[ "$output" =~ "dev-plaintext-http" ]]
     done
@@ -44,20 +44,20 @@ load 'test_helper'
     start_server "$CONTAINER_ALPHA"
 
     # Verify server is running
-    run container_exec "$CONTAINER_ALPHA" pgrep -f "env-sync serve"
+    run container_exec "$CONTAINER_ALPHA" pgrep -f "syncenv serve"
     [ "$status" -eq 0 ]
 }
 
 @test "modeA: Start HTTP server on beta" {
     start_server "$CONTAINER_BETA"
 
-    run container_exec "$CONTAINER_BETA" pgrep -f "env-sync serve"
+    run container_exec "$CONTAINER_BETA" pgrep -f "syncenv serve"
     [ "$status" -eq 0 ]
 }
 
 @test "modeA: Start HTTP server on gamma" {
     start_server "$CONTAINER_GAMMA"
 
-    run container_exec "$CONTAINER_GAMMA" pgrep -f "env-sync serve"
+    run container_exec "$CONTAINER_GAMMA" pgrep -f "syncenv serve"
     [ "$status" -eq 0 ]
 }

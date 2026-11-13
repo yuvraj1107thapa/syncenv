@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-**env-sync** is a distributed secrets synchronization tool for local networks. It allows multiple machines to sync `.env` style secrets without a central server, using peer-to-peer architecture with mDNS discovery.
+**syncenv** is a distributed secrets synchronization tool for local networks. It allows multiple machines to sync `.env` style secrets without a central server, using peer-to-peer architecture with mDNS discovery.
 
 **Current Version**: v3.0 - Security Mode Overhaul with Three Operation Modes
 
@@ -62,7 +62,7 @@
 ## File Structure
 
 ```
-envsync/
+syncenv/
 ├── CHANGELOG.md               # Version history
 ├── README.md                  # User documentation
 ├── AGENTS.md                  # This file - internal dev documentation
@@ -73,7 +73,7 @@ envsync/
 ├── install.sh                 # Installation script
 ├── Makefile                   # Build automation
 ├── src/                       # Go source code (v3.0)
-│   ├── cmd/env-sync/          # Main entry point
+│   ├── cmd/syncenv/          # Main entry point
 │   │   └── main.go
 │   ├── internal/              # Internal packages
 │   │   ├── cli/               # CLI interface and command routing
@@ -100,7 +100,7 @@ envsync/
 │   ├── go.mod                 # Go module definition
 │   └── go.sum                 # Go module checksums
 ├── target/                    # Build output
-│   └── env-sync               # Compiled Go binary
+│   └── syncenv               # Compiled Go binary
 └── tests/                     # Integration tests (BATS)
     ├── bats/                  # BATS test files
     ├── docker/                # Docker test environment
@@ -111,7 +111,7 @@ envsync/
 
 ### Main Components
 
-#### cmd/env-sync/main.go
+#### cmd/syncenv/main.go
 **Purpose**: Entry point for the Go binary
 **Key Features**:
 - Parses command-line arguments
@@ -248,9 +248,9 @@ envsync/
 ### Configuration Constants (config.go)
 
 ```go
-ENV_SYNC_VERSION = "4.0.0"
-ENV_SYNC_PORT = "5739"
-CONFIG_DIR = "~/.config/env-sync"
+SYNCENV_VERSION = "4.0.0"
+SYNCENV_PORT = "5739"
+CONFIG_DIR = "~/.config/syncenv"
 SECRETS_FILE = CONFIG_DIR + "/.secrets.env"
 BACKUP_DIR = CONFIG_DIR + "/backups"
 KEYS_DIR = CONFIG_DIR + "/keys"
@@ -270,7 +270,7 @@ TRANSPORT = "ssh" | "https-mtls" | "http"
 ### Plaintext Mode (trusted-owner)
 
 ```bash
-# === ENV_SYNC_METADATA ===
+# === SYNCENV_METADATA ===
 # VERSION: 3.0.0
 # TIMESTAMP: 2025-02-16T15:30:45Z
 # HOST: beelink.local
@@ -279,10 +279,10 @@ TRANSPORT = "ssh" | "https-mtls" | "http"
 # MODE: trusted-owner-ssh
 # === END_METADATA ===
 
-OPENAI_API_KEY="sk-abc123xyz" # ENVSYNC_UPDATED_AT=2025-02-16T15:30:45Z
-DATABASE_URL="postgres://user:pass@localhost/db" # ENVSYNC_UPDATED_AT=2025-02-16T14:20:10Z
+OPENAI_API_KEY="sk-abc123xyz" # SYNCENV_UPDATED_AT=2025-02-16T15:30:45Z
+DATABASE_URL="postgres://user:pass@localhost/db" # SYNCENV_UPDATED_AT=2025-02-16T14:20:10Z
 
-# === ENV_SYNC_FOOTER ===
+# === SYNCENV_FOOTER ===
 # VERSION: 3.0.0
 # TIMESTAMP: 2025-02-16T15:30:45Z
 # HOST: beelink.local
@@ -292,7 +292,7 @@ DATABASE_URL="postgres://user:pass@localhost/db" # ENVSYNC_UPDATED_AT=2025-02-16
 ### Encrypted Mode (secure-peer)
 
 ```bash
-# === ENV_SYNC_METADATA ===
+# === SYNCENV_METADATA ===
 # VERSION: 3.0.0
 # TIMESTAMP: 2025-02-16T15:30:45Z
 # HOST: beelink.local
@@ -302,10 +302,10 @@ DATABASE_URL="postgres://user:pass@localhost/db" # ENVSYNC_UPDATED_AT=2025-02-16
 # RECIPIENTS: beelink.local:age1xyz...,mbp16.local:age1abc...,nuc.local:age1def...
 # === END_METADATA ===
 
-OPENAI_API_KEY="YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+..." # ENVSYNC_UPDATED_AT=2025-02-16T15:30:45Z
-DATABASE_URL="YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+..." # ENVSYNC_UPDATED_AT=2025-02-16T14:20:10Z
+OPENAI_API_KEY="YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+..." # SYNCENV_UPDATED_AT=2025-02-16T15:30:45Z
+DATABASE_URL="YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+..." # SYNCENV_UPDATED_AT=2025-02-16T14:20:10Z
 
-# === ENV_SYNC_FOOTER ===
+# === SYNCENV_FOOTER ===
 # VERSION: 3.0.0
 # TIMESTAMP: 2025-02-16T15:30:45Z
 # HOST: beelink.local
@@ -324,7 +324,7 @@ DATABASE_URL="YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+..." # ENVSYNC_UPDATED_AT=2025-02-
 ### Mode Switch Flow
 
 ```
-env-sync mode set <new-mode>
+syncenv mode set <new-mode>
 └── mode.SetMode()
     ├── Check current mode
     ├── Validate prerequisites for new mode
@@ -339,7 +339,7 @@ env-sync mode set <new-mode>
 ### Trusted-Owner Sync Flow
 
 ```
-env-sync sync
+syncenv sync
 └── sync.syncTrustedOwner()
     ├── discovery.DiscoverPeers()
     ├── Filter peers by SSH reachability
@@ -359,7 +359,7 @@ env-sync sync
 ### Secure-Peer Sync Flow
 
 ```
-env-sync sync
+syncenv sync
 └── sync.syncSecurePeer()
     ├── discovery.DiscoverPeers()
     ├── For each peer:
@@ -384,14 +384,14 @@ env-sync sync
 
 ```
 # On existing peer (Host A)
-env-sync peer invite
+syncenv peer invite
 └── peers.CreateInvitation()
     ├── Generate enrollment token
     ├── Set expiry
     ├── Return: token, hostname, fingerprint
 
 # On new machine (Host B)
-env-sync peer request-access --to HostA --token <token>
+syncenv peer request-access --to HostA --token <token>
 └── transport/https.RequestAccess()
     ├── Load transport identity
     ├── Connect to HostA (mTLS)
@@ -399,7 +399,7 @@ env-sync peer request-access --to HostA --token <token>
     └── Host A marks as pending
 
 # On Host A (approval)
-env-sync peer approve HostB
+syncenv peer approve HostB
 └── peers.ApprovePeer()
     ├── Update peer status to approved
     ├── Pin HostB certificate
@@ -408,7 +408,7 @@ env-sync peer approve HostB
     └── Replicate to other peers
 
 # Host B syncs
-env-sync sync
+syncenv sync
 └── Now authorized, can decrypt secrets
 ```
 

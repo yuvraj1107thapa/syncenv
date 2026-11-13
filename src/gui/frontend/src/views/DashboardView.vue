@@ -50,7 +50,7 @@ onMounted(async () => {
     <div class="section-header">
       <div>
         <h1 class="section-title">Dashboard</h1>
-        <p class="section-subtitle">env-sync status overview</p>
+        <p class="section-subtitle">syncenv status overview</p>
       </div>
       <div class="header-actions">
         <button class="btn btn-primary" @click="syncAll" :disabled="syncing">
@@ -125,7 +125,7 @@ onMounted(async () => {
         <span class="card-title">⚠️ Not Initialized</span>
       </div>
       <p class="text-secondary">
-        No secrets file found. Go to <strong>Settings</strong> to initialize env-sync.
+        No secrets file found. Go to <strong>Settings</strong> to initialize syncenv.
       </p>
     </div>
 

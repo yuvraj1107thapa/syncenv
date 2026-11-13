@@ -26,7 +26,7 @@ load 'test_helper'
 }
 
 @test "modeA: Force pull from alpha to beta" {
-    run container_exec "$CONTAINER_BETA" env-sync sync --force-pull alpha.local
+    run container_exec "$CONTAINER_BETA" syncenv sync --force-pull alpha.local
     [ "$status" -eq 0 ]
 }
 
@@ -37,7 +37,7 @@ load 'test_helper'
 }
 
 @test "modeA: Force-pull without hostname fails" {
-    run container_exec "$CONTAINER_BETA" env-sync sync --force-pull
+    run container_exec "$CONTAINER_BETA" syncenv sync --force-pull
     [ "$status" -ne 0 ]
 }
 

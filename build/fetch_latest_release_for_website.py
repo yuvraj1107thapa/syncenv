@@ -7,7 +7,7 @@ import urllib.request
 
 
 def main() -> None:
-    repo = os.environ.get("GITHUB_REPOSITORY", "yuvraj1107thapa/envsync")
+    repo = os.environ.get("GITHUB_REPOSITORY", "yuvraj1107thapa/syncenv")
     token = os.environ.get("GITHUB_TOKEN", "")
     output_path = pathlib.Path(
         os.environ.get("OUTPUT_PATH", "website-app/public/download/latest-release.json")

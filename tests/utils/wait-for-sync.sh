@@ -1,5 +1,5 @@
 #!/bin/bash
-# Wait for env-sync to complete on a container
+# Wait for syncenv to complete on a container
 
 set -e
 
@@ -25,8 +25,8 @@ while true; do
     fi
 
     # Check if log file exists and has completion marker
-    if docker exec --user envsync "$CONTAINER" test -f /home/envsync/.config/env-sync/logs/env-sync.log 2>/dev/null; then
-        LOG_CONTENT=$(docker exec --user envsync "$CONTAINER" cat /home/envsync/.config/env-sync/logs/env-sync.log 2>/dev/null || echo "")
+    if docker exec --user syncenv "$CONTAINER" test -f /home/syncenv/.config/syncenv/logs/syncenv.log 2>/dev/null; then
+        LOG_CONTENT=$(docker exec --user syncenv "$CONTAINER" cat /home/syncenv/.config/syncenv/logs/syncenv.log 2>/dev/null || echo "")
 
         if echo "$LOG_CONTENT" | grep -qE "sync.*completed|Sync.*complete"; then
             echo "  ✓ Sync completed on $CONTAINER (${ELAPSED}s)"

@@ -5,8 +5,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"envsync/internal/config"
-	"envsync/internal/logging"
+	"syncenv/internal/config"
+	"syncenv/internal/logging"
 )
 
 const maxBackups = 5

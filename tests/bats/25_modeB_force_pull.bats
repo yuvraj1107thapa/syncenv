@@ -16,7 +16,7 @@ load 'test_helper'
 }
 
 @test "modeB: Force pull from alpha to beta (SSH)" {
-    run container_exec "$CONTAINER_BETA" env-sync sync --force-pull alpha.local
+    run container_exec "$CONTAINER_BETA" syncenv sync --force-pull alpha.local
     [ "$status" -eq 0 ]
 }
 
@@ -33,12 +33,12 @@ load 'test_helper'
 }
 
 @test "modeB: Force-pull without hostname fails" {
-    run container_exec "$CONTAINER_BETA" env-sync sync --force-pull
+    run container_exec "$CONTAINER_BETA" syncenv sync --force-pull
     [ "$status" -ne 0 ]
 }
 
 @test "modeB: Backup was created during force-pull" {
-    run container_exec "$CONTAINER_BETA" ls /home/envsync/.config/env-sync/backups/
+    run container_exec "$CONTAINER_BETA" ls /home/syncenv/.config/syncenv/backups/
     [ "$status" -eq 0 ]
     [ -n "$output" ]
 }

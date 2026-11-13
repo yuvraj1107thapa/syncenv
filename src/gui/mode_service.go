@@ -1,8 +1,8 @@
 package main
 
 import (
-	"envsync/internal/config"
-	"envsync/internal/mode"
+	"syncenv/internal/config"
+	"syncenv/internal/mode"
 )
 
 // ModeService provides mode management

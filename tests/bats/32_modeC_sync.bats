@@ -59,8 +59,8 @@ load 'test_helper'
 
 @test "modeC: Verify all containers have encrypted files" {
     run parallel_run \
-        "container_exec \"$CONTAINER_ALPHA\" grep -q \"ENCRYPTED: true\" /home/envsync/.secrets.env" \
-        "container_exec \"$CONTAINER_BETA\" grep -q \"ENCRYPTED: true\" /home/envsync/.secrets.env" \
-        "container_exec \"$CONTAINER_GAMMA\" grep -q \"ENCRYPTED: true\" /home/envsync/.secrets.env"
+        "container_exec \"$CONTAINER_ALPHA\" grep -q \"ENCRYPTED: true\" /home/syncenv/.secrets.env" \
+        "container_exec \"$CONTAINER_BETA\" grep -q \"ENCRYPTED: true\" /home/syncenv/.secrets.env" \
+        "container_exec \"$CONTAINER_GAMMA\" grep -q \"ENCRYPTED: true\" /home/syncenv/.secrets.env"
     [ "$status" -eq 0 ]
 }

@@ -7,7 +7,7 @@ echo "Checking container health..."
 
 ALL_HEALTHY=1
 
-for container in env-sync-alpha env-sync-beta env-sync-gamma; do
+for container in syncenv-alpha syncenv-beta syncenv-gamma; do
     echo ""
     echo "Checking $container..."
     
@@ -36,8 +36,8 @@ for container in env-sync-alpha env-sync-beta env-sync-gamma; do
     fi
     
     # Check SSH connectivity to other containers
-    if [ "$container" = "env-sync-alpha" ]; then
-        if docker exec --user envsync "$container" ssh -o ConnectTimeout=5 -o StrictHostKeyChecking=no beta.local echo "OK" > /dev/null 2>&1; then
+    if [ "$container" = "syncenv-alpha" ]; then
+        if docker exec --user syncenv "$container" ssh -o ConnectTimeout=5 -o StrictHostKeyChecking=no beta.local echo "OK" > /dev/null 2>&1; then
             echo "  ✓ SSH to beta.local: OK"
         else
             echo "  ✗ SSH to beta.local: FAILED"

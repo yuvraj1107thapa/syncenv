@@ -10,19 +10,19 @@ import (
 	"strings"
 	"time"
 
-	"envsync/internal/backup"
-	"envsync/internal/config"
-	"envsync/internal/discovery"
-	"envsync/internal/identity"
-	"envsync/internal/keys"
-	"envsync/internal/logging"
-	"envsync/internal/metadata"
-	"envsync/internal/mode"
-	"envsync/internal/peer"
-	"envsync/internal/secrets"
-	httptransport "envsync/internal/transport/http"
-	mtlstransport "envsync/internal/transport/mtls"
-	sshtransport "envsync/internal/transport/ssh"
+	"syncenv/internal/backup"
+	"syncenv/internal/config"
+	"syncenv/internal/discovery"
+	"syncenv/internal/identity"
+	"syncenv/internal/keys"
+	"syncenv/internal/logging"
+	"syncenv/internal/metadata"
+	"syncenv/internal/mode"
+	"syncenv/internal/peer"
+	"syncenv/internal/secrets"
+	httptransport "syncenv/internal/transport/http"
+	mtlstransport "syncenv/internal/transport/mtls"
+	sshtransport "syncenv/internal/transport/ssh"
 )
 
 type Options struct {
@@ -43,7 +43,7 @@ var (
 
 func Run(opts Options) error {
 	if opts.Quiet {
-		_ = os.Setenv("ENV_SYNC_QUIET", "true")
+		_ = os.Setenv("SYNCENV_QUIET", "true")
 	}
 
 	currentMode := mode.GetMode()
@@ -77,7 +77,7 @@ func Run(opts Options) error {
 		if !opts.InsecureHTTP {
 			if err := testSSHFunc(dial); err != nil {
 				logging.Log("ERROR", "Cannot SSH to "+dial)
-				logging.Log("INFO", "Ensure SSH keys are set up, or switch mode: env-sync mode set dev-plaintext-http")
+				logging.Log("INFO", "Ensure SSH keys are set up, or switch mode: syncenv mode set dev-plaintext-http")
 				return err
 			}
 			cachePeerPubkeyFor(ep)
@@ -126,7 +126,7 @@ func Run(opts Options) error {
 	if err != nil || newestHost == "" {
 		logging.Log("INFO", "No newer secrets found on network")
 		if !opts.InsecureHTTP {
-			logging.Log("INFO", "To sync without SSH: env-sync mode set dev-plaintext-http --yes")
+			logging.Log("INFO", "To sync without SSH: syncenv mode set dev-plaintext-http --yes")
 		}
 		return nil
 	}
@@ -207,7 +207,7 @@ func runSecurePeerSync(opts Options) error {
 		}
 
 		// Write to temp file and validate
-		tmpFile, err := os.CreateTemp("", "env-sync-secure-")
+		tmpFile, err := os.CreateTemp("", "syncenv-secure-")
 		if err != nil {
 			continue
 		}
@@ -257,7 +257,7 @@ func runSecurePeerSync(opts Options) error {
 
 	// If we got newer content from a peer, merge it with local
 	if newestContent != nil {
-		tmpFile, err := os.CreateTemp("", "env-sync-secure-")
+		tmpFile, err := os.CreateTemp("", "syncenv-secure-")
 		if err != nil {
 			return nil
 		}
@@ -344,7 +344,7 @@ func formatTransportName(useHTTP bool) string {
 }
 
 func printHTTPWarning() {
-	if strings.EqualFold(os.Getenv("ENV_SYNC_QUIET"), "true") {
+	if strings.EqualFold(os.Getenv("SYNCENV_QUIET"), "true") {
 		return
 	}
 	lines := []string{
@@ -444,7 +444,7 @@ func cachePeerPubkeyFor(ep secrets.Endpoint) {
 }
 
 func fetchFromHost(host string, useHTTP bool) (string, error) {
-	tmpFile, err := os.CreateTemp("", "env-sync-remote")
+	tmpFile, err := os.CreateTemp("", "syncenv-remote")
 	if err != nil {
 		return "", err
 	}
@@ -636,7 +636,7 @@ func maybeReencryptLocal() {
 		return
 	}
 
-	tempFile, err := os.CreateTemp(filepath.Dir(config.SecretsFile()), ".env-sync-reencrypt-")
+	tempFile, err := os.CreateTemp(filepath.Dir(config.SecretsFile()), ".syncenv-reencrypt-")
 	if err != nil {
 		return
 	}
@@ -673,7 +673,7 @@ func cachePeerPubkey(host string) {
 func ensureRegisteredWithPeer(host string) error {
 	localPubkey := keys.GetLocalPubkey()
 	if localPubkey == "" {
-		return errors.New("no local key found - generate with: env-sync init --encrypted")
+		return errors.New("no local key found - generate with: syncenv init --encrypted")
 	}
 	// Register under the per-user peer ID so two OS users on one machine
 	// don't overwrite each other's cached keys on the peer.
@@ -700,7 +700,7 @@ func reencryptSecrets(inputFile, outputFile string) error {
 	}
 
 	var newLines []string
-	linePattern := regexp.MustCompile(`^([A-Za-z_][A-Za-z0-9_]*)="(.*)"\s*#.*ENVSYNC_UPDATED_AT=(.*)`)
+	linePattern := regexp.MustCompile(`^([A-Za-z_][A-Za-z0-9_]*)="(.*)"\s*#.*SYNCENV_UPDATED_AT=(.*)`)
 	for _, line := range strings.Split(content, "\n") {
 		if strings.TrimSpace(line) == "" || strings.HasPrefix(strings.TrimSpace(line), "#") {
 			newLines = append(newLines, line)
@@ -722,7 +722,7 @@ func reencryptSecrets(inputFile, outputFile string) error {
 			logging.Log("ERROR", "Failed to re-encrypt "+matches[1])
 			return err
 		}
-		newLines = append(newLines, fmt.Sprintf("%s=\"%s\" # ENVSYNC_UPDATED_AT=%s", matches[1], encrypted, matches[3]))
+		newLines = append(newLines, fmt.Sprintf("%s=\"%s\" # SYNCENV_UPDATED_AT=%s", matches[1], encrypted, matches[3]))
 	}
 
 	if err := secrets.SetSecretsContent(outputFile, strings.TrimSpace(strings.Join(newLines, "\n"))); err != nil {

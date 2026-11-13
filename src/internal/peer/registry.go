@@ -9,8 +9,8 @@ import (
 	"sort"
 	"time"
 
-	"envsync/internal/config"
-	"envsync/internal/logging"
+	"syncenv/internal/config"
+	"syncenv/internal/logging"
 )
 
 // PeerState represents the authorization state of a peer.

@@ -34,7 +34,7 @@ print_warning() {
 }
 
 build_go_binary() {
-    local go_image="${ENV_SYNC_GO_DOCKER_IMAGE:-golang:1.24}"
+    local go_image="${SYNCENV_GO_DOCKER_IMAGE:-golang:1.24}"
 
     print_info "Building Go binary with Docker (${go_image})..."
     mkdir -p "$SCRIPT_DIR/target"
@@ -49,7 +49,7 @@ build_go_binary() {
         -v "$SCRIPT_DIR":/workspace \
         -w /workspace/src \
         "$go_image" \
-        bash -c 'mkdir -p /workspace/target && /usr/local/go/bin/go build -o /workspace/target/env-sync ./cmd/env-sync'
+        bash -c 'mkdir -p /workspace/target && /usr/local/go/bin/go build -o /workspace/target/syncenv ./cmd/syncenv'
 }
 
 # Parse arguments
@@ -100,7 +100,7 @@ fi
 
 echo ""
 echo "=============================================="
-echo "Starting env-sync Test Environment"
+echo "Starting syncenv Test Environment"
 echo "=============================================="
 echo ""
 
@@ -135,26 +135,26 @@ echo ""
 print_success "Test environment is ready!"
 echo ""
 echo "Containers:"
-echo "  - alpha (env-sync-alpha):    SSH/mDNS ready"
-echo "  - beta  (env-sync-beta):     SSH/mDNS ready"
-echo "  - gamma (env-sync-gamma):    SSH/mDNS ready"
+echo "  - alpha (syncenv-alpha):    SSH/mDNS ready"
+echo "  - beta  (syncenv-beta):     SSH/mDNS ready"
+echo "  - gamma (syncenv-gamma):    SSH/mDNS ready"
 echo ""
 echo "Quick commands:"
-echo "  docker exec -it env-sync-alpha bash    # Access alpha"
-echo "  docker exec -it env-sync-beta bash     # Access beta"
-echo "  docker exec -it env-sync-gamma bash    # Access gamma"
+echo "  docker exec -it syncenv-alpha bash    # Access alpha"
+echo "  docker exec -it syncenv-beta bash     # Access beta"
+echo "  docker exec -it syncenv-gamma bash    # Access gamma"
 echo ""
 echo "Example workflow:"
 echo "  # Initialize alpha with encrypted secrets"
-echo "  docker exec env-sync-alpha env-sync init --encrypted"
-echo "  docker exec env-sync-alpha env-sync add MY_SECRET='test-value'"
+echo "  docker exec syncenv-alpha syncenv init --encrypted"
+echo "  docker exec syncenv-alpha syncenv add MY_SECRET='test-value'"
 echo ""
 echo "  # Sync to beta"
-echo "  docker exec env-sync-beta env-sync init --encrypted"
-echo "  docker exec env-sync-beta env-sync --force"
+echo "  docker exec syncenv-beta syncenv init --encrypted"
+echo "  docker exec syncenv-beta syncenv --force"
 echo ""
 echo "  # View logs"
-echo "  docker logs env-sync-alpha -f"
+echo "  docker logs syncenv-alpha -f"
 echo ""
 echo "To stop the environment:"
 echo "  ./tests/start-test-env.sh --stop"

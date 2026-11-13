@@ -6,8 +6,8 @@ import (
 	"os/exec"
 	"strings"
 
-	"envsync/internal/logging"
-	"envsync/internal/secrets"
+	"syncenv/internal/logging"
+	"syncenv/internal/secrets"
 )
 
 func TestSSH(host string) error {
@@ -19,7 +19,7 @@ func TestSSH(host string) error {
 
 func FetchViaSCP(host string, remotePath string, dest string) error {
 	// Always use .secrets.env without path prefix
-	// SCP command runs relative to home folder, so this will work regardless of where env-sync is installed
+	// SCP command runs relative to home folder, so this will work regardless of where syncenv is installed
 	remote := fmt.Sprintf("%s:.secrets.env", host)
 	args := []string{"scp", "-o", "BatchMode=yes", "-o", "ConnectTimeout=5", "-o", "StrictHostKeyChecking=" + HostKeyCheckingMode(), remote, dest}
 	logging.LogCommand(args...)
@@ -32,7 +32,7 @@ func FetchViaSCP(host string, remotePath string, dest string) error {
 // in their known_hosts directory, and triggers re-encryption so the remote
 // secrets include this machine as a recipient.
 func RegisterPubkeyWithPeer(host string, localPubkey string, localHostname string) error {
-	script := `mkdir -p ~/.config/env-sync/keys/known_hosts && printf '%s' "$1" > ~/.config/env-sync/keys/known_hosts/$2.pub && env-sync 2>/dev/null || true && echo 'ENVSYNC_REGISTER_SUCCESS'`
+	script := `mkdir -p ~/.config/syncenv/keys/known_hosts && printf '%s' "$1" > ~/.config/syncenv/keys/known_hosts/$2.pub && syncenv 2>/dev/null || true && echo 'SYNCENV_REGISTER_SUCCESS'`
 	args := []string{
 		"ssh",
 		"-o", "BatchMode=yes",
@@ -48,7 +48,7 @@ func RegisterPubkeyWithPeer(host string, localPubkey string, localHostname strin
 	if err != nil {
 		return fmt.Errorf("SSH command failed: %w", err)
 	}
-	if !strings.Contains(string(output), "ENVSYNC_REGISTER_SUCCESS") {
+	if !strings.Contains(string(output), "SYNCENV_REGISTER_SUCCESS") {
 		return fmt.Errorf("remote registration did not succeed")
 	}
 	return nil
@@ -59,7 +59,7 @@ func Hostname() string {
 }
 
 func HostKeyCheckingMode() string {
-	if strings.EqualFold(os.Getenv("ENV_SYNC_STRICT_SSH"), "true") {
+	if strings.EqualFold(os.Getenv("SYNCENV_STRICT_SSH"), "true") {
 		return "yes"
 	}
 	return "accept-new"

@@ -1,6 +1,6 @@
 # Docker-Based Integration Tests
 
-This directory contains Docker-based integration tests for env-sync using **bats-core** (Bash Automated Testing System).
+This directory contains Docker-based integration tests for syncenv using **bats-core** (Bash Automated Testing System).
 
 ## Overview
 
@@ -20,9 +20,9 @@ From the project root:
 ./tests/test-dockers.sh
 ```
 
-Tests set `ENV_SYNC_DISCOVERY_TIMEOUT=2` inside containers to keep discovery waits short. Override it by exporting a different value before running the tests.
+Tests set `SYNCENV_DISCOVERY_TIMEOUT=2` inside containers to keep discovery waits short. Override it by exporting a different value before running the tests.
 
-The Go build uses a Docker Go image (default: `golang:1.24`). Override it by setting `ENV_SYNC_GO_DOCKER_IMAGE` if you need a different version.
+The Go build uses a Docker Go image (default: `golang:1.24`). Override it by setting `SYNCENV_GO_DOCKER_IMAGE` if you need a different version.
 
 This will:
 1. Build the Go binary using Docker (Linux arch matching your Docker engine)
@@ -43,9 +43,9 @@ This starts the containers and leaves them running for manual exploration.
 
 Access containers:
 ```bash
-docker exec -it env-sync-alpha bash
-docker exec -it env-sync-beta bash
-docker exec -it env-sync-gamma bash
+docker exec -it syncenv-alpha bash
+docker exec -it syncenv-beta bash
+docker exec -it syncenv-gamma bash
 ```
 
 Stop the environment:
@@ -87,7 +87,7 @@ Stop the environment:
 
 ### Docker Configuration (`tests/docker/`)
 
-- **Dockerfile** - Ubuntu 22.04 base with env-sync, SSH, avahi, age
+- **Dockerfile** - Ubuntu 22.04 base with syncenv, SSH, avahi, age
 - **docker-compose.yml** - 3-container setup with networking
 - **entrypoint.sh** - Container startup script
 
@@ -172,7 +172,7 @@ Tests use the bats-core framework:
 ```
 
 The `test_helper.bash` provides utility functions:
-- `init_container` - Initialize env-sync in a container
+- `init_container` - Initialize syncenv in a container
 - `add_secret` - Add a secret
 - `get_secret` - Get a secret value
 - `trigger_sync` - Trigger sync
@@ -183,35 +183,35 @@ The `test_helper.bash` provides utility functions:
 ### View Container Logs
 
 ```bash
-docker logs env-sync-alpha
-docker logs env-sync-beta
-docker logs env-sync-gamma
+docker logs syncenv-alpha
+docker logs syncenv-beta
+docker logs syncenv-gamma
 ```
 
 ### Access Running Containers
 
 ```bash
-docker exec -it env-sync-alpha bash
+docker exec -it syncenv-alpha bash
 
 # Inside container:
-env-sync status              # Check sync status
-env-sync list                # List secrets
-env-sync show KEY            # Show secret value
+syncenv status              # Check sync status
+syncenv list                # List secrets
+syncenv show KEY            # Show secret value
 cat ~/.secrets.env           # View raw secrets file
-ls ~/.config/env-sync/logs/  # View logs
+ls ~/.config/syncenv/logs/  # View logs
 ```
 
 ### Check Network Connectivity
 
 ```bash
 # Test mDNS
-docker exec env-sync-alpha avahi-browse -a -t
+docker exec syncenv-alpha avahi-browse -a -t
 
 # Test SSH
-docker exec env-sync-alpha ssh beta.local echo OK
+docker exec syncenv-alpha ssh beta.local echo OK
 
 # Test hostname resolution
-docker exec env-sync-alpha getent hosts beta.local
+docker exec syncenv-alpha getent hosts beta.local
 ```
 
 ### Run Tests With Debug Output
@@ -290,7 +290,7 @@ SSH keys might not be generated:
 
 The containers need privileged mode for avahi-daemon. Check if it started:
 ```bash
-docker exec env-sync-alpha pgrep avahi-daemon
+docker exec syncenv-alpha pgrep avahi-daemon
 ```
 
 ## License

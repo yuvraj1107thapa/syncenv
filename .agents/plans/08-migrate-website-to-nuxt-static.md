@@ -53,7 +53,7 @@ Migration must keep these capabilities, but move page composition into reusable 
 Create a dedicated Nuxt app at `website-app/` and treat `website/` as legacy during transition.
 
 ```text
-envsync/
+syncenv/
 ├── website-app/
 │   ├── app.vue
 │   ├── nuxt.config.ts
@@ -108,11 +108,11 @@ envsync/
 │   │   ├── security/index.vue
 │   │   └── comparisons/
 │   │       ├── index.vue
-│   │       ├── vault-vs-envsync.vue
-│   │       ├── infisical-vs-envsync.vue
-│   │       ├── doppler-vs-envsync.vue
-│   │       ├── dotenvx-vs-envsync.vue
-│   │       └── sops-vs-envsync.vue
+│   │       ├── vault-vs-syncenv.vue
+│   │       ├── infisical-vs-syncenv.vue
+│   │       ├── doppler-vs-syncenv.vue
+│   │       ├── dotenvx-vs-syncenv.vue
+│   │       └── sops-vs-syncenv.vue
 │   └── server/
 │       └── tsconfig.json                # Nuxt internal (generated/managed)
 ├── build/
@@ -145,11 +145,11 @@ All existing public paths should remain unchanged:
 | `/modes` | `pages/modes/index.vue` |
 | `/security` | `pages/security/index.vue` |
 | `/comparisons` | `pages/comparisons/index.vue` |
-| `/comparisons/vault-vs-envsync` | `pages/comparisons/vault-vs-envsync.vue` |
-| `/comparisons/infisical-vs-envsync` | `pages/comparisons/infisical-vs-envsync.vue` |
-| `/comparisons/doppler-vs-envsync` | `pages/comparisons/doppler-vs-envsync.vue` |
-| `/comparisons/dotenvx-vs-envsync` | `pages/comparisons/dotenvx-vs-envsync.vue` |
-| `/comparisons/sops-vs-envsync` | `pages/comparisons/sops-vs-envsync.vue` |
+| `/comparisons/vault-vs-syncenv` | `pages/comparisons/vault-vs-syncenv.vue` |
+| `/comparisons/infisical-vs-syncenv` | `pages/comparisons/infisical-vs-syncenv.vue` |
+| `/comparisons/doppler-vs-syncenv` | `pages/comparisons/doppler-vs-syncenv.vue` |
+| `/comparisons/dotenvx-vs-syncenv` | `pages/comparisons/dotenvx-vs-syncenv.vue` |
+| `/comparisons/sops-vs-syncenv` | `pages/comparisons/sops-vs-syncenv.vue` |
 
 ---
 

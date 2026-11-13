@@ -1,4 +1,4 @@
-# env-sync V2.0 - Docker-Based Testing Infrastructure
+# syncenv V2.0 - Docker-Based Testing Infrastructure
 
 ## Overview
 
@@ -18,7 +18,7 @@ Implement a comprehensive Docker-based testing infrastructure to verify the dist
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    Docker Network: env-sync-test              │
+│                    Docker Network: syncenv-test              │
 │                        (bridge mode)                          │
 │                                                               │
 │  ┌──────────────┐   ┌──────────────┐   ┌──────────────┐      │
@@ -43,12 +43,12 @@ Each container:
 - **Hostname**: alpha.local, beta.local, gamma.local
 - **Network**: Shared bridge network with mDNS support
 - **Services**: SSH daemon, avahi-daemon for mDNS
-- **Tools**: env-sync, age, avahi-utils, openssh-server
+- **Tools**: syncenv, age, avahi-utils, openssh-server
 
 ## Directory Structure
 
 ```
-env-sync/
+syncenv/
 ├── tests/
 │   ├── docker/
 │   │   ├── Dockerfile                    # Test container image
@@ -93,7 +93,7 @@ RUN apt-get update && apt-get install -y \
 
 # Configure SSH
 RUN mkdir -p /var/run/sshd
-RUN echo 'root:envsync' | chpasswd
+RUN echo 'root:syncenv' | chpasswd
 RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
 RUN sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
 
@@ -101,16 +101,16 @@ RUN sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/s
 RUN sed -i 's/#enable-dbus=yes/enable-dbus=no/' /etc/avahi/avahi-daemon.conf
 RUN sed -i 's/hosts:.*files dns/hosts: files mdns_minimal [NOTFOUND=return] dns mdns/' /etc/nsswitch.conf
 
-# Copy env-sync binaries (built from source)
+# Copy syncenv binaries (built from source)
 COPY bin/ /usr/local/bin/
-COPY lib/ /usr/local/lib/env-sync/
+COPY lib/ /usr/local/lib/syncenv/
 
 # Make scripts executable
-RUN chmod +x /usr/local/bin/env-sync*
+RUN chmod +x /usr/local/bin/syncenv*
 
-# Create env-sync directories
-RUN mkdir -p /root/.config/env-sync/keys/known_hosts
-RUN mkdir -p /root/.config/env-sync/logs
+# Create syncenv directories
+RUN mkdir -p /root/.config/syncenv/keys/known_hosts
+RUN mkdir -p /root/.config/syncenv/logs
 
 # Copy SSH keys (injected at runtime)
 RUN mkdir -p /root/.ssh
@@ -129,7 +129,7 @@ CMD ["bash"]
 version: '3.8'
 
 networks:
-  env-sync-test:
+  syncenv-test:
     driver: bridge
     ipam:
       config:
@@ -141,35 +141,35 @@ services:
       context: ../..
       dockerfile: tests/docker/Dockerfile
     hostname: alpha.local
-    container_name: env-sync-alpha
+    container_name: syncenv-alpha
     networks:
-      env-sync-test:
+      syncenv-test:
         ipv4_address: 172.20.0.2
     volumes:
       - ./ssh-keys:/root/.ssh:ro
-      - alpha-data:/root/.config/env-sync
+      - alpha-data:/root/.config/syncenv
     environment:
-      - ENV_SYNC_DEBUG=1
+      - SYNCENV_DEBUG=1
       - CONTAINER_NAME=alpha
     cap_add:
       - NET_ADMIN  # Required for mDNS
     ports:
-      - "5739:5739"  # env-sync HTTP port (optional)
+      - "5739:5739"  # syncenv HTTP port (optional)
 
   beta:
     build:
       context: ../..
       dockerfile: tests/docker/Dockerfile
     hostname: beta.local
-    container_name: env-sync-beta
+    container_name: syncenv-beta
     networks:
-      env-sync-test:
+      syncenv-test:
         ipv4_address: 172.20.0.3
     volumes:
       - ./ssh-keys:/root/.ssh:ro
-      - beta-data:/root/.config/env-sync
+      - beta-data:/root/.config/syncenv
     environment:
-      - ENV_SYNC_DEBUG=1
+      - SYNCENV_DEBUG=1
       - CONTAINER_NAME=beta
     cap_add:
       - NET_ADMIN
@@ -179,15 +179,15 @@ services:
       context: ../..
       dockerfile: tests/docker/Dockerfile
     hostname: gamma.local
-    container_name: env-sync-gamma
+    container_name: syncenv-gamma
     networks:
-      env-sync-test:
+      syncenv-test:
         ipv4_address: 172.20.0.4
     volumes:
       - ./ssh-keys:/root/.ssh:ro
-      - gamma-data:/root/.config/env-sync
+      - gamma-data:/root/.config/syncenv
     environment:
-      - ENV_SYNC_DEBUG=1
+      - SYNCENV_DEBUG=1
       - CONTAINER_NAME=gamma
     cap_add:
       - NET_ADMIN
@@ -224,7 +224,7 @@ for host in alpha.local beta.local gamma.local; do
     ssh-keyscan -H $host >> /root/.ssh/known_hosts 2>/dev/null || true
 done
 
-# If this is first run, initialize env-sync
+# If this is first run, initialize syncenv
 if [ ! -f /root/.secrets.env ]; then
     # Will be initialized by test scripts
     echo "Container ready for testing"
@@ -248,7 +248,7 @@ mkdir -p "$KEYS_DIR"
 
 # Generate single key pair for all containers (simplifies testing)
 if [ ! -f "$KEYS_DIR/id_ed25519" ]; then
-    ssh-keygen -t ed25519 -f "$KEYS_DIR/id_ed25519" -N "" -C "env-sync-test"
+    ssh-keygen -t ed25519 -f "$KEYS_DIR/id_ed25519" -N "" -C "syncenv-test"
 fi
 
 # Copy public key as authorized_keys
@@ -270,8 +270,8 @@ TIMEOUT=${2:-30}
 echo "Waiting for sync in $CONTAINER..."
 docker exec $CONTAINER timeout $TIMEOUT bash -c '
     while true; do
-        if [ -f /root/.config/env-sync/logs/env-sync.log ]; then
-            if grep -q "sync completed\|sync failed" /root/.config/env-sync/logs/env-sync.log 2>/dev/null; then
+        if [ -f /root/.config/syncenv/logs/syncenv.log ]; then
+            if grep -q "sync completed\|sync failed" /root/.config/syncenv/logs/syncenv.log 2>/dev/null; then
                 exit 0
             fi
         fi
@@ -290,11 +290,11 @@ docker exec $CONTAINER timeout $TIMEOUT bash -c '
 KEY=$1
 EXPECTED_VALUE=$2
 
-for container in env-sync-alpha env-sync-beta env-sync-gamma; do
+for container in syncenv-alpha syncenv-beta syncenv-gamma; do
     echo "Checking $container..."
     
     # Get secret value from container
-    ACTUAL=$(docker exec $container env-sync show "$KEY" 2>/dev/null || echo "")
+    ACTUAL=$(docker exec $container syncenv show "$KEY" 2>/dev/null || echo "")
     
     if [ "$ACTUAL" != "$EXPECTED_VALUE" ]; then
         echo "ERROR: $container has wrong value for $KEY"
@@ -325,23 +325,23 @@ echo "=== Test Scenario 1: Basic Sync (Unencrypted) ==="
 
 # Step 1: Initialize alpha with a secret
 echo "Initializing alpha with plaintext secrets..."
-docker exec env-sync-alpha env-sync init
+docker exec syncenv-alpha syncenv init
 
 # Add a test secret
-docker exec env-sync-alpha env-sync add TEST_KEY="alpha-value-123"
+docker exec syncenv-alpha syncenv add TEST_KEY="alpha-value-123"
 
 # Step 2: Initialize beta and gamma
 echo "Initializing beta and gamma..."
-docker exec env-sync-beta env-sync init
-docker exec env-sync-gamma env-sync init
+docker exec syncenv-beta syncenv init
+docker exec syncenv-gamma syncenv init
 
 # Step 3: Trigger sync from beta to get secrets from alpha
 echo "Triggering sync on beta..."
-docker exec env-sync-beta env-sync --force
+docker exec syncenv-beta syncenv --force
 
 # Step 4: Trigger sync from gamma
 echo "Triggering sync on gamma..."
-docker exec env-sync-gamma env-sync --force
+docker exec syncenv-gamma syncenv --force
 
 # Step 5: Verify all containers have the secret
 echo "Verifying secrets synced..."
@@ -364,38 +364,38 @@ echo "=== Test Scenario 2: Encrypted Sync ==="
 
 # Step 1: Clear all containers and initialize with encryption
 echo "Initializing alpha with encrypted secrets..."
-docker exec env-sync-alpha rm -f /root/.secrets.env
-docker exec env-sync-alpha env-sync init --encrypted
-docker exec env-sync-alpha env-sync add ENCRYPTED_SECRET="secret-value-456"
+docker exec syncenv-alpha rm -f /root/.secrets.env
+docker exec syncenv-alpha syncenv init --encrypted
+docker exec syncenv-alpha syncenv add ENCRYPTED_SECRET="secret-value-456"
 
 # Step 2: Get alpha's pubkey and add to beta/gamma
-ALPHA_PUBKEY=$(docker exec env-sync-alpha env-sync key show)
+ALPHA_PUBKEY=$(docker exec syncenv-alpha syncenv key show)
 echo "Alpha pubkey: $ALPHA_PUBKEY"
 
 # Initialize beta and gamma with encryption
-docker exec env-sync-beta rm -f /root/.secrets.env
-docker exec env-sync-beta env-sync init --encrypted
-docker exec env-sync-gamma rm -f /root/.secrets.env
-docker exec env-sync-gamma env-sync init --encrypted
+docker exec syncenv-beta rm -f /root/.secrets.env
+docker exec syncenv-beta syncenv init --encrypted
+docker exec syncenv-gamma rm -f /root/.secrets.env
+docker exec syncenv-gamma syncenv init --encrypted
 
 # Step 3: Exchange public keys between all containers
 echo "Exchanging public keys..."
-BETA_PUBKEY=$(docker exec env-sync-beta env-sync key show)
-GAMMA_PUBKEY=$(docker exec env-sync-gamma env-sync key show)
+BETA_PUBKEY=$(docker exec syncenv-beta syncenv key show)
+GAMMA_PUBKEY=$(docker exec syncenv-gamma syncenv key show)
 
 # Import keys on each container
-docker exec env-sync-alpha env-sync key import "$BETA_PUBKEY" beta.local
-docker exec env-sync-alpha env-sync key import "$GAMMA_PUBKEY" gamma.local
-docker exec env-sync-beta env-sync key import "$ALPHA_PUBKEY" alpha.local
-docker exec env-sync-beta env-sync key import "$GAMMA_PUBKEY" gamma.local
-docker exec env-sync-gamma env-sync key import "$ALPHA_PUBKEY" alpha.local
-docker exec env-sync-gamma env-sync key import "$BETA_PUBKEY" beta.local
+docker exec syncenv-alpha syncenv key import "$BETA_PUBKEY" beta.local
+docker exec syncenv-alpha syncenv key import "$GAMMA_PUBKEY" gamma.local
+docker exec syncenv-beta syncenv key import "$ALPHA_PUBKEY" alpha.local
+docker exec syncenv-beta syncenv key import "$GAMMA_PUBKEY" gamma.local
+docker exec syncenv-gamma syncenv key import "$ALPHA_PUBKEY" alpha.local
+docker exec syncenv-gamma syncenv key import "$BETA_PUBKEY" beta.local
 
 # Step 4: Trigger sync on all containers
 echo "Triggering sync..."
-docker exec env-sync-alpha env-sync --force
-docker exec env-sync-beta env-sync --force
-docker exec env-sync-gamma env-sync --force
+docker exec syncenv-alpha syncenv --force
+docker exec syncenv-beta syncenv --force
+docker exec syncenv-gamma syncenv --force
 
 # Step 5: Verify encrypted secrets synced
 echo "Verifying encrypted secrets synced..."
@@ -420,14 +420,14 @@ echo "=== Test Scenario 3: New Secret Propagation ==="
 
 # Step 1: Add new secret to beta
 echo "Adding new secret to beta..."
-docker exec env-sync-beta env-sync add NEW_SECRET="new-value-789"
+docker exec syncenv-beta syncenv add NEW_SECRET="new-value-789"
 
 # Step 2: Trigger sync on alpha and gamma (they should get the new secret)
 echo "Triggering sync on alpha..."
-docker exec env-sync-alpha env-sync --force
+docker exec syncenv-alpha syncenv --force
 
 echo "Triggering sync on gamma..."
-docker exec env-sync-gamma env-sync --force
+docker exec syncenv-gamma syncenv --force
 
 # Step 3: Verify all containers have the new secret
 echo "Verifying new secret propagated..."
@@ -453,47 +453,47 @@ echo "=== Test Scenario 4: Adding Fourth Container (Delta) ==="
 
 # Step 1: Start delta container
 docker run -d \
-    --name env-sync-delta \
+    --name syncenv-delta \
     --hostname delta.local \
-    --network env-sync-test \
+    --network syncenv-test \
     --ip 172.20.0.5 \
     -v "$(pwd)/tests/docker/ssh-keys:/root/.ssh:ro" \
-    -e ENV_SYNC_DEBUG=1 \
-    env-sync:test
+    -e SYNCENV_DEBUG=1 \
+    syncenv:test
 
 # Wait for delta to be ready
 sleep 5
 
 # Step 2: Initialize delta with encryption
-docker exec env-sync-delta env-sync init --encrypted
+docker exec syncenv-delta syncenv init --encrypted
 
 # Step 3: Collect pubkeys from existing machines
 echo "Collecting public keys from alpha, beta, gamma..."
-docker exec env-sync-delta env-sync discover --collect-keys
+docker exec syncenv-delta syncenv discover --collect-keys
 
 # Step 4: Request access by triggering re-encryption on alpha
 echo "Requesting access via alpha..."
-docker exec env-sync-delta env-sync key request-access --trigger alpha.local
+docker exec syncenv-delta syncenv key request-access --trigger alpha.local
 
 # Step 5: Sync delta to get encrypted secrets
 echo "Syncing delta..."
-docker exec env-sync-delta env-sync --force
+docker exec syncenv-delta syncenv --force
 
 # Step 6: Verify delta can decrypt and see all secrets
 echo "Verifying delta has all secrets..."
-DELTA_VALUE=$(docker exec env-sync-delta env-sync show ENCRYPTED_SECRET 2>/dev/null || echo "")
+DELTA_VALUE=$(docker exec syncenv-delta syncenv show ENCRYPTED_SECRET 2>/dev/null || echo "")
 if [ "$DELTA_VALUE" != "secret-value-456" ]; then
     echo "ERROR: Delta cannot access encrypted secrets"
     exit 1
 fi
 
 # Step 7: Add secret on delta and verify it syncs back
-docker exec env-sync-delta env-sync add DELTA_SECRET="delta-specific"
-docker exec env-sync-alpha env-sync --force
+docker exec syncenv-delta syncenv add DELTA_SECRET="delta-specific"
+docker exec syncenv-alpha syncenv --force
 ./tests/utils/verify-secrets.sh "DELTA_SECRET" "delta-specific"
 
 # Cleanup
-docker stop env-sync-delta && docker rm env-sync-delta
+docker stop syncenv-delta && docker rm syncenv-delta
 
 echo "✓ Test Scenario 4 PASSED"
 ```
@@ -527,7 +527,7 @@ echo "Waiting for containers to be ready..."
 sleep 10
 
 # Verify all containers are running
-for container in env-sync-alpha env-sync-beta env-sync-gamma; do
+for container in syncenv-alpha syncenv-beta syncenv-gamma; do
     if ! docker ps | grep -q $container; then
         echo "ERROR: $container is not running"
         exit 1
@@ -537,7 +537,7 @@ done
 
 # Verify mDNS is working
 echo "Verifying mDNS discovery..."
-docker exec env-sync-alpha timeout 10 avahi-browse -a -t | grep -E "alpha|beta|gamma" || true
+docker exec syncenv-alpha timeout 10 avahi-browse -a -t | grep -E "alpha|beta|gamma" || true
 
 echo "✓ Test environment ready"
 ```
@@ -554,11 +554,11 @@ echo "=== Cleaning up test environment ==="
 docker-compose -f tests/docker/docker-compose.yml down -v
 
 # Remove delta if it exists
-docker stop env-sync-delta 2>/dev/null || true
-docker rm env-sync-delta 2>/dev/null || true
+docker stop syncenv-delta 2>/dev/null || true
+docker rm syncenv-delta 2>/dev/null || true
 
 # Optionally remove test image
-docker rmi env-sync:test 2>/dev/null || true
+docker rmi syncenv:test 2>/dev/null || true
 
 echo "✓ Cleanup complete"
 ```
@@ -615,7 +615,7 @@ trap cleanup EXIT
 
 # Setup
 echo "========================================"
-echo "env-sync Docker Test Suite"
+echo "syncenv Docker Test Suite"
 echo "========================================"
 ./scripts/test-setup.sh
 
@@ -745,18 +745,18 @@ make test-docker-clean
 make test-docker-setup
 
 # Access alpha container
-docker exec -it env-sync-alpha bash
+docker exec -it syncenv-alpha bash
 
 # Inside container:
-env-sync status              # Check status
-env-sync list                # List secrets
-env-sync show TEST_KEY       # Show specific secret
-env-sync discover            # Discover peers
+syncenv status              # Check status
+syncenv list                # List secrets
+syncenv show TEST_KEY       # Show specific secret
+syncenv discover            # Discover peers
 cat ~/.secrets.env           # View raw file
 
 # View logs
-docker logs env-sync-alpha
-docker exec env-sync-alpha cat ~/.config/env-sync/logs/env-sync.log
+docker logs syncenv-alpha
+docker exec syncenv-alpha cat ~/.config/syncenv/logs/syncenv.log
 ```
 
 ## Debugging Failed Tests
@@ -765,35 +765,35 @@ docker exec env-sync-alpha cat ~/.config/env-sync/logs/env-sync.log
 
 ```bash
 # List running containers
-docker ps | grep env-sync
+docker ps | grep syncenv
 
 # Check container logs
-docker logs env-sync-alpha
-docker logs env-sync-beta
-docker logs env-sync-gamma
+docker logs syncenv-alpha
+docker logs syncenv-beta
+docker logs syncenv-gamma
 
 # Check if services are running
-docker exec env-sync-alpha pgrep sshd
-docker exec env-sync-alpha pgrep avahi-daemon
+docker exec syncenv-alpha pgrep sshd
+docker exec syncenv-alpha pgrep avahi-daemon
 
 # Test mDNS discovery
-docker exec env-sync-alpha avahi-browse -a -t
-docker exec env-sync-alpha dns-sd -B _envsync._tcp
+docker exec syncenv-alpha avahi-browse -a -t
+docker exec syncenv-alpha dns-sd -B _syncenv._tcp
 ```
 
 ### Verify Network Connectivity
 
 ```bash
 # Test SSH between containers
-docker exec env-sync-alpha ssh -o ConnectTimeout=5 beta.local echo "SSH works"
-docker exec env-sync-alpha ssh -o ConnectTimeout=5 gamma.local echo "SSH works"
+docker exec syncenv-alpha ssh -o ConnectTimeout=5 beta.local echo "SSH works"
+docker exec syncenv-alpha ssh -o ConnectTimeout=5 gamma.local echo "SSH works"
 
 # Test SCP
-docker exec env-sync-alpha scp beta.local:/root/.secrets.env /tmp/test.env
+docker exec syncenv-alpha scp beta.local:/root/.secrets.env /tmp/test.env
 
 # Check mDNS resolution
-docker exec env-sync-alpha getent hosts beta.local
-docker exec env-sync-alpha getent hosts gamma.local
+docker exec syncenv-alpha getent hosts beta.local
+docker exec syncenv-alpha getent hosts gamma.local
 ```
 
 ### Inspect Secrets Files
@@ -801,17 +801,17 @@ docker exec env-sync-alpha getent hosts gamma.local
 ```bash
 # View secrets on each container
 echo "=== Alpha ==="
-docker exec env-sync-alpha cat /root/.secrets.env
+docker exec syncenv-alpha cat /root/.secrets.env
 echo ""
 echo "=== Beta ==="
-docker exec env-sync-beta cat /root/.secrets.env
+docker exec syncenv-beta cat /root/.secrets.env
 echo ""
 echo "=== Gamma ==="
-docker exec env-sync-gamma cat /root/.secrets.env
+docker exec syncenv-gamma cat /root/.secrets.env
 
 # Check AGE keys
-docker exec env-sync-alpha env-sync key show
-docker exec env-sync-alpha ls -la ~/.config/env-sync/keys/
+docker exec syncenv-alpha syncenv key show
+docker exec syncenv-alpha ls -la ~/.config/syncenv/keys/
 ```
 
 ## Success Criteria

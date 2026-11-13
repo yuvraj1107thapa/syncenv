@@ -58,13 +58,13 @@ load 'test_helper'
 }
 
 @test "modeA: path command works in HTTP mode" {
-    run container_exec "$CONTAINER_ALPHA" env-sync path
+    run container_exec "$CONTAINER_ALPHA" syncenv path
     [ "$status" -eq 0 ]
     [[ "$output" =~ ^/.+\.secrets\.env$ ]]
 }
 
 @test "modeA: path --backup returns backup directory" {
-    run container_exec "$CONTAINER_ALPHA" env-sync path --backup
+    run container_exec "$CONTAINER_ALPHA" syncenv path --backup
     [ "$status" -eq 0 ]
     [[ "$output" =~ ^/.+/backups$ ]]
 }

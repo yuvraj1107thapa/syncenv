@@ -1,8 +1,8 @@
 version: '3.8'
 
 networks:
-  env-sync-test:
-    name: env-sync-test
+  syncenv-test:
+    name: syncenv-test
     driver: bridge
     ipam:
       config:
@@ -14,19 +14,19 @@ services:
       context: ../..
       dockerfile: tests/docker/Dockerfile
       args:
-        ENV_SYNC_BIN: ${ENV_SYNC_BIN:-target/env-sync}
+        SYNCENV_BIN: ${SYNCENV_BIN:-target/syncenv}
     hostname: alpha.local
-    container_name: env-sync-alpha
+    container_name: syncenv-alpha
     networks:
-      env-sync-test:
+      syncenv-test:
         ipv4_address: 172.20.0.2
         aliases:
           - alpha.local
     volumes:
       - ./ssh-keys:/mnt/ssh-keys:ro
-      - alpha-data:/home/envsync/.config/env-sync
+      - alpha-data:/home/syncenv/.config/syncenv
     environment:
-      - ENV_SYNC_DEBUG=1
+      - SYNCENV_DEBUG=1
       - CONTAINER_NAME=alpha
     cap_add:
       - NET_ADMIN
@@ -38,19 +38,19 @@ services:
       context: ../..
       dockerfile: tests/docker/Dockerfile
       args:
-        ENV_SYNC_BIN: ${ENV_SYNC_BIN:-target/env-sync}
+        SYNCENV_BIN: ${SYNCENV_BIN:-target/syncenv}
     hostname: beta.local
-    container_name: env-sync-beta
+    container_name: syncenv-beta
     networks:
-      env-sync-test:
+      syncenv-test:
         ipv4_address: 172.20.0.3
         aliases:
           - beta.local
     volumes:
       - ./ssh-keys:/mnt/ssh-keys:ro
-      - beta-data:/home/envsync/.config/env-sync
+      - beta-data:/home/syncenv/.config/syncenv
     environment:
-      - ENV_SYNC_DEBUG=1
+      - SYNCENV_DEBUG=1
       - CONTAINER_NAME=beta
     cap_add:
       - NET_ADMIN
@@ -62,19 +62,19 @@ services:
       context: ../..
       dockerfile: tests/docker/Dockerfile
       args:
-        ENV_SYNC_BIN: ${ENV_SYNC_BIN:-target/env-sync}
+        SYNCENV_BIN: ${SYNCENV_BIN:-target/syncenv}
     hostname: gamma.local
-    container_name: env-sync-gamma
+    container_name: syncenv-gamma
     networks:
-      env-sync-test:
+      syncenv-test:
         ipv4_address: 172.20.0.4
         aliases:
           - gamma.local
     volumes:
       - ./ssh-keys:/mnt/ssh-keys:ro
-      - gamma-data:/home/envsync/.config/env-sync
+      - gamma-data:/home/syncenv/.config/syncenv
     environment:
-      - ENV_SYNC_DEBUG=1
+      - SYNCENV_DEBUG=1
       - CONTAINER_NAME=gamma
     cap_add:
       - NET_ADMIN
@@ -83,8 +83,8 @@ services:
 
 volumes:
   alpha-data:
-    name: env-sync-test_alpha-data
+    name: syncenv-test_alpha-data
   beta-data:
-    name: env-sync-test_beta-data
+    name: syncenv-test_beta-data
   gamma-data:
-    name: env-sync-test_gamma-data
+    name: syncenv-test_gamma-data

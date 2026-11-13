@@ -50,7 +50,7 @@ load 'test_helper'
     [ "$status" -eq 0 ]
 }
 
-@test "env-sync binary is available" {
-    run container_exec "$CONTAINER_ALPHA" env-sync --version
+@test "syncenv binary is available" {
+    run container_exec "$CONTAINER_ALPHA" syncenv --version
     [ "$status" -eq 0 ]
 }

@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"envsync/internal/crypto/age"
+	"syncenv/internal/crypto/age"
 )
 
 func TestDecryptSecretsFile_FailsOnInvalidEncryption(t *testing.T) {
@@ -22,7 +22,7 @@ func TestDecryptSecretsFile_FailsOnInvalidEncryption(t *testing.T) {
 
 	// Generate a different key pair for the "remote" user
 	remoteDir := filepath.Join(tempDir, "remote")
-	if err := os.MkdirAll(filepath.Join(remoteDir, ".config", "env-sync", "keys"), 0o700); err != nil {
+	if err := os.MkdirAll(filepath.Join(remoteDir, ".config", "syncenv", "keys"), 0o700); err != nil {
 		t.Fatalf("MkdirAll() error = %v", err)
 	}
 	t.Setenv("HOME", remoteDir)
@@ -45,7 +45,7 @@ func TestDecryptSecretsFile_FailsOnInvalidEncryption(t *testing.T) {
 		t.Fatalf("EncryptValue() error = %v", err)
 	}
 
-	content := `# === ENV_SYNC_METADATA ===
+	content := `# === SYNCENV_METADATA ===
 # VERSION: 2.0.0
 # TIMESTAMP: 2025-02-08T15:30:45Z
 # HOST: remote.local
@@ -54,10 +54,10 @@ func TestDecryptSecretsFile_FailsOnInvalidEncryption(t *testing.T) {
 # PUBLIC_KEYS: remote.local:` + remotePubkey + `
 # === END_METADATA ===
 
-OPENAI_API_KEY="` + value1 + `" # ENVSYNC_UPDATED_AT=2025-02-08T15:30:45Z
-DATABASE_URL="` + value2 + `" # ENVSYNC_UPDATED_AT=2025-02-08T14:20:10Z
+OPENAI_API_KEY="` + value1 + `" # SYNCENV_UPDATED_AT=2025-02-08T15:30:45Z
+DATABASE_URL="` + value2 + `" # SYNCENV_UPDATED_AT=2025-02-08T14:20:10Z
 
-# === ENV_SYNC_FOOTER ===
+# === SYNCENV_FOOTER ===
 # VERSION: 2.0.0
 # TIMESTAMP: 2025-02-08T15:30:45Z
 # HOST: remote.local
@@ -106,7 +106,7 @@ func TestDecryptSecretsFile_SucceedsWithCorrectKey(t *testing.T) {
 		t.Fatalf("EncryptValue() error = %v", err)
 	}
 
-	content := `# === ENV_SYNC_METADATA ===
+	content := `# === SYNCENV_METADATA ===
 # VERSION: 2.0.0
 # TIMESTAMP: 2025-02-08T15:30:45Z
 # HOST: local.local
@@ -115,10 +115,10 @@ func TestDecryptSecretsFile_SucceedsWithCorrectKey(t *testing.T) {
 # PUBLIC_KEYS: local.local:` + pubkey + `
 # === END_METADATA ===
 
-OPENAI_API_KEY="` + value1 + `" # ENVSYNC_UPDATED_AT=2025-02-08T15:30:45Z
-DATABASE_URL="` + value2 + `" # ENVSYNC_UPDATED_AT=2025-02-08T14:20:10Z
+OPENAI_API_KEY="` + value1 + `" # SYNCENV_UPDATED_AT=2025-02-08T15:30:45Z
+DATABASE_URL="` + value2 + `" # SYNCENV_UPDATED_AT=2025-02-08T14:20:10Z
 
-# === ENV_SYNC_FOOTER ===
+# === SYNCENV_FOOTER ===
 # VERSION: 2.0.0
 # TIMESTAMP: 2025-02-08T15:30:45Z
 # HOST: local.local
@@ -166,7 +166,7 @@ func TestRecipientsContain_UsesRecipientMatches(t *testing.T) {
 func TestGetRecipientsFromFile_RecipientsFieldFallback(t *testing.T) {
 	dir := t.TempDir()
 	file := filepath.Join(dir, "secrets.env")
-	content := `# === ENV_SYNC_METADATA ===
+	content := `# === SYNCENV_METADATA ===
 # VERSION: 2.0.0
 # TIMESTAMP: 2025-02-08T15:30:45Z
 # HOST: fallback.local
@@ -175,9 +175,9 @@ func TestGetRecipientsFromFile_RecipientsFieldFallback(t *testing.T) {
 # RECIPIENTS: age1abc123, age1def456
 # === END_METADATA ===
 
-FOO="bar" # ENVSYNC_UPDATED_AT=2025-02-08T15:30:45Z
+FOO="bar" # SYNCENV_UPDATED_AT=2025-02-08T15:30:45Z
 
-# === ENV_SYNC_FOOTER ===
+# === SYNCENV_FOOTER ===
 # VERSION: 2.0.0
 # TIMESTAMP: 2025-02-08T15:30:45Z
 # HOST: fallback.local

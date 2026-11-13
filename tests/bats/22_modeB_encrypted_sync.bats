@@ -16,7 +16,7 @@ load 'test_helper'
 }
 
 @test "modeB: Verify encrypted file exists on alpha" {
-    run container_exec "$CONTAINER_ALPHA" grep -q "ENCRYPTED: true" /home/envsync/.secrets.env
+    run container_exec "$CONTAINER_ALPHA" grep -q "ENCRYPTED: true" /home/syncenv/.secrets.env
     [ "$status" -eq 0 ]
 }
 
@@ -83,8 +83,8 @@ load 'test_helper'
 
 @test "modeB: Verify all containers have encrypted files" {
     run parallel_run \
-        "container_exec \"$CONTAINER_ALPHA\" grep -q \"ENCRYPTED: true\" /home/envsync/.secrets.env" \
-        "container_exec \"$CONTAINER_BETA\" grep -q \"ENCRYPTED: true\" /home/envsync/.secrets.env" \
-        "container_exec \"$CONTAINER_GAMMA\" grep -q \"ENCRYPTED: true\" /home/envsync/.secrets.env"
+        "container_exec \"$CONTAINER_ALPHA\" grep -q \"ENCRYPTED: true\" /home/syncenv/.secrets.env" \
+        "container_exec \"$CONTAINER_BETA\" grep -q \"ENCRYPTED: true\" /home/syncenv/.secrets.env" \
+        "container_exec \"$CONTAINER_GAMMA\" grep -q \"ENCRYPTED: true\" /home/syncenv/.secrets.env"
     [ "$status" -eq 0 ]
 }

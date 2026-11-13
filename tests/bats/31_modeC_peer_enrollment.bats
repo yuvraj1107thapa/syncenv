@@ -70,7 +70,7 @@ load 'test_helper'
     exchange_tls_certs "$CONTAINER_ALPHA" "$CONTAINER_BETA" "$CONTAINER_GAMMA"
 
     # Verify each container has the others' certs in trusted dir
-    run container_exec "$CONTAINER_BETA" ls /home/envsync/.config/env-sync/tls/trusted/
+    run container_exec "$CONTAINER_BETA" ls /home/syncenv/.config/syncenv/tls/trusted/
     [ "$status" -eq 0 ]
     [[ "$output" =~ "alpha" ]]
 }
@@ -106,6 +106,6 @@ load 'test_helper'
 }
 
 @test "modeC: Peer commands require secure-peer mode" {
-    run container_exec "$CONTAINER_ALPHA" env-sync peer list
+    run container_exec "$CONTAINER_ALPHA" syncenv peer list
     [ "$status" -eq 0 ]
 }

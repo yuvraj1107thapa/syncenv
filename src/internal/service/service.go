@@ -6,10 +6,10 @@ import (
 
 	"github.com/kardianos/service"
 
-	"envsync/internal/logging"
+	"syncenv/internal/logging"
 )
 
-// StopIfRunning stops the env-sync service if it's running
+// StopIfRunning stops the syncenv service if it's running
 // Returns true if the service was stopped, false if it wasn't running
 func StopIfRunning() (bool, error) {
 	svc, err := getService()
@@ -36,7 +36,7 @@ func StopIfRunning() (bool, error) {
 		return false, fmt.Errorf("failed to stop service: %w", err)
 	}
 
-	logging.Log("INFO", "Stopped env-sync service for installation")
+	logging.Log("INFO", "Stopped syncenv service for installation")
 	return true, nil
 }
 
@@ -55,7 +55,7 @@ func RestartIfNeeded(wasStopped bool) error {
 		return fmt.Errorf("failed to restart service: %w", err)
 	}
 
-	logging.Log("SUCCESS", "Restarted env-sync service")
+	logging.Log("SUCCESS", "Restarted syncenv service")
 	return nil
 }
 
@@ -88,7 +88,7 @@ func UninstallIfInstalled() (bool, error) {
 		return false, fmt.Errorf("failed to uninstall service: %w", err)
 	}
 
-	logging.Log("INFO", "Uninstalled env-sync service")
+	logging.Log("INFO", "Uninstalled syncenv service")
 	return true, nil
 }
 
@@ -98,9 +98,9 @@ func getService() (service.Service, error) {
 	// We don't need the full program implementation for stop/start/uninstall
 	prg := &dummyProgram{}
 	svcConfig := &service.Config{
-		Name:        "env-sync",
-		DisplayName: "env-sync",
-		Description: "env-sync HTTP server",
+		Name:        "syncenv",
+		DisplayName: "syncenv",
+		Description: "syncenv HTTP server",
 		Option:      service.KeyValue{"UserService": true},
 	}
 	return service.New(prg, svcConfig)

@@ -21,11 +21,11 @@ load 'test_helper'
 
 @test "Clean up Docker volumes" {
     # Remove any lingering volumes
-    docker volume rm -f env-sync-test_alpha-data 2>/dev/null || true
-    docker volume rm -f env-sync-test_beta-data 2>/dev/null || true
-    docker volume rm -f env-sync-test_gamma-data 2>/dev/null || true
+    docker volume rm -f syncenv-test_alpha-data 2>/dev/null || true
+    docker volume rm -f syncenv-test_beta-data 2>/dev/null || true
+    docker volume rm -f syncenv-test_gamma-data 2>/dev/null || true
 
     # Verify network is removed
-    run wait_for_network_removed "env-sync-test" 60
+    run wait_for_network_removed "syncenv-test" 60
     [ "$status" -eq 0 ]
 }

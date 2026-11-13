@@ -1,5 +1,5 @@
 {
-  "name": "env-sync-gui",
+  "name": "syncenv-gui",
   "private": true,
   "version": "0.0.0",
   "type": "module",

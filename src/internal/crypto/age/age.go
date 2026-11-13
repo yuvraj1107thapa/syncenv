@@ -12,8 +12,8 @@ import (
 
 	agecrypto "filippo.io/age"
 
-	"envsync/internal/config"
-	"envsync/internal/logging"
+	"syncenv/internal/config"
+	"syncenv/internal/logging"
 )
 
 func CheckInstalled() error {

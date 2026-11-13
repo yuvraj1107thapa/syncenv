@@ -19,7 +19,7 @@ load 'test_helper'
 
 @test "modeC: Verify mode is secure-peer on all containers" {
     for container in $CONTAINER_ALPHA $CONTAINER_BETA $CONTAINER_GAMMA; do
-        run container_exec "$container" env-sync mode get
+        run container_exec "$container" syncenv mode get
         [ "$status" -eq 0 ]
         [[ "$output" =~ "secure-peer" ]]
     done
@@ -27,9 +27,9 @@ load 'test_helper'
 
 @test "modeC: TLS identity was generated on all containers" {
     for container in $CONTAINER_ALPHA $CONTAINER_BETA $CONTAINER_GAMMA; do
-        run container_exec "$container" test -f /home/envsync/.config/env-sync/tls/transport.crt
+        run container_exec "$container" test -f /home/syncenv/.config/syncenv/tls/transport.crt
         [ "$status" -eq 0 ]
-        run container_exec "$container" test -f /home/envsync/.config/env-sync/tls/transport.key
+        run container_exec "$container" test -f /home/syncenv/.config/syncenv/tls/transport.key
         [ "$status" -eq 0 ]
     done
 }
@@ -52,20 +52,20 @@ load 'test_helper'
 @test "modeC: Start mTLS server on alpha" {
     start_mtls_server "$CONTAINER_ALPHA"
 
-    run container_exec "$CONTAINER_ALPHA" pgrep -f "env-sync serve"
+    run container_exec "$CONTAINER_ALPHA" pgrep -f "syncenv serve"
     [ "$status" -eq 0 ]
 }
 
 @test "modeC: Start mTLS server on beta" {
     start_mtls_server "$CONTAINER_BETA"
 
-    run container_exec "$CONTAINER_BETA" pgrep -f "env-sync serve"
+    run container_exec "$CONTAINER_BETA" pgrep -f "syncenv serve"
     [ "$status" -eq 0 ]
 }
 
 @test "modeC: Start mTLS server on gamma" {
     start_mtls_server "$CONTAINER_GAMMA"
 
-    run container_exec "$CONTAINER_GAMMA" pgrep -f "env-sync serve"
+    run container_exec "$CONTAINER_GAMMA" pgrep -f "syncenv serve"
     [ "$status" -eq 0 ]
 }

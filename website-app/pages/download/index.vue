@@ -1,20 +1,20 @@
 <script setup lang="ts">
 useHead({
-  title: 'Download env-sync | Latest CLI and GUI builds',
+  title: 'Download syncenv | Latest CLI and GUI builds',
   meta: [
-    { name: 'description', content: 'Download the latest env-sync release assets from GitHub. Choose CLI or GUI builds by OS and architecture.' },
-    { property: 'og:title', content: 'Download env-sync | Latest CLI and GUI builds' },
-    { property: 'og:description', content: 'Pick CLI or GUI, select your OS and architecture, and download the latest env-sync release directly from GitHub.' },
+    { name: 'description', content: 'Download the latest syncenv release assets from GitHub. Choose CLI or GUI builds by OS and architecture.' },
+    { property: 'og:title', content: 'Download syncenv | Latest CLI and GUI builds' },
+    { property: 'og:description', content: 'Pick CLI or GUI, select your OS and architecture, and download the latest syncenv release directly from GitHub.' },
     { property: 'og:type', content: 'website' },
-    { property: 'og:url', content: 'https://envsync.yuvrajthapa.com/download' },
-    { property: 'og:image', content: 'https://envsync.yuvrajthapa.com/assets/cover.png' },
+    { property: 'og:url', content: 'https://syncenv.yuvrajthapa.com/download' },
+    { property: 'og:image', content: 'https://syncenv.yuvrajthapa.com/assets/cover.png' },
     { name: 'twitter:card', content: 'summary_large_image' },
-    { name: 'twitter:title', content: 'Download env-sync | Latest CLI and GUI builds' },
-    { name: 'twitter:description', content: 'Choose CLI or GUI downloads for Linux, macOS, and Windows from the latest env-sync GitHub release.' },
-    { name: 'twitter:image', content: 'https://envsync.yuvrajthapa.com/assets/cover.png' },
+    { name: 'twitter:title', content: 'Download syncenv | Latest CLI and GUI builds' },
+    { name: 'twitter:description', content: 'Choose CLI or GUI downloads for Linux, macOS, and Windows from the latest syncenv GitHub release.' },
+    { name: 'twitter:image', content: 'https://syncenv.yuvrajthapa.com/assets/cover.png' },
   ],
   link: [
-    { rel: 'canonical', href: 'https://envsync.yuvrajthapa.com/download' },
+    { rel: 'canonical', href: 'https://syncenv.yuvrajthapa.com/download' },
   ],
 })
 
@@ -47,12 +47,12 @@ const loadError = ref(false)
 const loaded = ref(false)
 
 function classifyAsset(asset: ReleaseAsset) {
-  const guiMatch = asset.name.match(/^env-sync-gui-(linux|macos|windows)-([a-z0-9_]+)(?:-(?:installer|portable))?(?:\.[a-z0-9.]+)?$/)
+  const guiMatch = asset.name.match(/^syncenv-gui-(linux|macos|windows)-([a-z0-9_]+)(?:-(?:installer|portable))?(?:\.[a-z0-9.]+)?$/)
   if (guiMatch) {
     return { appType: 'gui', os: guiMatch[1], arch: guiMatch[2] }
   }
 
-  const cliMatch = asset.name.match(/^env-sync-(linux|macos|windows)-([a-z0-9_]+)(?:\.[a-z0-9.]+)?$/)
+  const cliMatch = asset.name.match(/^syncenv-(linux|macos|windows)-([a-z0-9_]+)(?:\.[a-z0-9.]+)?$/)
   if (cliMatch) {
     return { appType: 'cli', os: cliMatch[1], arch: cliMatch[2] }
   }
@@ -169,26 +169,26 @@ function matchesTip(tip: Tip): boolean {
 
 const baseTips: Tip[] = [
   {
-    html: 'CLI binaries must be added to your PATH before you can run env-sync from any terminal.',
+    html: 'CLI binaries must be added to your PATH before you can run syncenv from any terminal.',
     modes: ['cli'],
   },
   {
-    html: 'On Windows, place env-sync.exe in a stable folder and add that folder to your User PATH.',
+    html: 'On Windows, place syncenv.exe in a stable folder and add that folder to your User PATH.',
     modes: ['cli'],
     oses: ['windows'],
   },
   {
-    html: 'On Linux, put the binary in a PATH directory such as <code>~/.local/bin</code> or <code>/usr/local/bin</code>, then run <code>chmod +x env-sync</code> before first use.',
+    html: 'On Linux, put the binary in a PATH directory such as <code>~/.local/bin</code> or <code>/usr/local/bin</code>, then run <code>chmod +x syncenv</code> before first use.',
     modes: ['cli'],
     oses: ['linux'],
   },
   {
-    html: 'On macOS, move the binary to /usr/local/bin (or another PATH directory) and run <code>chmod +x env-sync</code> before first use.',
+    html: 'On macOS, move the binary to /usr/local/bin (or another PATH directory) and run <code>chmod +x syncenv</code> before first use.',
     modes: ['cli'],
     oses: ['macos'],
   },
   {
-    html: 'After PATH setup, verify with <code>env-sync --version</code> and then run <code>env-sync setup</code>.',
+    html: 'After PATH setup, verify with <code>syncenv --version</code> and then run <code>syncenv setup</code>.',
     modes: ['cli'],
   },
   {
@@ -196,7 +196,7 @@ const baseTips: Tip[] = [
     modes: ['gui'],
   },
   {
-    html: 'For Linux app integration, prefer the .deb asset when available. It installs app metadata so env-sync appears in your desktop app launcher.',
+    html: 'For Linux app integration, prefer the .deb asset when available. It installs app metadata so syncenv appears in your desktop app launcher.',
     modes: ['gui'],
     oses: ['linux'],
   },
@@ -295,7 +295,7 @@ onMounted(() => {
 
 <template>
   <div class="subpage-hero">
-    <h1>Download env-sync</h1>
+    <h1>Download syncenv</h1>
     <p>Pick your app type, operating system, and architecture. Downloads are sourced from the <strong>latest GitHub release</strong> of this repository.</p>
     <p class="muted-note"><strong>Tip:</strong> The web-based install script is usually easier. If you prefer to manually download binaries (or avoid running untrusted <code>.sh</code> scripts), install from the assets below.</p>
   </div>
@@ -347,7 +347,7 @@ onMounted(() => {
       <!-- Error state -->
       <template v-if="loadError">
         <p class="muted-note">Could not load release assets right now. Please use the releases page directly.</p>
-        <p><a class="btn btn-secondary" href="https://github.com/yuvraj1107thapa/envsync/releases"><i class="fa-brands fa-github"></i> Open releases</a></p>
+        <p><a class="btn btn-secondary" href="https://github.com/yuvraj1107thapa/syncenv/releases"><i class="fa-brands fa-github"></i> Open releases</a></p>
       </template>
 
       <!-- No assets in release -->
@@ -385,7 +385,7 @@ onMounted(() => {
     <h2>Need an older version?</h2>
     <p>Browse all published tags and assets on GitHub releases.</p>
     <div class="cta-row" style="justify-content:center;">
-      <a class="btn btn-secondary" href="https://github.com/yuvraj1107thapa/envsync/releases"><i class="fa-brands fa-github"></i> View all releases</a>
+      <a class="btn btn-secondary" href="https://github.com/yuvraj1107thapa/syncenv/releases"><i class="fa-brands fa-github"></i> View all releases</a>
     </div>
   </section>
 </template>

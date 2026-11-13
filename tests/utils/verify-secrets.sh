@@ -17,7 +17,7 @@ echo "Verifying secret '$KEY' across all containers..."
 echo "  Expected value: $EXPECTED_VALUE"
 echo ""
 
-for container in env-sync-alpha env-sync-beta env-sync-gamma; do
+for container in syncenv-alpha syncenv-beta syncenv-gamma; do
     if ! docker ps --format "{{.Names}}" | grep -q "^${container}$"; then
         echo "  ✗ $container: NOT RUNNING"
         FAILED=1
@@ -25,7 +25,7 @@ for container in env-sync-alpha env-sync-beta env-sync-gamma; do
     fi
     
     # Get secret value from container
-    ACTUAL=$(docker exec --user envsync "$container" env-sync show "$KEY" 2>/dev/null || echo "")
+    ACTUAL=$(docker exec --user syncenv "$container" syncenv show "$KEY" 2>/dev/null || echo "")
     
     if [ "$ACTUAL" != "$EXPECTED_VALUE" ]; then
         echo "  ✗ $container: MISMATCH"

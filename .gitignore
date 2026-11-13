@@ -1,11 +1,11 @@
-# env-sync specific
+# syncenv specific
 *.backup.*
 *.bak
 *.log
 target/
 dist/
 ~/.secrets.env
-~/.config/env-sync/
+~/.config/syncenv/
 
 # Frontend build artifacts
 src/gui/frontend/node_modules/

@@ -1,8 +1,8 @@
 package main
 
 import (
-	"envsync/internal/backup"
-	"envsync/internal/config"
+	"syncenv/internal/backup"
+	"syncenv/internal/config"
 	"os"
 	"path/filepath"
 	"time"

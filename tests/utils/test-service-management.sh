@@ -7,7 +7,7 @@ echo "=== Testing Service Management During Installation ==="
 echo ""
 
 # Build the binary first
-echo "1. Building env-sync binary..."
+echo "1. Building syncenv binary..."
 make clean 2>/dev/null || true
 make build
 echo "   ✓ Build successful"
@@ -15,13 +15,13 @@ echo ""
 
 # Test 1: Verify service command exists
 echo "2. Testing service command availability..."
-./target/env-sync service help >/dev/null 2>&1
+./target/syncenv service help >/dev/null 2>&1
 echo "   ✓ Service command available"
 echo ""
 
 # Test 2: Test service stop when not running
 echo "3. Testing service stop (when not running)..."
-OUTPUT=$(./target/env-sync service stop 2>&1 || true)
+OUTPUT=$(./target/syncenv service stop 2>&1 || true)
 if echo "$OUTPUT" | grep -q "Service is not running\|Service stopped"; then
     echo "   ✓ Service stop handled correctly"
 else
@@ -32,7 +32,7 @@ echo ""
 
 # Test 3: Test service uninstall when not installed
 echo "4. Testing service uninstall (when not installed)..."
-OUTPUT=$(./target/env-sync service uninstall 2>&1 || true)
+OUTPUT=$(./target/syncenv service uninstall 2>&1 || true)
 if echo "$OUTPUT" | grep -q "Service is not installed\|Service uninstalled"; then
     echo "   ✓ Service uninstall handled correctly"
 else
@@ -43,7 +43,7 @@ echo ""
 
 # Test 4: Test install.sh dry run (check logic)
 echo "5. Verifying install.sh contains service management..."
-if grep -q "env-sync service stop" install.sh; then
+if grep -q "syncenv service stop" install.sh; then
     echo "   ✓ install.sh includes service stop"
 else
     echo "   ✗ install.sh missing service stop"
@@ -59,7 +59,7 @@ echo ""
 
 # Test 5: Test Makefile contains service management
 echo "6. Verifying Makefile contains service management..."
-if grep -q "env-sync service stop" Makefile; then
+if grep -q "syncenv service stop" Makefile; then
     echo "   ✓ Makefile includes service stop"
 else
     echo "   ✗ Makefile missing service stop"
@@ -88,6 +88,6 @@ echo "  ✓ Installation scripts handle service lifecycle"
 echo "  ✓ Unit tests pass"
 echo ""
 echo "Note: Manual testing required for:"
-echo "  - Actual service installation (env-sync serve -d)"
+echo "  - Actual service installation (syncenv serve -d)"
 echo "  - Service stop/restart during live installation"
 echo "  - Testing on Linux (systemd) and macOS (launchd)"

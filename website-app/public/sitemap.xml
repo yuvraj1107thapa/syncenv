@@ -1,77 +1,77 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://envsync.yuvrajthapa.com/</loc>
+    <loc>https://syncenv.yuvrajthapa.com/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://envsync.yuvrajthapa.com/installation</loc>
+    <loc>https://syncenv.yuvrajthapa.com/installation</loc>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://envsync.yuvrajthapa.com/download</loc>
+    <loc>https://syncenv.yuvrajthapa.com/download</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://envsync.yuvrajthapa.com/installation/quickstart</loc>
+    <loc>https://syncenv.yuvrajthapa.com/installation/quickstart</loc>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://envsync.yuvrajthapa.com/installation/trusted-peers</loc>
+    <loc>https://syncenv.yuvrajthapa.com/installation/trusted-peers</loc>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://envsync.yuvrajthapa.com/installation/secure-peers</loc>
+    <loc>https://syncenv.yuvrajthapa.com/installation/secure-peers</loc>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://envsync.yuvrajthapa.com/usage</loc>
+    <loc>https://syncenv.yuvrajthapa.com/usage</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://envsync.yuvrajthapa.com/modes</loc>
+    <loc>https://syncenv.yuvrajthapa.com/modes</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://envsync.yuvrajthapa.com/security</loc>
+    <loc>https://syncenv.yuvrajthapa.com/security</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://envsync.yuvrajthapa.com/comparisons</loc>
+    <loc>https://syncenv.yuvrajthapa.com/comparisons</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://envsync.yuvrajthapa.com/comparisons/dotenvx-vs-envsync</loc>
+    <loc>https://syncenv.yuvrajthapa.com/comparisons/dotenvx-vs-syncenv</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://envsync.yuvrajthapa.com/comparisons/sops-vs-envsync</loc>
+    <loc>https://syncenv.yuvrajthapa.com/comparisons/sops-vs-syncenv</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://envsync.yuvrajthapa.com/comparisons/vault-vs-envsync</loc>
+    <loc>https://syncenv.yuvrajthapa.com/comparisons/vault-vs-syncenv</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://envsync.yuvrajthapa.com/comparisons/infisical-vs-envsync</loc>
+    <loc>https://syncenv.yuvrajthapa.com/comparisons/infisical-vs-syncenv</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://envsync.yuvrajthapa.com/comparisons/doppler-vs-envsync</loc>
+    <loc>https://syncenv.yuvrajthapa.com/comparisons/doppler-vs-syncenv</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>

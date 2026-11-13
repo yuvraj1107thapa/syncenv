@@ -4,7 +4,7 @@ import (
 	"context"
 	"os"
 
-	"envsync/internal/config"
+	"syncenv/internal/config"
 )
 
 // App struct holds the application context
@@ -36,7 +36,7 @@ type ConfigPaths struct {
 	KeysDir     string `json:"keysDir"`
 }
 
-// GetVersion returns the current env-sync version
+// GetVersion returns the current syncenv version
 func (a *App) GetVersion() string {
 	return config.Version
 }

@@ -19,7 +19,7 @@ load 'test_helper'
 
 @test "modeB: Verify mode is trusted-owner-ssh on all containers" {
     for container in $CONTAINER_ALPHA $CONTAINER_BETA $CONTAINER_GAMMA; do
-        run container_exec "$container" env-sync mode get
+        run container_exec "$container" syncenv mode get
         [ "$status" -eq 0 ]
         [[ "$output" =~ "trusted-owner-ssh" ]]
     done

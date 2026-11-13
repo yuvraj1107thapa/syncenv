@@ -3,19 +3,19 @@ package discovery
 import (
 	"testing"
 
-	sshtransport "envsync/internal/transport/ssh"
+	sshtransport "syncenv/internal/transport/ssh"
 )
 
 func TestParseDnssdPeersAcceptsTrailingDotService(t *testing.T) {
-	t.Setenv("ENV_SYNC_HOSTNAME", "ci-test-host")
-	t.Setenv("ENV_SYNC_USER", "ci-test-user")
+	t.Setenv("SYNCENV_HOSTNAME", "ci-test-host")
+	t.Setenv("SYNCENV_USER", "ci-test-user")
 	sample := `
 DATE: ---Tue 10 Feb 2026---
 21:12:46.949  ...STARTING...
 Timestamp     A/R    Flags  if Domain               Service Type         Instance Name
-21:12:46.949  Add        3  14 local.               _envsync._tcp.       beelink
-21:12:46.949  Add        3   1 local.               _envsync._tcp.       mbp16
-21:12:46.949  Add        2  14 local.               _envsync._tcp.       mbp16
+21:12:46.949  Add        3  14 local.               _syncenv._tcp.       beelink
+21:12:46.949  Add        3   1 local.               _syncenv._tcp.       mbp16
+21:12:46.949  Add        2  14 local.               _syncenv._tcp.       mbp16
 `
 
 	peers := parseDnssdPeers(sample)
@@ -34,8 +34,8 @@ Timestamp     A/R    Flags  if Domain               Service Type         Instanc
 
 func TestParseDnssdPeersFiltersSelfHostname(t *testing.T) {
 	// Pin a fake self identity so the test is hermetic on any machine.
-	t.Setenv("ENV_SYNC_HOSTNAME", "ci-self-host")
-	t.Setenv("ENV_SYNC_USER", "ci-self-user")
+	t.Setenv("SYNCENV_HOSTNAME", "ci-self-host")
+	t.Setenv("SYNCENV_USER", "ci-self-user")
 
 	// Get current hostname to use in test
 	selfHostname := sshtransport.Hostname()
@@ -50,9 +50,9 @@ func TestParseDnssdPeersFiltersSelfHostname(t *testing.T) {
 DATE: ---Tue 10 Feb 2026---
 21:12:46.949  ...STARTING...
 Timestamp     A/R    Flags  if Domain               Service Type         Instance Name
-21:12:46.949  Add        3  14 local.               _envsync._tcp.       beelink
-21:12:46.949  Add        3   1 local.               _envsync._tcp.       ` + instanceName + `
-21:12:46.949  Add        2  14 local.               _envsync._tcp.       mbp16
+21:12:46.949  Add        3  14 local.               _syncenv._tcp.       beelink
+21:12:46.949  Add        3   1 local.               _syncenv._tcp.       ` + instanceName + `
+21:12:46.949  Add        2  14 local.               _syncenv._tcp.       mbp16
 `
 
 	peers := parseDnssdPeers(sample)
@@ -77,8 +77,8 @@ Timestamp     A/R    Flags  if Domain               Service Type         Instanc
 }
 
 func TestParseDnssdPeersFiltersMultipleSelfReferences(t *testing.T) {
-	t.Setenv("ENV_SYNC_HOSTNAME", "ci-self-host")
-	t.Setenv("ENV_SYNC_USER", "ci-self-user")
+	t.Setenv("SYNCENV_HOSTNAME", "ci-self-host")
+	t.Setenv("SYNCENV_USER", "ci-self-user")
 	selfHostname := sshtransport.Hostname()
 
 	// Extract just the hostname part without .local suffix for instance name
@@ -92,9 +92,9 @@ func TestParseDnssdPeersFiltersMultipleSelfReferences(t *testing.T) {
 DATE: ---Tue 10 Feb 2026---
 21:12:46.949  ...STARTING...
 Timestamp     A/R    Flags  if Domain               Service Type         Instance Name
-21:12:46.949  Add        3  14 local.               _envsync._tcp.       ` + instanceName + `
-21:12:46.949  Add        3   1 local.               _envsync._tcp.       ` + instanceName + `
-21:12:46.949  Add        2  14 local.               _envsync._tcp.       beelink
+21:12:46.949  Add        3  14 local.               _syncenv._tcp.       ` + instanceName + `
+21:12:46.949  Add        3   1 local.               _syncenv._tcp.       ` + instanceName + `
+21:12:46.949  Add        2  14 local.               _syncenv._tcp.       beelink
 `
 
 	peers := parseDnssdPeers(sample)

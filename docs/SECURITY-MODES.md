@@ -1,6 +1,6 @@
 # Security Modes
 
-env-sync v3.0+ operates in three distinct security modes, each designed for different trust scenarios. This document explains the security guarantees, trade-offs, and appropriate use cases for each mode.
+syncenv v3.0+ operates in three distinct security modes, each designed for different trust scenarios. This document explains the security guarantees, trade-offs, and appropriate use cases for each mode.
 
 ## Table of Contents
 
@@ -36,7 +36,7 @@ Each mode makes different security trade-offs. Choose based on your actual trust
 
 ### When to Use
 
-- Debugging env-sync itself
+- Debugging syncenv itself
 - Local testing in isolated environments
 - Learning how the system works
 
@@ -60,10 +60,10 @@ This mode displays prominent warnings on every command:
 
 ```bash
 # Switch to dev mode (requires explicit confirmation)
-env-sync mode set dev-plaintext-http
+syncenv mode set dev-plaintext-http
 
 # Start HTTP server (no encryption)
-env-sync serve -d
+syncenv serve -d
 ```
 
 ### Architecture Diagram
@@ -152,9 +152,9 @@ Adding a new machine requires **zero action on existing machines**:
 
 ```bash
 # On new machine only:
-env-sync init                    # Creates plaintext secrets file
-env-sync discover                # Find peers
-env-sync                         # Sync (SSH key must be set up first)
+syncenv init                    # Creates plaintext secrets file
+syncenv discover                # Find peers
+syncenv                         # Sync (SSH key must be set up first)
 ```
 
 That's it. No commands needed on existing peers.
@@ -251,7 +251,7 @@ Initial Setup - 3 machines with mutual SSH trust:
 │         ┌──┴──┐         │            │         │        │
 │         │  C  │         │            │         ▼        │
 │         └─────┘         │            │  ┌────────────┐  │
-│                         │            │  │ env-sync   │  │
+│                         │            │  │ syncenv   │  │
 │  No commands needed     │            │  │   init     │  │
 │  on A, B, or C!         │            │  └──────┬─────┘  │
 │                         │            │         │        │
@@ -317,10 +317,10 @@ You can still enable AGE encryption if you want:
 
 ```bash
 # Initialize with encryption
-env-sync init --encrypted
+syncenv init --encrypted
 
 # Or add encryption later
-env-sync mode set trusted-owner-ssh --encrypted
+syncenv mode set trusted-owner-ssh --encrypted
 ```
 
 **Note**: This provides defense-in-depth for specific scenarios (e.g., laptop theft), but doesn't protect against network-level attacks from compromised peers that have SSH access.
@@ -329,16 +329,16 @@ env-sync mode set trusted-owner-ssh --encrypted
 
 ```bash
 # Set mode (default)
-env-sync mode set trusted-owner-ssh
+syncenv mode set trusted-owner-ssh
 
 # Initialize with optional encryption
-env-sync init --encrypted
+syncenv init --encrypted
 
 # Discover peers (filters by SSH reachability)
-env-sync discover
+syncenv discover
 
 # Request access on new machine
-env-sync key request-access --trigger alice@hostname.local
+syncenv key request-access --trigger alice@hostname.local
 ```
 
 ### Security Considerations
@@ -393,7 +393,7 @@ Each OS user on each host has (v4: identity is per-user `user@host`):
 3. **Peer Registry**: Database of known peers and their authorization status
 
 ```
-~/.config/env-sync/              # per-OS-user (~ = each user's home)
+~/.config/syncenv/              # per-OS-user (~ = each user's home)
 ├── keys/
 │   ├── transport_key          # mTLS private key
 │   ├── transport_cert.pem     # Self-signed certificate
@@ -406,7 +406,7 @@ Each OS user on each host has (v4: identity is per-user `user@host`):
 
 #### Trust Bootstrap (No Global Root CA)
 
-**No global env-sync root certificate is shipped.** Trust is deployment-local:
+**No global syncenv root certificate is shipped.** Trust is deployment-local:
 
 1. First host (genesis) creates its own identity
 2. New hosts are invited via enrollment tokens
@@ -421,15 +421,15 @@ This avoids global trust and blast radius issues.
 
 ```bash
 # On existing trusted peer
-env-sync peer invite --expires 1h
+syncenv peer invite --expires 1h
 # Outputs: token, peer ID (user@host), fingerprint
 
 # On new machine
-env-sync mode set secure-peer
-env-sync peer request alice@hostname.local <token>
+syncenv mode set secure-peer
+syncenv peer request alice@hostname.local <token>
 
 # Back on existing peer
-env-sync peer approve bob@new-host.local
+syncenv peer approve bob@new-host.local
 ```
 
 #### Membership Propagation
@@ -445,14 +445,14 @@ Once approved by one trusted peer, a new host is automatically learned by all ot
 
 ```bash
 # View pending requests
-env-sync peer list --pending
+syncenv peer list --pending
 
 # Approve or revoke (peer IDs are user@host)
-env-sync peer approve alice@hostname.local
-env-sync peer revoke bob@hostname.local
+syncenv peer approve alice@hostname.local
+syncenv peer revoke bob@hostname.local
 
 # View authorization status
-env-sync peer list
+syncenv peer list
 ```
 
 ### Architecture Diagram
@@ -552,7 +552,7 @@ Phase 1: Create Invitation
 ┌─────────────────────────────────────────────────────────────────────┐
 │ On Machine A (Alice creates invite for Dave):                       │
 │                                                                     │
-│ $ env-sync peer invite --expires 1h                                │
+│ $ syncenv peer invite --expires 1h                                │
 │                                                                     │
 │ Token: abc123def456                                                │
 │ Peer: alice@alice-laptop (user@host)                               │
@@ -567,8 +567,8 @@ Phase 1: Create Invitation
 │ Phase 2: Request Access                                             │
 │ On Machine D (Dave's laptop):                                       │
 │                                                                     │
-│ $ env-sync mode set secure-peer                                    │
-│ $ env-sync peer request alice@alice-laptop abc123def456            │
+│ $ syncenv mode set secure-peer                                    │
+│ $ syncenv peer request alice@alice-laptop abc123def456            │
 │ D generates:                                                        │
 │ - Transport identity (cert/key)                                    │
 │ - AGE keypair                                                      │
@@ -581,12 +581,12 @@ Phase 1: Create Invitation
 │ Phase 3: Pending Approval                                           │
 │ On Machine A:                                                       │
 │                                                                     │
-│ $ env-sync peer list --pending                                     │
+│ $ syncenv peer list --pending                                     │
 │                                                                     │
 │ Pending peers:                                                      │
 │ • dave@dave-laptop (2025-02-16 15:45)                             │
 │                                                                     │
-│ $ env-sync peer approve dave@dave-laptop                           │
+│ $ syncenv peer approve dave@dave-laptop                           │
 │ ✓ Approved dave@dave-laptop                                        │
 └─────────────────────────────────────────────────────────────────────┘
                     │
@@ -669,7 +669,7 @@ Step 1: Revoke C
 ┌─────────────────────────────────────────────────────────────────────┐
 │ Any approved peer can revoke:                                       │
 │                                                                     │
-│ $ env-sync peer revoke charlie@charlie-desktop.local               │
+│ $ syncenv peer revoke charlie@charlie-desktop.local               │
 │                                                                     │
 │ Alice revokes Charlie:                                              │
 │ - Updates local registry (Charlie → revoked)                       │
@@ -730,22 +730,22 @@ Security Note:
 
 ```bash
 # Switch to secure-peer mode
-env-sync mode set secure-peer
+syncenv mode set secure-peer
 
 # Create invitation
-env-sync peer invite --expires 30m --description "John's laptop"
+syncenv peer invite --expires 30m --description "John's laptop"
 
 # Request access
-env-sync peer request alice@hostname.local <token>
+syncenv peer request alice@hostname.local <token>
 
 # Manage peers
-env-sync peer list
-env-sync peer approve bob@hostname.local
-env-sync peer revoke mallory@hostname.local
-env-sync peer trust show alice@hostname.local
+syncenv peer list
+syncenv peer approve bob@hostname.local
+syncenv peer revoke mallory@hostname.local
+syncenv peer trust show alice@hostname.local
 
 # Sync (uses mTLS)
-env-sync
+syncenv
 ```
 
 ### Security Considerations
@@ -809,7 +809,7 @@ Mode switches preserve existing data:
 
 ```bash
 # Switch modes (keys and secrets preserved)
-env-sync mode set secure-peer
+syncenv mode set secure-peer
 ```
 
 Your existing keys, certificates, and secrets remain available.
@@ -820,7 +820,7 @@ To remove old mode's material:
 
 ```bash
 # Switch and clean up
-env-sync mode set trusted-owner-ssh --prune-old-material --yes
+syncenv mode set trusted-owner-ssh --prune-old-material --yes
 ```
 
 **Warning**: This deletes mode-specific data (certificates, peer registry, etc.)
@@ -830,7 +830,7 @@ env-sync mode set trusted-owner-ssh --prune-old-material --yes
 Switching from secure-peer to less secure modes requires explicit confirmation:
 
 ```bash
-$ env-sync mode set dev-plaintext-http
+$ syncenv mode set dev-plaintext-http
 ⚠️  SECURITY WARNING: You are switching from secure-peer to dev-plaintext-http.
    This will disable encryption and mTLS.
    Secrets will be stored and transmitted in plaintext!
@@ -867,7 +867,7 @@ $ env-sync mode set dev-plaintext-http
 
 **Mitigations**:
 - Enable AGE encryption for defense-in-depth
-- Use `ENV_SYNC_STRICT_SSH=true` and pre-populate known_hosts
+- Use `SYNCENV_STRICT_SSH=true` and pre-populate known_hosts
 - Regular key rotation
 
 ### Mode C Threat Model

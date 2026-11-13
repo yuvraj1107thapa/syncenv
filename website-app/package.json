@@ -1,5 +1,5 @@
 {
-  "name": "env-sync-website",
+  "name": "syncenv-website",
   "private": true,
   "type": "module",
   "scripts": {

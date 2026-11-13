@@ -9,8 +9,8 @@ import (
 	"path/filepath"
 	"time"
 
-	"envsync/internal/config"
-	"envsync/internal/logging"
+	"syncenv/internal/config"
+	"syncenv/internal/logging"
 )
 
 // Invite represents a one-time enrollment token for a new peer.

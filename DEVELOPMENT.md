@@ -4,7 +4,7 @@
 
 The core CLI build (`make build`) does not require these GTK/WebKit dependencies.
 
-To build the optional env-sync desktop GUI from source on Debian/Ubuntu Linux, install these system packages first:
+To build the optional syncenv desktop GUI from source on Debian/Ubuntu Linux, install these system packages first:
 
 ```bash
 sudo apt update

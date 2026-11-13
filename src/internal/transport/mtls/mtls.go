@@ -13,9 +13,9 @@ import (
 	"path/filepath"
 	"time"
 
-	"envsync/internal/config"
-	"envsync/internal/identity"
-	"envsync/internal/secrets"
+	"syncenv/internal/config"
+	"syncenv/internal/identity"
+	"syncenv/internal/secrets"
 )
 
 // NewServerTLSConfig creates a TLS configuration for the mTLS server.
@@ -105,7 +105,7 @@ type HealthResponse struct {
 func dialURL(dial, path string) string {
 	host, port := secrets.SplitDial(dial)
 	if port == "" {
-		port = config.EnvSyncPort()
+		port = config.SyncEnvPort()
 	}
 	return fmt.Sprintf("https://%s:%s%s", host, port, path)
 }

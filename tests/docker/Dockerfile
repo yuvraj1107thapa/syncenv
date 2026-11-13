@@ -18,10 +18,10 @@ RUN apt-get update && apt-get install -y \
     sudo \
     && rm -rf /var/lib/apt/lists/*
 
-# Create envsync user
-RUN useradd -m -s /bin/bash -u 1000 envsync && \
-    echo 'envsync:envsync' | chpasswd && \
-    usermod -aG sudo envsync
+# Create syncenv user
+RUN useradd -m -s /bin/bash -u 1000 syncenv && \
+    echo 'syncenv:syncenv' | chpasswd && \
+    usermod -aG sudo syncenv
 
 # Configure SSH
 RUN mkdir -p /var/run/sshd
@@ -29,30 +29,30 @@ RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin no/' /etc/ssh/s
 RUN sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config
 RUN sed -i 's/PermitRootLogin prohibit-password/PermitRootLogin no/' /etc/ssh/sshd_config
 
-# Allow envsync user to run commands without password (for tests)
-RUN echo 'envsync ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/envsync && \
-    chmod 440 /etc/sudoers.d/envsync
+# Allow syncenv user to run commands without password (for tests)
+RUN echo 'syncenv ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/syncenv && \
+    chmod 440 /etc/sudoers.d/syncenv
 
 # Configure Avahi for mDNS (enable D-Bus)
 RUN sed -i 's/#enable-dbus=yes/enable-dbus=yes/' /etc/avahi/avahi-daemon.conf
 RUN sed -i 's/hosts:.*files dns/hosts: files mdns_minimal [NOTFOUND=return] dns mdns/' /etc/nsswitch.conf
 
-# Copy env-sync binary (built from source)
-ARG ENV_SYNC_BIN=target/env-sync
-COPY ${ENV_SYNC_BIN} /usr/local/bin/env-sync
+# Copy syncenv binary (built from source)
+ARG SYNCENV_BIN=target/syncenv
+COPY ${SYNCENV_BIN} /usr/local/bin/syncenv
 
 # Make scripts executable
-RUN chmod +x /usr/local/bin/env-sync*
+RUN chmod +x /usr/local/bin/syncenv*
 
-# Create env-sync directories for envsync user
-RUN mkdir -p /home/envsync/.config/env-sync/keys/known_hosts && \
-    mkdir -p /home/envsync/.config/env-sync/logs && \
-    mkdir -p /home/envsync/.ssh && \
-    chmod 700 /home/envsync/.ssh && \
-    chmod 755 /home/envsync/.config && \
-    chmod 700 /home/envsync/.config/env-sync && \
-    chmod 700 /home/envsync/.config/env-sync/keys && \
-    chown -R envsync:envsync /home/envsync
+# Create syncenv directories for syncenv user
+RUN mkdir -p /home/syncenv/.config/syncenv/keys/known_hosts && \
+    mkdir -p /home/syncenv/.config/syncenv/logs && \
+    mkdir -p /home/syncenv/.ssh && \
+    chmod 700 /home/syncenv/.ssh && \
+    chmod 755 /home/syncenv/.config && \
+    chmod 700 /home/syncenv/.config/syncenv && \
+    chmod 700 /home/syncenv/.config/syncenv/keys && \
+    chown -R syncenv:syncenv /home/syncenv
 
 # Entrypoint script
 COPY tests/docker/entrypoint.sh /entrypoint.sh

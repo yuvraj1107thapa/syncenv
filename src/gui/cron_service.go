@@ -1,7 +1,7 @@
 package main
 
 import (
-	"envsync/internal/cron"
+	"syncenv/internal/cron"
 	"fmt"
 	"os/exec"
 	"strings"
@@ -27,7 +27,7 @@ func (c *CronService) GetCronStatus() (CronInfo, error) {
 	}
 
 	for _, line := range strings.Split(string(output), "\n") {
-		if strings.Contains(line, "env-sync") {
+		if strings.Contains(line, "syncenv") {
 			info.Installed = true
 			info.Interval = parseCronInterval(line)
 			break
@@ -43,9 +43,9 @@ func (c *CronService) InstallCron(intervalMinutes int) error {
 		intervalMinutes = 30
 	}
 
-	execPath, err := exec.LookPath("env-sync")
+	execPath, err := exec.LookPath("syncenv")
 	if err != nil {
-		return fmt.Errorf("env-sync binary not found in PATH")
+		return fmt.Errorf("syncenv binary not found in PATH")
 	}
 
 	return cron.Install(execPath, intervalMinutes)

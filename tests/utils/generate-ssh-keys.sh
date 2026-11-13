@@ -14,7 +14,7 @@ mkdir -p "$KEYS_DIR"
 # Generate a single key pair for all containers (simplifies testing)
 if [ ! -f "$KEYS_DIR/id_ed25519" ]; then
     echo "  Creating Ed25519 key pair..."
-    ssh-keygen -t ed25519 -f "$KEYS_DIR/id_ed25519" -N "" -C "env-sync-test@docker"
+    ssh-keygen -t ed25519 -f "$KEYS_DIR/id_ed25519" -N "" -C "syncenv-test@docker"
     echo "  ✓ Created $KEYS_DIR/id_ed25519"
 else
     echo "  ✓ Key pair already exists: $KEYS_DIR/id_ed25519"

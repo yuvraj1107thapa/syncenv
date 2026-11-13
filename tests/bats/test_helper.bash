@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Test helper for env-sync Docker tests (v3.0 — 3-mode support)
+# Test helper for syncenv Docker tests (v3.0 — 3-mode support)
 # This file is sourced by all .bats test files
 
 # Setup function - runs before each test
@@ -9,15 +9,15 @@ setup() {
     export TESTS_DIR="$(cd "$(dirname "$BATS_TEST_FILENAME")/.." && pwd)"
     export UTILS_DIR="$TESTS_DIR/utils"
     export DOCKER_DIR="$TESTS_DIR/docker"
-    export ENV_SYNC_DISCOVERY_TIMEOUT="${ENV_SYNC_DISCOVERY_TIMEOUT:-2}"
-    export ENV_SYNC_PARALLEL_JOBS="${ENV_SYNC_PARALLEL_JOBS:-4}"
-    export ENV_SYNC_EXEC_TIMEOUT="${ENV_SYNC_EXEC_TIMEOUT:-300}"
+    export SYNCENV_DISCOVERY_TIMEOUT="${SYNCENV_DISCOVERY_TIMEOUT:-2}"
+    export SYNCENV_PARALLEL_JOBS="${SYNCENV_PARALLEL_JOBS:-4}"
+    export SYNCENV_EXEC_TIMEOUT="${SYNCENV_EXEC_TIMEOUT:-300}"
 
     # Container names
-    export CONTAINER_ALPHA="env-sync-alpha"
-    export CONTAINER_BETA="env-sync-beta"
-    export CONTAINER_GAMMA="env-sync-gamma"
-    export CONTAINER_DELTA="env-sync-delta"
+    export CONTAINER_ALPHA="syncenv-alpha"
+    export CONTAINER_BETA="syncenv-beta"
+    export CONTAINER_GAMMA="syncenv-gamma"
+    export CONTAINER_DELTA="syncenv-delta"
 
     # Colors for output (if terminal supports it)
     export GREEN='\033[0;32m'
@@ -204,13 +204,13 @@ container_exec() {
     local container="$1"
     shift
     local env_args=()
-    if [[ -n "${ENV_SYNC_DISCOVERY_TIMEOUT:-}" ]]; then
-        env_args+=(-e "ENV_SYNC_DISCOVERY_TIMEOUT=$ENV_SYNC_DISCOVERY_TIMEOUT")
+    if [[ -n "${SYNCENV_DISCOVERY_TIMEOUT:-}" ]]; then
+        env_args+=(-e "SYNCENV_DISCOVERY_TIMEOUT=$SYNCENV_DISCOVERY_TIMEOUT")
     fi
     if [[ ${#env_args[@]} -gt 0 ]]; then
-        docker exec "${env_args[@]}" --user envsync "$container" timeout "${ENV_SYNC_EXEC_TIMEOUT}s" "$@"
+        docker exec "${env_args[@]}" --user syncenv "$container" timeout "${SYNCENV_EXEC_TIMEOUT}s" "$@"
     else
-        docker exec --user envsync "$container" timeout "${ENV_SYNC_EXEC_TIMEOUT}s" "$@"
+        docker exec --user syncenv "$container" timeout "${SYNCENV_EXEC_TIMEOUT}s" "$@"
     fi
 }
 
@@ -222,13 +222,13 @@ container_exec() {
 set_mode() {
     local container="$1"
     local mode="$2"
-    container_exec "$container" env-sync mode set "$mode" --yes
+    container_exec "$container" syncenv mode set "$mode" --yes
 }
 
 # Get current mode from a container
 get_mode() {
     local container="$1"
-    container_exec "$container" env-sync mode get 2>/dev/null | head -1 | awk '{print $NF}'
+    container_exec "$container" syncenv mode get 2>/dev/null | head -1 | awk '{print $NF}'
 }
 
 # Set mode on all three primary containers
@@ -248,14 +248,14 @@ init_container() {
     local encrypted="${2:-false}"
 
     # Remove existing secrets file
-    container_exec "$container" rm -f /home/envsync/.secrets.env
+    container_exec "$container" rm -f /home/syncenv/.secrets.env
 
     if [ "$encrypted" = true ]; then
-        container_exec "$container" rm -f /home/envsync/.config/env-sync/keys/age_key
-        container_exec "$container" rm -f /home/envsync/.config/env-sync/keys/age_key.pub
-        container_exec "$container" env-sync init --encrypted
+        container_exec "$container" rm -f /home/syncenv/.config/syncenv/keys/age_key
+        container_exec "$container" rm -f /home/syncenv/.config/syncenv/keys/age_key.pub
+        container_exec "$container" syncenv init --encrypted
     else
-        container_exec "$container" env-sync init
+        container_exec "$container" syncenv init
     fi
 }
 
@@ -264,21 +264,21 @@ add_secret() {
     local key="$2"
     local value="$3"
 
-    container_exec "$container" env-sync add "$key=$value"
+    container_exec "$container" syncenv add "$key=$value"
 }
 
 get_secret() {
     local container="$1"
     local key="$2"
 
-    container_exec "$container" env-sync show "$key" 2>/dev/null || echo ""
+    container_exec "$container" syncenv show "$key" 2>/dev/null || echo ""
 }
 
 trigger_sync() {
     local container="$1"
     local force="${2:--f}"
 
-    container_exec "$container" env-sync sync "$force"
+    container_exec "$container" syncenv sync "$force"
 }
 
 verify_secret() {
@@ -306,21 +306,21 @@ start_server() {
     local port="${2:-5739}"
 
     # Start server in background
-    docker exec -d --user envsync "$container" env-sync serve -p "$port" -q
+    docker exec -d --user syncenv "$container" syncenv serve -p "$port" -q
     sleep 2 # Give server time to start
 }
 
 # Stop the HTTP server on a container
 stop_server() {
     local container="$1"
-    container_exec "$container" pkill -f "env-sync serve" 2>/dev/null || true
+    container_exec "$container" pkill -f "syncenv serve" 2>/dev/null || true
     sleep 1
 }
 
 # Sync using HTTP (mode A)
 trigger_sync_http() {
     local container="$1"
-    container_exec "$container" env-sync sync --insecure-http
+    container_exec "$container" syncenv sync --insecure-http
 }
 
 # ─────────────────────────────────────────────────────────────
@@ -329,7 +329,7 @@ trigger_sync_http() {
 
 get_pubkey() {
     local container="$1"
-    container_exec "$container" env-sync key export 2>/dev/null || echo ""
+    container_exec "$container" syncenv key export 2>/dev/null || echo ""
 }
 
 import_pubkey() {
@@ -337,7 +337,7 @@ import_pubkey() {
     local pubkey="$2"
     local hostname="$3"
 
-    container_exec "$container" env-sync key import "$pubkey" "$hostname"
+    container_exec "$container" syncenv key import "$pubkey" "$hostname"
 }
 
 # ─────────────────────────────────────────────────────────────
@@ -349,7 +349,7 @@ peer_invite() {
     local container="$1"
     local expiry="${2:-24h}"
 
-    container_exec "$container" env-sync peer invite --expiry "$expiry" 2>/dev/null
+    container_exec "$container" syncenv peer invite --expiry "$expiry" 2>/dev/null
 }
 
 # Extract invite token from peer invite output
@@ -364,7 +364,7 @@ peer_request() {
     local host="$2"
     local token="$3"
 
-    container_exec "$container" env-sync peer request "$host" "$token"
+    container_exec "$container" syncenv peer request "$host" "$token"
 }
 
 # Approve a peer
@@ -372,7 +372,7 @@ peer_approve() {
     local container="$1"
     local peer_id="$2"
 
-    container_exec "$container" env-sync peer approve "$peer_id"
+    container_exec "$container" syncenv peer approve "$peer_id"
 }
 
 # Revoke a peer
@@ -380,26 +380,26 @@ peer_revoke() {
     local container="$1"
     local peer_id="$2"
 
-    container_exec "$container" env-sync peer revoke "$peer_id"
+    container_exec "$container" syncenv peer revoke "$peer_id"
 }
 
 # List peers
 peer_list() {
     local container="$1"
-    container_exec "$container" env-sync peer list 2>/dev/null
+    container_exec "$container" syncenv peer list 2>/dev/null
 }
 
 # Show trust info
 peer_trust_show() {
     local container="$1"
-    container_exec "$container" env-sync peer trust show 2>/dev/null
+    container_exec "$container" syncenv peer trust show 2>/dev/null
 }
 
 # Exchange TLS certs between containers for bidirectional mTLS
 # Each container needs the other containers' transport certs in its trusted dir
 exchange_tls_certs() {
     local containers=("$@")
-    local cert_dir="/home/envsync/.config/env-sync/tls"
+    local cert_dir="/home/syncenv/.config/syncenv/tls"
     local trusted_dir="$cert_dir/trusted"
 
     for src in "${containers[@]}"; do
@@ -420,7 +420,7 @@ start_mtls_server() {
     local container="$1"
     local port="${2:-5739}"
 
-    docker exec -d --user envsync "$container" env-sync serve -p "$port" -q
+    docker exec -d --user syncenv "$container" syncenv serve -p "$port" -q
     sleep 2
 }
 
@@ -429,7 +429,7 @@ start_mtls_server() {
 # ─────────────────────────────────────────────────────────────
 
 parallel_run() {
-    local jobs="${ENV_SYNC_PARALLEL_JOBS:-4}"
+    local jobs="${SYNCENV_PARALLEL_JOBS:-4}"
 
     export -f container_exec
     export -f trigger_sync
@@ -470,19 +470,19 @@ cleanup_all() {
     echo "Cleanup complete"
 }
 
-# Reset containers to clean state (remove all env-sync data)
+# Reset containers to clean state (remove all syncenv data)
 reset_containers() {
     for container in $CONTAINER_ALPHA $CONTAINER_BETA $CONTAINER_GAMMA; do
-        container_exec "$container" rm -rf /home/envsync/.secrets.env 2>/dev/null || true
-        container_exec "$container" rm -rf /home/envsync/.config/env-sync/keys/age_key 2>/dev/null || true
-        container_exec "$container" rm -rf /home/envsync/.config/env-sync/keys/age_key.pub 2>/dev/null || true
-        container_exec "$container" rm -rf /home/envsync/.config/env-sync/keys/known_hosts/ 2>/dev/null || true
-        container_exec "$container" rm -rf /home/envsync/.config/env-sync/peers/ 2>/dev/null || true
-        container_exec "$container" rm -rf /home/envsync/.config/env-sync/identity/ 2>/dev/null || true
-        container_exec "$container" rm -rf /home/envsync/.config/env-sync/invites/ 2>/dev/null || true
-        container_exec "$container" rm -rf /home/envsync/.config/env-sync/events/ 2>/dev/null || true
-        container_exec "$container" rm -f /home/envsync/.config/env-sync/mode 2>/dev/null || true
-        container_exec "$container" rm -rf /home/envsync/.config/env-sync/backups/ 2>/dev/null || true
+        container_exec "$container" rm -rf /home/syncenv/.secrets.env 2>/dev/null || true
+        container_exec "$container" rm -rf /home/syncenv/.config/syncenv/keys/age_key 2>/dev/null || true
+        container_exec "$container" rm -rf /home/syncenv/.config/syncenv/keys/age_key.pub 2>/dev/null || true
+        container_exec "$container" rm -rf /home/syncenv/.config/syncenv/keys/known_hosts/ 2>/dev/null || true
+        container_exec "$container" rm -rf /home/syncenv/.config/syncenv/peers/ 2>/dev/null || true
+        container_exec "$container" rm -rf /home/syncenv/.config/syncenv/identity/ 2>/dev/null || true
+        container_exec "$container" rm -rf /home/syncenv/.config/syncenv/invites/ 2>/dev/null || true
+        container_exec "$container" rm -rf /home/syncenv/.config/syncenv/events/ 2>/dev/null || true
+        container_exec "$container" rm -f /home/syncenv/.config/syncenv/mode 2>/dev/null || true
+        container_exec "$container" rm -rf /home/syncenv/.config/syncenv/backups/ 2>/dev/null || true
         stop_server "$container" 2>/dev/null || true
     done
 }

@@ -77,8 +77,8 @@ func TestNormalizePeerID(t *testing.T) {
 }
 
 func TestLocalPeerIDWithOverrides(t *testing.T) {
-	t.Setenv("ENV_SYNC_USER", "alice")
-	t.Setenv("ENV_SYNC_HOSTNAME", "beelink.local")
+	t.Setenv("SYNCENV_USER", "alice")
+	t.Setenv("SYNCENV_HOSTNAME", "beelink.local")
 	if got := LocalPeerID(); got != "alice@beelink" {
 		t.Fatalf("got %q", got)
 	}
@@ -88,8 +88,8 @@ func TestLocalPeerIDWithOverrides(t *testing.T) {
 }
 
 func TestIsSelf(t *testing.T) {
-	t.Setenv("ENV_SYNC_USER", "alice")
-	t.Setenv("ENV_SYNC_HOSTNAME", "beelink.local")
+	t.Setenv("SYNCENV_USER", "alice")
+	t.Setenv("SYNCENV_HOSTNAME", "beelink.local")
 	if !ParseEndpoint("alice@beelink").IsSelf() {
 		t.Fatal("alice@beelink should be self")
 	}

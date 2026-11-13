@@ -13,23 +13,23 @@ import (
 	"strings"
 	"time"
 
-	"envsync/internal/backup"
-	"envsync/internal/config"
-	"envsync/internal/cron"
-	"envsync/internal/discovery"
-	"envsync/internal/identity"
-	"envsync/internal/keys"
-	"envsync/internal/logging"
-	"envsync/internal/metadata"
-	modeutil "envsync/internal/mode"
-	"envsync/internal/peer"
-	"envsync/internal/secrets"
-	"envsync/internal/server"
-	svcmgr "envsync/internal/service"
-	syncer "envsync/internal/sync"
-	mtlstransport "envsync/internal/transport/mtls"
-	sshtransport "envsync/internal/transport/ssh"
-	"envsync/internal/update"
+	"syncenv/internal/backup"
+	"syncenv/internal/config"
+	"syncenv/internal/cron"
+	"syncenv/internal/discovery"
+	"syncenv/internal/identity"
+	"syncenv/internal/keys"
+	"syncenv/internal/logging"
+	"syncenv/internal/metadata"
+	modeutil "syncenv/internal/mode"
+	"syncenv/internal/peer"
+	"syncenv/internal/secrets"
+	"syncenv/internal/server"
+	svcmgr "syncenv/internal/service"
+	syncer "syncenv/internal/sync"
+	mtlstransport "syncenv/internal/transport/mtls"
+	sshtransport "syncenv/internal/transport/ssh"
+	"syncenv/internal/update"
 )
 
 func Run(argv []string) int {
@@ -58,7 +58,7 @@ func Run(argv []string) int {
 	}
 
 	if len(args) == 0 {
-		return runSync(args, "env-sync sync")
+		return runSync(args, "syncenv sync")
 	}
 
 	if args[0] == "help" || args[0] == "--help" || args[0] == "-h" {
@@ -67,18 +67,18 @@ func Run(argv []string) int {
 	}
 
 	if args[0] == "version" || args[0] == "--version" {
-		fmt.Println("env-sync version " + config.Version)
+		fmt.Println("syncenv version " + config.Version)
 		return 0
 	}
 
 	// Handle -v as version (but --verbose takes precedence in handleGlobalFlags)
 	if args[0] == "-v" && !config.IsVerbose() {
-		fmt.Println("env-sync version " + config.Version)
+		fmt.Println("syncenv version " + config.Version)
 		return 0
 	}
 
 	if strings.HasPrefix(args[0], "-") {
-		return runSync(args, "env-sync sync")
+		return runSync(args, "syncenv sync")
 	}
 
 	command := args[0]
@@ -86,11 +86,11 @@ func Run(argv []string) int {
 
 	switch command {
 	case "sync", "s":
-		return runSync(args, "env-sync sync")
+		return runSync(args, "syncenv sync")
 	case "serve", "server":
-		return runServe(args, "env-sync serve")
+		return runServe(args, "syncenv serve")
 	case "discover", "d":
-		return runDiscover(args, "env-sync discover")
+		return runDiscover(args, "syncenv discover")
 	case "status", "st":
 		return runStatus(args)
 	case "init", "i":
@@ -125,7 +125,7 @@ func Run(argv []string) int {
 		showHelp()
 		return 0
 	case "version", "--version", "-v":
-		fmt.Println("env-sync version " + config.Version)
+		fmt.Println("syncenv version " + config.Version)
 		return 0
 	default:
 		logging.Log("ERROR", "Unknown command: "+command)
@@ -148,22 +148,22 @@ func handleGlobalFlags(args []string) []string {
 }
 
 func showHelp() {
-	fmt.Print(`env-sync v3.0 - Distributed secrets synchronization tool
+	fmt.Print(`syncenv v3.0 - Distributed secrets synchronization tool
 
-Usage: env-sync [global options] [command] [options]
+Usage: syncenv [global options] [command] [options]
 
 Global Options:
   --verbose                Print verbose output
 
 SECURITY MODEL (v3.0):
-  env-sync supports three operation modes:
+  syncenv supports three operation modes:
 
   trusted-owner-ssh (default)  Same-owner devices, SCP/SSH transport
   secure-peer                  Cross-owner, HTTPS+mTLS, encrypted storage
   dev-plaintext-http           Debug only, plaintext HTTP (INSECURE)
 
-  Use 'env-sync mode get' to see current mode.
-  Use 'env-sync mode set <mode>' to change.
+  Use 'syncenv mode get' to see current mode.
+  Use 'syncenv mode set <mode>' to change.
 
 Commands:
   sync [options]           Sync secrets from network (default)
@@ -208,10 +208,10 @@ Commands:
   list                     List all secret keys
   show KEY                 Show value of a key
   load [options]           Load secrets for shell integration
-  path [options]           Show env-sync file paths
+  path [options]           Show syncenv file paths
   cron [options]           Setup periodic sync cron job
   service [subcommand]     Manage background service
-  update [options]         Check for updates and upgrade env-sync
+  update [options]         Check for updates and upgrade syncenv
     Options:
       --check              Check for newer version without installing
       --yes, -y            Skip confirmation prompt
@@ -221,12 +221,12 @@ Commands:
   help                     Show this help
 
 Examples:
-  env-sync                              # Sync (uses mode-appropriate transport)
-  env-sync mode set secure-peer --yes   # Switch to secure-peer mode
-  env-sync peer invite                  # Create peer enrollment invite
-  env-sync serve -d                     # Start server as daemon
-  env-sync status                       # Show status
-  env-sync update --check           # Check if a newer version exists
+  syncenv                              # Sync (uses mode-appropriate transport)
+  syncenv mode set secure-peer --yes   # Switch to secure-peer mode
+  syncenv peer invite                  # Create peer enrollment invite
+  syncenv serve -d                     # Start server as daemon
+  syncenv status                       # Show status
+  syncenv update --check           # Check if a newer version exists
 
 `)
 }
@@ -260,10 +260,10 @@ func runSync(args []string, usageName string) int {
 			fmt.Println("  hostname               Specific hostname to sync from")
 			fmt.Println("")
 			fmt.Println("Examples:")
-			fmt.Println("  env-sync sync                           # Sync via SCP (secure)")
-			fmt.Println("  env-sync sync mbp16.local               # Sync from specific host")
-			fmt.Println("  env-sync sync --force-pull mbp16.local  # Force overwrite from specific host")
-			fmt.Println("  env-sync sync --insecure-http           # Sync via HTTP (INSECURE)")
+			fmt.Println("  syncenv sync                           # Sync via SCP (secure)")
+			fmt.Println("  syncenv sync mbp16.local               # Sync from specific host")
+			fmt.Println("  syncenv sync --force-pull mbp16.local  # Force overwrite from specific host")
+			fmt.Println("  syncenv sync --insecure-http           # Sync via HTTP (INSECURE)")
 			return 0
 		default:
 			if strings.HasPrefix(args[i], "-") {
@@ -283,7 +283,7 @@ func runSync(args []string, usageName string) int {
 
 	if opts.ForcePull && opts.TargetHost == "" {
 		logging.Log("ERROR", "--force-pull requires a specific hostname")
-		logging.Log("INFO", "Usage: env-sync sync --force-pull hostname.local")
+		logging.Log("INFO", "Usage: syncenv sync --force-pull hostname.local")
 		return 1
 	}
 
@@ -294,7 +294,7 @@ func runSync(args []string, usageName string) int {
 }
 
 func runServe(args []string, usageName string) int {
-	opts := server.Options{Port: config.EnvSyncPort()}
+	opts := server.Options{Port: config.SyncEnvPort()}
 	for i := 0; i < len(args); i++ {
 		switch args[i] {
 		case "-p", "--port":
@@ -311,7 +311,7 @@ func runServe(args []string, usageName string) int {
 			opts.Service = true
 		case "-q", "--quiet":
 			opts.Quiet = true
-			_ = os.Setenv("ENV_SYNC_QUIET", "true")
+			_ = os.Setenv("SYNCENV_QUIET", "true")
 		case "-h", "--help":
 			fmt.Println("Usage: " + usageName + " [options]")
 			fmt.Println("Options:")
@@ -327,7 +327,7 @@ func runServe(args []string, usageName string) int {
 
 	if _, err := os.Stat(config.SecretsFile()); err != nil {
 		logging.Log("ERROR", "Secrets file not found: "+config.SecretsFile())
-		logging.Log("INFO", "Run 'env-sync init' to create one")
+		logging.Log("INFO", "Run 'syncenv init' to create one")
 		return 1
 	}
 
@@ -368,7 +368,7 @@ func runDiscover(args []string, usageName string) int {
 }
 
 func runStatus(_ []string) int {
-	fmt.Println("=== env-sync Status ===")
+	fmt.Println("=== syncenv Status ===")
 	fmt.Println("")
 
 	fmt.Println("Local Secrets File:")
@@ -387,18 +387,18 @@ func runStatus(_ []string) int {
 		fmt.Println("")
 	} else {
 		fmt.Println("  File: " + config.SecretsFile() + " (NOT FOUND)")
-		fmt.Println("  Run 'env-sync init' to create one")
+		fmt.Println("  Run 'syncenv init' to create one")
 		fmt.Println("")
 	}
 
 	fmt.Println("Local Server:")
 	if health, err := fetchHealth("localhost"); err == nil {
 		fmt.Println("  Status: Running")
-		fmt.Println("  Port: " + config.EnvSyncPort())
+		fmt.Println("  Port: " + config.SyncEnvPort())
 		fmt.Println("  Version: " + health.Version)
 	} else {
 		fmt.Println("  Status: Not running")
-		fmt.Println("  Run 'env-sync serve -d' to start")
+		fmt.Println("  Run 'syncenv serve -d' to start")
 	}
 	fmt.Println("")
 
@@ -462,7 +462,7 @@ func runInit(args []string) int {
 		case "--encrypt-existing":
 			encryptExisting = true
 		case "--help":
-			fmt.Println("Usage: env-sync init [options]")
+			fmt.Println("Usage: syncenv init [options]")
 			fmt.Println("Options:")
 			fmt.Println("  --encrypted         Initialize with encryption enabled (generates AGE key)")
 			fmt.Println("  --encrypt-existing  Encrypt an existing plaintext secrets file")
@@ -520,12 +520,12 @@ func runInit(args []string) int {
 		}
 		logging.Log("SUCCESS", "Initialized encrypted secrets file at "+config.SecretsFile())
 		logging.Log("INFO", "Your AGE public key: "+pubkey)
-		logging.Log("INFO", "Edit the file to add your secrets (use 'env-sync add'), then run 'env-sync'")
+		logging.Log("INFO", "Edit the file to add your secrets (use 'syncenv add'), then run 'syncenv'")
 		return 0
 	}
 
 	logging.Log("SUCCESS", "Initialized secrets file at "+config.SecretsFile())
-	logging.Log("INFO", "Edit the file to add your secrets, then run 'env-sync'")
+	logging.Log("INFO", "Edit the file to add your secrets, then run 'syncenv'")
 	return 0
 }
 
@@ -569,7 +569,7 @@ func handleEncryptExisting() int {
 			if err != nil {
 				return 1
 			}
-			newLines = append(newLines, fmt.Sprintf("%s=\"%s\" # ENVSYNC_UPDATED_AT=%s", key, encrypted, timestamp))
+			newLines = append(newLines, fmt.Sprintf("%s=\"%s\" # SYNCENV_UPDATED_AT=%s", key, encrypted, timestamp))
 		} else {
 			newLines = append(newLines, line)
 		}
@@ -593,7 +593,7 @@ func handleEncryptExisting() int {
 	}
 
 	logging.Log("SUCCESS", "Encrypted existing secrets file")
-	logging.Log("INFO", "Run 'env-sync' to sync with peers and add them as recipients")
+	logging.Log("INFO", "Run 'syncenv' to sync with peers and add them as recipients")
 	return 0
 }
 
@@ -633,7 +633,7 @@ func runCron(args []string) int {
 		case "--interval":
 			if i+1 >= len(args) {
 				logging.Log("ERROR", "--interval requires a value")
-				fmt.Println("Usage: env-sync cron --install --interval <minutes>")
+				fmt.Println("Usage: syncenv cron --install --interval <minutes>")
 				return 1
 			}
 			i++
@@ -677,8 +677,8 @@ func runCron(args []string) int {
 
 func runAdd(args []string) int {
 	if len(args) < 1 {
-		fmt.Println("Usage: env-sync add KEY=\"value\"")
-		fmt.Println("Example: env-sync add OPENAI_API_KEY=\"sk-...\"")
+		fmt.Println("Usage: syncenv add KEY=\"value\"")
+		fmt.Println("Example: syncenv add OPENAI_API_KEY=\"sk-...\"")
 		return 1
 	}
 
@@ -694,7 +694,7 @@ func runAdd(args []string) int {
 	value = strings.Trim(value, "'")
 
 	if _, err := os.Stat(config.SecretsFile()); err != nil {
-		logging.Log("ERROR", "Secrets file not found. Run 'env-sync init' first.")
+		logging.Log("ERROR", "Secrets file not found. Run 'syncenv init' first.")
 		return 1
 	}
 
@@ -732,7 +732,7 @@ func runAdd(args []string) int {
 		}
 	}
 
-	lines = append(lines, fmt.Sprintf("%s=\"%s\" # ENVSYNC_UPDATED_AT=%s", key, finalValue, timestamp))
+	lines = append(lines, fmt.Sprintf("%s=\"%s\" # SYNCENV_UPDATED_AT=%s", key, finalValue, timestamp))
 
 	if err := secrets.SetSecretsContent(config.SecretsFile(), strings.Join(lines, "\n")); err != nil {
 		return 1
@@ -754,8 +754,8 @@ func runAdd(args []string) int {
 
 func runRemove(args []string) int {
 	if len(args) < 1 {
-		fmt.Println("Usage: env-sync remove KEY")
-		fmt.Println("Example: env-sync remove OPENAI_API_KEY")
+		fmt.Println("Usage: syncenv remove KEY")
+		fmt.Println("Example: syncenv remove OPENAI_API_KEY")
 		return 1
 	}
 	key := args[0]
@@ -765,7 +765,7 @@ func runRemove(args []string) int {
 	}
 
 	if _, err := os.Stat(config.SecretsFile()); err != nil {
-		logging.Log("ERROR", "Secrets file not found. Run 'env-sync init' first.")
+		logging.Log("ERROR", "Secrets file not found. Run 'syncenv init' first.")
 		return 1
 	}
 
@@ -800,13 +800,13 @@ func runRemove(args []string) int {
 
 func runShow(args []string) int {
 	if len(args) < 1 {
-		fmt.Println("Usage: env-sync show KEY")
-		fmt.Println("Example: env-sync show OPENAI_API_KEY")
+		fmt.Println("Usage: syncenv show KEY")
+		fmt.Println("Example: syncenv show OPENAI_API_KEY")
 		return 1
 	}
 	key := args[0]
 	if _, err := os.Stat(config.SecretsFile()); err != nil {
-		logging.Log("ERROR", "Secrets file not found. Run 'env-sync init' first.")
+		logging.Log("ERROR", "Secrets file not found. Run 'syncenv init' first.")
 		return 1
 	}
 	content, _ := secrets.GetSecretsContent(config.SecretsFile())
@@ -847,7 +847,7 @@ func runShow(args []string) int {
 
 func runList(_ []string) int {
 	if _, err := os.Stat(config.SecretsFile()); err != nil {
-		logging.Log("ERROR", "Secrets file not found. Run 'env-sync init' first.")
+		logging.Log("ERROR", "Secrets file not found. Run 'syncenv init' first.")
 		return 1
 	}
 	content, _ := secrets.GetSecretsContent(config.SecretsFile())
@@ -899,9 +899,9 @@ func runLoad(args []string) int {
 		case "--decrypt-only":
 			decryptOnly = true
 		case "--quiet":
-			_ = os.Setenv("ENV_SYNC_QUIET", "true")
+			_ = os.Setenv("SYNCENV_QUIET", "true")
 		case "--help":
-			fmt.Println("Usage: env-sync load [options]")
+			fmt.Println("Usage: syncenv load [options]")
 			fmt.Println("")
 			fmt.Println("Load and decrypt secrets for shell integration.")
 			fmt.Println("Outputs export statements suitable for eval.")
@@ -914,14 +914,14 @@ func runLoad(args []string) int {
 			fmt.Println("  --help                 Show this help")
 			fmt.Println("")
 			fmt.Println("Examples:")
-			fmt.Println("  eval \"$(env-sync load)\"                    # Load all secrets")
-			fmt.Println("  eval \"$(env-sync load --quiet)\"            # Silent load")
-			fmt.Println("  env-sync load --format json                # Output as JSON")
-			fmt.Println("  env-sync load --key OPENAI_API_KEY         # Load specific key")
+			fmt.Println("  eval \"$(syncenv load)\"                    # Load all secrets")
+			fmt.Println("  eval \"$(syncenv load --quiet)\"            # Silent load")
+			fmt.Println("  syncenv load --format json                # Output as JSON")
+			fmt.Println("  syncenv load --key OPENAI_API_KEY         # Load specific key")
 			fmt.Println("")
 			fmt.Println("Shell Integration:")
 			fmt.Println("  Add this to your ~/.bashrc or ~/.zshrc:")
-			fmt.Println("  eval \"$(env-sync load 2>/dev/null)\"")
+			fmt.Println("  eval \"$(syncenv load 2>/dev/null)\"")
 			return 0
 		default:
 			logging.Log("ERROR", fmt.Sprintf("Unknown option: %s", args[i]))
@@ -930,7 +930,7 @@ func runLoad(args []string) int {
 	}
 
 	if _, err := os.Stat(config.SecretsFile()); err != nil {
-		if !strings.EqualFold(os.Getenv("ENV_SYNC_QUIET"), "true") {
+		if !strings.EqualFold(os.Getenv("SYNCENV_QUIET"), "true") {
 			logging.Log("ERROR", "Secrets file not found: "+config.SecretsFile())
 		}
 		return 1
@@ -940,20 +940,20 @@ func runLoad(args []string) int {
 	tempFile := ""
 	if keys.IsFileEncrypted(config.SecretsFile()) {
 		if !keys.CanDecryptFile(config.SecretsFile()) {
-			if !strings.EqualFold(os.Getenv("ENV_SYNC_QUIET"), "true") {
+			if !strings.EqualFold(os.Getenv("SYNCENV_QUIET"), "true") {
 				logging.Log("ERROR", "Cannot decrypt secrets file - not in recipient list")
-				logging.Log("INFO", "Run 'env-sync key request-access --trigger-all' to request access")
+				logging.Log("INFO", "Run 'syncenv key request-access --trigger-all' to request access")
 			}
 			return 1
 		}
-		tmp, err := os.CreateTemp("", "env-sync-decrypt")
+		tmp, err := os.CreateTemp("", "syncenv-decrypt")
 		if err != nil {
 			return 1
 		}
 		tempFile = tmp.Name()
 		_ = tmp.Close()
 		if err := keys.DecryptSecretsFile(config.SecretsFile(), tempFile); err != nil {
-			if !strings.EqualFold(os.Getenv("ENV_SYNC_QUIET"), "true") {
+			if !strings.EqualFold(os.Getenv("SYNCENV_QUIET"), "true") {
 				logging.Log("ERROR", "Failed to decrypt secrets file")
 			}
 			_ = os.Remove(tempFile)
@@ -1026,19 +1026,19 @@ func runPath(args []string) int {
 		case "--backup":
 			showBackup = true
 		case "--help":
-			fmt.Println("Usage: env-sync path [options]")
+			fmt.Println("Usage: syncenv path [options]")
 			fmt.Println("")
-			fmt.Println("Show paths to env-sync files and directories.")
+			fmt.Println("Show paths to syncenv files and directories.")
 			fmt.Println("")
 			fmt.Println("Options:")
 			fmt.Println("  --backup    Show backup directory path")
 			fmt.Println("")
 			fmt.Println("Examples:")
-			fmt.Println("  env-sync path           # Show secrets file path")
-			fmt.Println("  env-sync path --backup  # Show backup directory path")
+			fmt.Println("  syncenv path           # Show secrets file path")
+			fmt.Println("  syncenv path --backup  # Show backup directory path")
 			fmt.Println("")
 			fmt.Println("Usage in scripts:")
-			fmt.Println("  scp host:$(env-sync path) /tmp/  # Copy secrets file")
+			fmt.Println("  scp host:$(syncenv path) /tmp/  # Copy secrets file")
 			return 0
 		default:
 			logging.Log("ERROR", fmt.Sprintf("Unknown option: %s", arg))
@@ -1090,9 +1090,9 @@ func runKey(args []string) int {
 }
 
 func showKeyHelp() {
-	fmt.Print(`env-sync key - Manage AGE encryption keys
+	fmt.Print(`syncenv key - Manage AGE encryption keys
 
-Usage: env-sync key [subcommand] [options]
+Usage: syncenv key [subcommand] [options]
 
 Subcommands:
   show [options]                 Show this machine's key
@@ -1127,11 +1127,11 @@ Subcommands:
   revoke <hostname>              Remove key and re-encrypt without them
 
 Examples:
-  env-sync key show                        # Show your public key
-  env-sync key export                      # Export your pubkey
-  env-sync key import beelink age1xyz...   # Import beelink's pubkey
-  env-sync key request-access --trigger-all  # Request immediate access
-  env-sync key list                        # List known pubkeys
+  syncenv key show                        # Show your public key
+  syncenv key export                      # Export your pubkey
+  syncenv key import beelink age1xyz...   # Import beelink's pubkey
+  syncenv key request-access --trigger-all  # Request immediate access
+  syncenv key list                        # List known pubkeys
 
 `)
 }
@@ -1143,7 +1143,7 @@ func runKeyShow(args []string) int {
 		case "--private":
 			showPrivate = true
 		case "--help":
-			fmt.Println("Usage: env-sync key show [options]")
+			fmt.Println("Usage: syncenv key show [options]")
 			fmt.Println("Options:")
 			fmt.Println("  --private    Show private key (be careful!)")
 			return 0
@@ -1166,14 +1166,14 @@ func runKeyShow(args []string) int {
 
 	pubkey := keys.GetLocalPubkey()
 	if pubkey == "" {
-		logging.Log("INFO", "No public key found. Generate one with: env-sync init --encrypted")
+		logging.Log("INFO", "No public key found. Generate one with: syncenv init --encrypted")
 		return 1
 	}
 	fmt.Println("Public Key: " + pubkey)
 	fmt.Println("Peer ID: " + secrets.LocalPeerID())
 	fmt.Println("")
 	fmt.Println("To share with peers:")
-	fmt.Println("  env-sync key import --pubkey \"" + pubkey + "\" " + secrets.LocalPeerID())
+	fmt.Println("  syncenv key import --pubkey \"" + pubkey + "\" " + secrets.LocalPeerID())
 	return 0
 }
 
@@ -1184,7 +1184,7 @@ func runKeyExport(args []string) int {
 		case "--qr":
 			useQR = true
 		case "--help":
-			fmt.Println("Usage: env-sync key export [options]")
+			fmt.Println("Usage: syncenv key export [options]")
 			fmt.Println("Options:")
 			fmt.Println("  --qr    Display as QR code")
 			return 0
@@ -1196,7 +1196,7 @@ func runKeyExport(args []string) int {
 
 	pubkey := keys.GetLocalPubkey()
 	if pubkey == "" {
-		logging.Log("ERROR", "No public key found. Generate one with: env-sync init --encrypted")
+		logging.Log("ERROR", "No public key found. Generate one with: syncenv init --encrypted")
 		return 1
 	}
 
@@ -1232,13 +1232,13 @@ func runKeyImport(args []string) int {
 				i++
 			}
 		case "--help":
-			fmt.Println("Usage: env-sync key import [options] <pubkey> [hostname]")
+			fmt.Println("Usage: syncenv key import [options] <pubkey> [hostname]")
 			fmt.Println("Options:")
 			fmt.Println("  --from <hostname>    Import from peer via SSH")
 			fmt.Println("")
 			fmt.Println("Examples:")
-			fmt.Println("  env-sync key import age1xyz... beelink.local")
-			fmt.Println("  env-sync key import --from beelink.local")
+			fmt.Println("  syncenv key import age1xyz... beelink.local")
+			fmt.Println("  syncenv key import --from beelink.local")
 			return 0
 		default:
 			if strings.HasPrefix(args[i], "-") {
@@ -1263,7 +1263,7 @@ func runKeyImport(args []string) int {
 			"-o", "ConnectTimeout=5",
 			"-o", "StrictHostKeyChecking=" + sshtransport.HostKeyCheckingMode(),
 			fromEp.SSHDial(),
-			"cat ~/.config/env-sync/keys/age_key.pub",
+			"cat ~/.config/syncenv/keys/age_key.pub",
 		}
 		logging.LogCommand(args...)
 		cmd := exec.Command(args[0], args[1:]...)
@@ -1281,7 +1281,7 @@ func runKeyImport(args []string) int {
 		return 1
 	}
 	if hostname == "" {
-		logging.Log("ERROR", "Hostname required. Usage: env-sync key import <pubkey> <hostname>")
+		logging.Log("ERROR", "Hostname required. Usage: syncenv key import <pubkey> <hostname>")
 		return 1
 	}
 	// Normalize "user@host" to the canonical peer ID so two OS users on
@@ -1300,7 +1300,7 @@ func runKeyImport(args []string) int {
 	}
 	logging.Log("SUCCESS", "Imported public key for "+hostname)
 	syncer.ReencryptLocal()
-	logging.Log("INFO", "Run 'env-sync' to sync secrets with peers")
+	logging.Log("INFO", "Run 'syncenv' to sync secrets with peers")
 	return 0
 }
 
@@ -1311,7 +1311,7 @@ func runKeyList(args []string) int {
 		case "--local":
 			localOnly = true
 		case "--help":
-			fmt.Println("Usage: env-sync key list [options]")
+			fmt.Println("Usage: syncenv key list [options]")
 			fmt.Println("Options:")
 			fmt.Println("  --local    Show only this machine's key")
 			return 0
@@ -1365,7 +1365,7 @@ func runKeyRequestAccess(args []string) int {
 		case "--all":
 			requestAll = true
 		case "--help":
-			fmt.Println("Usage: env-sync key request-access [options]")
+			fmt.Println("Usage: syncenv key request-access [options]")
 			fmt.Println("Options:")
 			fmt.Println("  --trigger <hostname>    SSH into host and trigger re-encryption")
 			fmt.Println("  --trigger-all           Trigger on all online hosts")
@@ -1373,8 +1373,8 @@ func runKeyRequestAccess(args []string) int {
 			fmt.Println("  --all                   Request from all discovered hosts")
 			fmt.Println("")
 			fmt.Println("Examples:")
-			fmt.Println("  env-sync key request-access --trigger beelink.local")
-			fmt.Println("  env-sync key request-access --trigger-all")
+			fmt.Println("  syncenv key request-access --trigger beelink.local")
+			fmt.Println("  syncenv key request-access --trigger-all")
 			return 0
 		default:
 			logging.Log("ERROR", fmt.Sprintf("Unknown option: %s", args[i]))
@@ -1384,7 +1384,7 @@ func runKeyRequestAccess(args []string) int {
 
 	localPubkey := keys.GetLocalPubkey()
 	if localPubkey == "" {
-		logging.Log("ERROR", "No local key found. Generate with: env-sync init --encrypted")
+		logging.Log("ERROR", "No local key found. Generate with: syncenv init --encrypted")
 		return 1
 	}
 
@@ -1414,7 +1414,7 @@ func runKeyRequestAccess(args []string) int {
 				"-o", "StrictHostKeyChecking=" + sshtransport.HostKeyCheckingMode(),
 				host,
 				"bash", "-c",
-				"mkdir -p ~/.config/env-sync/keys/known_hosts && printf %s \"$1\" > ~/.config/env-sync/keys/known_hosts/$2.pub && env-sync 2>/dev/null || true && echo 'SUCCESS'",
+				"mkdir -p ~/.config/syncenv/keys/known_hosts && printf %s \"$1\" > ~/.config/syncenv/keys/known_hosts/$2.pub && syncenv 2>/dev/null || true && echo 'SUCCESS'",
 				"bash", localPubkey, secrets.LocalPeerID(),
 			}
 			logging.LogCommand(args...)
@@ -1430,7 +1430,7 @@ func runKeyRequestAccess(args []string) int {
 
 		if triggered > 0 {
 			logging.Log("SUCCESS", fmt.Sprintf("Successfully triggered %d host(s)", triggered))
-			logging.Log("INFO", "Run 'env-sync' to download encrypted secrets")
+			logging.Log("INFO", "Run 'syncenv' to download encrypted secrets")
 			return 0
 		}
 		logging.Log("ERROR", "Failed to trigger any hosts")
@@ -1460,7 +1460,7 @@ func runKeyRequestAccess(args []string) int {
 				"-o", "StrictHostKeyChecking=" + sshtransport.HostKeyCheckingMode(),
 				host,
 				"bash", "-c",
-				"mkdir -p ~/.config/env-sync/requests && cat > ~/.config/env-sync/requests/$1.request && echo 'REQUEST_SENT'",
+				"mkdir -p ~/.config/syncenv/requests && cat > ~/.config/syncenv/requests/$1.request && echo 'REQUEST_SENT'",
 				"bash", secrets.LocalPeerID(),
 			}
 			logging.LogCommand(args...)
@@ -1469,7 +1469,7 @@ func runKeyRequestAccess(args []string) int {
 			output, _ := cmd.Output()
 			if strings.Contains(string(output), "REQUEST_SENT") {
 				logging.Log("SUCCESS", "Access request sent to "+host)
-				logging.Log("INFO", "An admin must run 'env-sync key approve-requests' on "+host)
+				logging.Log("INFO", "An admin must run 'syncenv key approve-requests' on "+host)
 				requested++
 			} else {
 				logging.Log("WARN", "Failed to send request to "+host)
@@ -1503,7 +1503,7 @@ func runKeyGrantAccess(args []string) int {
 				i++
 			}
 		case "--help":
-			fmt.Println("Usage: env-sync key grant-access [options]")
+			fmt.Println("Usage: syncenv key grant-access [options]")
 			fmt.Println("Options:")
 			fmt.Println("  --to <hostname>      Hostname of machine to grant access")
 			fmt.Println("  --pubkey <key>       Public key of machine")
@@ -1583,8 +1583,8 @@ func runKeyApprove(_ []string) int {
 
 func runKeyRemove(args []string, revoke bool) int {
 	if len(args) == 0 || args[0] == "--help" {
-		fmt.Println("Usage: env-sync key remove <hostname>")
-		fmt.Println("       env-sync key revoke <hostname>  (also re-encrypts without them)")
+		fmt.Println("Usage: syncenv key remove <hostname>")
+		fmt.Println("       syncenv key revoke <hostname>  (also re-encrypts without them)")
 		return 0
 	}
 	hostname := args[0]
@@ -1601,7 +1601,7 @@ func runKeyRemove(args []string, revoke bool) int {
 
 func runMode(args []string) int {
 	if len(args) == 0 {
-		fmt.Println("Usage: env-sync mode <get|set>")
+		fmt.Println("Usage: syncenv mode <get|set>")
 		return 0
 	}
 
@@ -1614,7 +1614,7 @@ func runMode(args []string) int {
 
 	case "set":
 		if len(args) < 2 {
-			fmt.Println("Usage: env-sync mode set <mode> [--yes] [--prune-old-material]")
+			fmt.Println("Usage: syncenv mode set <mode> [--yes] [--prune-old-material]")
 			fmt.Println("")
 			fmt.Println("Available modes:")
 			for _, m := range config.ValidSyncModes() {
@@ -1655,7 +1655,7 @@ func runMode(args []string) int {
 
 	default:
 		logging.Log("ERROR", "Unknown subcommand: "+args[0])
-		fmt.Println("Usage: env-sync mode <get|set>")
+		fmt.Println("Usage: syncenv mode <get|set>")
 		return 1
 	}
 }
@@ -1665,7 +1665,7 @@ func runPeer(args []string) int {
 	currentMode := modeutil.GetMode()
 	if currentMode != config.ModeSecurePeer {
 		logging.Log("ERROR", "Peer commands require secure-peer mode")
-		logging.Log("INFO", "Switch with: env-sync mode set secure-peer --yes")
+		logging.Log("INFO", "Switch with: syncenv mode set secure-peer --yes")
 		return 1
 	}
 
@@ -1689,7 +1689,7 @@ func runPeer(args []string) int {
 		if len(args) > 1 && args[1] == "show" {
 			return runPeerTrustShow()
 		}
-		fmt.Println("Usage: env-sync peer trust show")
+		fmt.Println("Usage: syncenv peer trust show")
 		return 0
 	case "help", "--help", "-h":
 		showPeerHelp()
@@ -1702,9 +1702,9 @@ func runPeer(args []string) int {
 }
 
 func showPeerHelp() {
-	fmt.Print(`env-sync peer - Manage peers (secure-peer mode)
+	fmt.Print(`syncenv peer - Manage peers (secure-peer mode)
 
-Usage: env-sync peer <subcommand> [options]
+Usage: syncenv peer <subcommand> [options]
 
 Subcommands:
   invite [options]            Create enrollment invite token
@@ -1722,11 +1722,11 @@ Subcommands:
   trust show                  Show trust information (fingerprints, certs)
 
 Examples:
-  env-sync peer invite                      # Create invite (24h expiry)
-  env-sync peer invite --expiry 1h          # Create 1-hour invite
-  env-sync peer request beelink.local abc   # Request access with token
-  env-sync peer approve beelink             # Approve pending peer
-  env-sync peer list                        # List all peers
+  syncenv peer invite                      # Create invite (24h expiry)
+  syncenv peer invite --expiry 1h          # Create 1-hour invite
+  syncenv peer request beelink.local abc   # Request access with token
+  syncenv peer approve beelink             # Approve pending peer
+  syncenv peer list                        # List all peers
 `)
 }
 
@@ -1750,7 +1750,7 @@ func runPeerInvite(args []string) int {
 
 	id, err := identity.LoadIdentity()
 	if err != nil {
-		logging.Log("ERROR", "No transport identity found. Run 'env-sync mode set secure-peer --yes' first.")
+		logging.Log("ERROR", "No transport identity found. Run 'syncenv mode set secure-peer --yes' first.")
 		return 1
 	}
 
@@ -1773,13 +1773,13 @@ func runPeerInvite(args []string) int {
 	fmt.Println("Expires:     " + invite.ExpiresAt)
 	fmt.Println("")
 	fmt.Println("On the new peer, run:")
-	fmt.Printf("  env-sync peer request %s %s\n", localPeerID, invite.Token)
+	fmt.Printf("  syncenv peer request %s %s\n", localPeerID, invite.Token)
 	return 0
 }
 
 func runPeerRequest(args []string) int {
 	if len(args) < 2 {
-		fmt.Println("Usage: env-sync peer request <host> <invite-token>")
+		fmt.Println("Usage: syncenv peer request <host> <invite-token>")
 		return 1
 	}
 
@@ -1814,18 +1814,18 @@ func runPeerRequest(args []string) int {
 	err = mtlstransport.RequestAccess(dial, token, localPeerID, secrets.GetHostname(), fingerprint, agePubkey, id.CertPEM)
 	if err != nil {
 		logging.Log("ERROR", "Access request failed: "+err.Error())
-		logging.Log("INFO", "Ensure the peer server is running: env-sync serve -d")
+		logging.Log("INFO", "Ensure the peer server is running: syncenv serve -d")
 		return 1
 	}
 
 	logging.Log("SUCCESS", "Access request sent to "+host)
-	logging.Log("INFO", "Wait for the peer owner to run: env-sync peer approve "+localPeerID)
+	logging.Log("INFO", "Wait for the peer owner to run: syncenv peer approve "+localPeerID)
 	return 0
 }
 
 func runPeerApprove(args []string) int {
 	if len(args) < 1 {
-		fmt.Println("Usage: env-sync peer approve <peer-id>")
+		fmt.Println("Usage: syncenv peer approve <peer-id>")
 
 		// Show pending peers
 		reg, err := peer.LoadRegistry()
@@ -1900,7 +1900,7 @@ func runPeerApprove(args []string) int {
 
 func runPeerRevoke(args []string) int {
 	if len(args) < 1 {
-		fmt.Println("Usage: env-sync peer revoke <peer-id>")
+		fmt.Println("Usage: syncenv peer revoke <peer-id>")
 		return 1
 	}
 
@@ -1976,7 +1976,7 @@ func runPeerList(args []string) int {
 
 	if len(reg.Peers) == 0 {
 		fmt.Println("No peers registered.")
-		fmt.Println("Create an invite with: env-sync peer invite")
+		fmt.Println("Create an invite with: syncenv peer invite")
 		return 0
 	}
 
@@ -2138,17 +2138,17 @@ func runServiceUninstall() int {
 }
 
 func showServiceHelp() {
-	fmt.Print(`env-sync service - Manage env-sync background service
+	fmt.Print(`syncenv service - Manage syncenv background service
 
-Usage: env-sync service [subcommand]
+Usage: syncenv service [subcommand]
 
 Subcommands:
   stop         Stop the running service
   restart      Restart the service
   uninstall    Uninstall the service completely
 
-Note: The service is created when you run 'env-sync serve -d'
-      Use 'systemctl --user status env-sync' (Linux) or
-      'launchctl print gui/$(id -u)/env-sync' (macOS) to check status.
+Note: The service is created when you run 'syncenv serve -d'
+      Use 'systemctl --user status syncenv' (Linux) or
+      'launchctl print gui/$(id -u)/syncenv' (macOS) to check status.
 `)
 }

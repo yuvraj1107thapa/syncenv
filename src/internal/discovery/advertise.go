@@ -5,9 +5,9 @@ import (
 	"os/exec"
 	"runtime"
 
-	"envsync/internal/config"
-	"envsync/internal/logging"
-	"envsync/internal/secrets"
+	"syncenv/internal/config"
+	"syncenv/internal/logging"
+	"syncenv/internal/secrets"
 )
 
 // Advertiser keeps an mDNS advertisement process running.
@@ -15,13 +15,13 @@ type Advertiser struct {
 	cmd *exec.Cmd
 }
 
-// StartAdvertiser announces env-sync on the local network via mDNS/Bonjour.
+// StartAdvertiser announces syncenv on the local network via mDNS/Bonjour.
 // The instance name is per-user ("user@host") so two OS users on the same
 // machine advertise distinct instances and can run side by side.
 // Missing system binaries are treated as non-fatal and will skip advertising.
 func StartAdvertiser(port string) (*Advertiser, error) {
 	if port == "" {
-		port = config.EnvSyncPort()
+		port = config.SyncEnvPort()
 	}
 
 	name := secrets.LocalInstanceName()

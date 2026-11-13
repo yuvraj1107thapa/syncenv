@@ -1,4 +1,4 @@
-# env-sync
+# syncenv
 
 [![Go](https://img.shields.io/badge/Go-1.24%2B-00ADD8?logo=go&logoColor=white)](https://go.dev/)
 [![SSH](https://img.shields.io/badge/SSH-Secure%20Transfer-green?logo=openssh&logoColor=white)](https://www.openssh.com/)
@@ -7,7 +7,7 @@
 [![Linux](https://img.shields.io/badge/Linux-Supported-FCC624?logo=linux&logoColor=white)](https://kernel.org/)
 [![macOS](https://img.shields.io/badge/macOS-Supported-000000?logo=apple&logoColor=white)](https://apple.com/macos/)
 [![Windows](https://img.shields.io/badge/Windows%20(WSL2)-Supported-0078D6?logo=windows11&logoColor=white)](https://docs.microsoft.com/en-us/windows/wsl/)
-[![BATS Tests](https://github.com/yuvraj1107thapa/envsync/actions/workflows/bats-tests.yml/badge.svg)](https://github.com/yuvraj1107thapa/envsync/actions/workflows/bats-tests.yml)
+[![BATS Tests](https://github.com/yuvraj1107thapa/syncenv/actions/workflows/bats-tests.yml/badge.svg)](https://github.com/yuvraj1107thapa/syncenv/actions/workflows/bats-tests.yml)
 
 Distributed secrets synchronization for local networks. Sync your `.env` files securely across multiple machines with three operation modes for different trust scenarios.
 
@@ -19,10 +19,10 @@ Distributed secrets synchronization for local networks. Sync your `.env` files s
 
 ```bash
 # System-wide install
-curl -fsSL https://envsync.yuvrajthapa.com/install.sh | sudo bash
+curl -fsSL https://syncenv.yuvrajthapa.com/install.sh | sudo bash
 
 # User install (no sudo)
-curl -fsSL https://envsync.yuvrajthapa.com/install.sh | bash -s -- --user
+curl -fsSL https://syncenv.yuvrajthapa.com/install.sh | bash -s -- --user
 ```
 
 The installer defaults to the CLI. Add `--all` to install both the CLI and desktop GUI, or use `--gui-only` to install just the GUI app.
@@ -33,22 +33,22 @@ See [INSTALLATION.md](./docs/INSTALLATION.md) for detailed platform-specific ins
 
 ```bash
 # Initialize (creates secrets file with mode-appropriate defaults)
-env-sync init
+syncenv init
 
 # Add secrets
-env-sync add OPENAI_API_KEY="sk-..."
-env-sync add DATABASE_URL="postgres://..."
+syncenv add OPENAI_API_KEY="sk-..."
+syncenv add DATABASE_URL="postgres://..."
 
 # Sync with peers
-env-sync
+syncenv
 
 # Optional: Set up periodic sync
-env-sync cron --install
+syncenv cron --install
 ```
 
 ## Three Security Modes
 
-env-sync v3.0+ operates in three distinct modes designed for different trust scenarios:
+syncenv v3.0+ operates in three distinct modes designed for different trust scenarios:
 
 | Mode | Storage | Transport | Use Case |
 |------|---------|-----------|----------|
@@ -66,8 +66,8 @@ For syncing secrets across your own devices.
 
 ```bash
 # Default mode - works out of the box
-env-sync init
-env-sync
+syncenv init
+syncenv
 ```
 
 ### Mode C: Secure-Peer
@@ -80,16 +80,16 @@ For collaborating across different owners without sharing SSH access.
 
 ```bash
 # Switch to secure mode
-env-sync mode set secure-peer
+syncenv mode set secure-peer
 
 # Create invitation
-env-sync peer invite --expires 1h
+syncenv peer invite --expires 1h
 
 # On new machine, request access (peer IDs are user@host)
-env-sync peer request alice@hostname.local <token>
+syncenv peer request alice@hostname.local <token>
 
 # Approve from existing peer
-env-sync peer approve bob@new-host.local
+syncenv peer approve bob@new-host.local
 ```
 
 See [SECURITY-MODES.md](./docs/SECURITY-MODES.md) for detailed security analysis and threat models.
@@ -98,29 +98,29 @@ See [SECURITY-MODES.md](./docs/SECURITY-MODES.md) for detailed security analysis
 
 ```bash
 # Sync with peers
-env-sync
+syncenv
 
 # Manage secrets
-env-sync add KEY="value"
-env-sync remove KEY
-env-sync list
-env-sync show KEY
+syncenv add KEY="value"
+syncenv remove KEY
+syncenv list
+syncenv show KEY
 
 # Load secrets for shell
-eval "$(env-sync load)"
+eval "$(syncenv load)"
 
 # Mode management
-env-sync mode get
-env-sync mode set secure-peer
+syncenv mode get
+syncenv mode set secure-peer
 
 # Peer management (secure-peer mode, peer IDs are user@host)
-env-sync peer list
-env-sync peer approve bob@hostname.local
+syncenv peer list
+syncenv peer approve bob@hostname.local
 
 # Service management
-env-sync serve -d        # Start background service
-env-sync service stop    # Stop service
-env-sync cron --install  # Set up periodic sync
+syncenv serve -d        # Start background service
+syncenv service stop    # Stop service
+syncenv cron --install  # Set up periodic sync
 ```
 
 See [USAGE.md](./docs/USAGE.md) for complete command reference.
@@ -131,11 +131,11 @@ Add to `~/.bashrc` or `~/.zshrc`:
 
 ```bash
 # Auto-load secrets on startup
-eval "$(env-sync load 2>/dev/null)"
+eval "$(syncenv load 2>/dev/null)"
 
 # Auto-sync in background
-if command -v env-sync &> /dev/null; then
-    (env-sync --quiet &)
+if command -v syncenv &> /dev/null; then
+    (syncenv --quiet &)
 fi
 ```
 
@@ -185,12 +185,12 @@ Machine A                      Machine B
 
 **Multi-user (v4+)**: peer IDs are `user@host`; each OS user gets their own
 port (default 5739, overridable, auto-bumped unless pinned); `serve -p` /
-`ENV_SYNC_PORT` pins an explicit port that is never bumped.
+`SYNCENV_PORT` pins an explicit port that is never bumped.
 
 ## File Locations
 
 ```
-~/.config/env-sync/
+~/.config/syncenv/
 ├── config                 # Config file
 ├── .secrets.env          # Secrets (encrypted or plaintext)
 ├── .secrets.env.backup.* # Backups (last 5)
@@ -203,8 +203,8 @@ port (default 5739, overridable, auto-bumped unless pinned); `serve -p` /
 ## Building from Source
 
 ```bash
-git clone https://github.com/yuvraj1107thapa/envsync.git
-cd envsync
+git clone https://github.com/yuvraj1107thapa/syncenv.git
+cd syncenv
 
 # Build CLI
 make build
@@ -262,4 +262,4 @@ See [CHANGELOG.md](./CHANGELOG.md) for version history.
 
 ---
 
-**Note**: env-sync is designed for local networks. Do not expose the HTTP server to the public internet.
+**Note**: syncenv is designed for local networks. Do not expose the HTTP server to the public internet.

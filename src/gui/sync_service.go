@@ -1,7 +1,7 @@
 package main
 
 import (
-	syncer "envsync/internal/sync"
+	syncer "syncenv/internal/sync"
 )
 
 // SyncService provides sync operations

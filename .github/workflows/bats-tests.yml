@@ -127,5 +127,5 @@ jobs:
       - name: Verify Version
         run: |
           ./tests/start-test-env.sh
-          docker exec env-sync-alpha env-sync --version
+          docker exec syncenv-alpha syncenv --version
           ./tests/start-test-env.sh --stop

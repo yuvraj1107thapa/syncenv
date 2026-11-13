@@ -10,10 +10,10 @@ load 'test_helper'
     docker run -d \
         --name "$CONTAINER_DELTA" \
         --hostname delta.local \
-        --network env-sync-test \
+        --network syncenv-test \
         --ip 172.20.0.5 \
         -v "$DOCKER_DIR/ssh-keys:/mnt/ssh-keys:ro" \
-        -e ENV_SYNC_DEBUG=1 \
+        -e SYNCENV_DEBUG=1 \
         -e CONTAINER_NAME=delta \
         --privileged \
         docker-alpha:latest
@@ -37,11 +37,11 @@ load 'test_helper'
     [ -n "$DELTA_PUBKEY" ]
 
     # Import existing keys into delta
-    run container_exec "$CONTAINER_DELTA" env-sync key import "$(get_pubkey "$CONTAINER_ALPHA")" "alpha.local"
+    run container_exec "$CONTAINER_DELTA" syncenv key import "$(get_pubkey "$CONTAINER_ALPHA")" "alpha.local"
     [ "$status" -eq 0 ]
-    run container_exec "$CONTAINER_DELTA" env-sync key import "$(get_pubkey "$CONTAINER_BETA")" "beta.local"
+    run container_exec "$CONTAINER_DELTA" syncenv key import "$(get_pubkey "$CONTAINER_BETA")" "beta.local"
     [ "$status" -eq 0 ]
-    run container_exec "$CONTAINER_DELTA" env-sync key import "$(get_pubkey "$CONTAINER_GAMMA")" "gamma.local"
+    run container_exec "$CONTAINER_DELTA" syncenv key import "$(get_pubkey "$CONTAINER_GAMMA")" "gamma.local"
     [ "$status" -eq 0 ]
 
     # Share delta's key with others

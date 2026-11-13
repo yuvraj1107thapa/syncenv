@@ -1,7 +1,7 @@
 package main
 
 import (
-	"envsync/internal/config"
+	"syncenv/internal/config"
 	"testing"
 )
 

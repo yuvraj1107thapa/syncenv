@@ -1,21 +1,21 @@
 <script setup lang="ts">
 useHead({
-  title: 'Security architecture | env-sync',
+  title: 'Security architecture | syncenv',
   meta: [
-    { name: 'description', content: 'Security architecture of env-sync: trust boundaries, mTLS, AGE encryption, certificate pinning, signed membership events, and threat model.' },
-    { property: 'og:title', content: 'Security architecture | env-sync' },
+    { name: 'description', content: 'Security architecture of syncenv: trust boundaries, mTLS, AGE encryption, certificate pinning, signed membership events, and threat model.' },
+    { property: 'og:title', content: 'Security architecture | syncenv' },
     { property: 'og:description', content: 'Defense-in-depth security: mTLS, AGE encryption, certificate pinning, signed membership events, and threat model for peer-to-peer secrets sync.' },
     { property: 'og:type', content: 'article' },
-    { property: 'og:url', content: 'https://envsync.yuvrajthapa.com/security' },
-    { property: 'og:image', content: 'https://envsync.yuvrajthapa.com/assets/cover.png' },
+    { property: 'og:url', content: 'https://syncenv.yuvrajthapa.com/security' },
+    { property: 'og:image', content: 'https://syncenv.yuvrajthapa.com/assets/cover.png' },
     { name: 'twitter:card', content: 'summary_large_image' },
-    { name: 'twitter:title', content: 'Security architecture | env-sync' },
+    { name: 'twitter:title', content: 'Security architecture | syncenv' },
     { name: 'twitter:description', content: 'Defense-in-depth: mTLS, AGE encryption, certificate pinning, signed membership events for peer-to-peer secrets sync.' },
-    { name: 'twitter:image', content: 'https://envsync.yuvrajthapa.com/assets/cover.png' },
-    { name: 'keywords', content: 'env-sync security, mTLS, AGE encryption, certificate pinning, threat model, peer-to-peer security, secrets encryption' },
+    { name: 'twitter:image', content: 'https://syncenv.yuvrajthapa.com/assets/cover.png' },
+    { name: 'keywords', content: 'syncenv security, mTLS, AGE encryption, certificate pinning, threat model, peer-to-peer security, secrets encryption' },
   ],
   link: [
-    { rel: 'canonical', href: 'https://envsync.yuvrajthapa.com/security' },
+    { rel: 'canonical', href: 'https://syncenv.yuvrajthapa.com/security' },
   ],
 })
 </script>
@@ -23,7 +23,7 @@ useHead({
 <template>
   <div class="subpage-hero">
     <h1>Security architecture</h1>
-    <p>env-sync uses defense-in-depth across three explicit security modes. No implicit trust — you choose the model that fits your threat profile.</p>
+    <p>syncenv uses defense-in-depth across three explicit security modes. No implicit trust — you choose the model that fits your threat profile.</p>
   </div>
 
   <section class="panel">
@@ -84,7 +84,7 @@ useHead({
     <h2>Operational security checklist</h2>
     <ul>
       <li><i class="fa-solid fa-circle-check"></i> Keep file permissions strict — <code>600</code> for secrets files.</li>
-      <li><i class="fa-solid fa-circle-check"></i> Never log secret values — env-sync's logging respects this boundary.</li>
+      <li><i class="fa-solid fa-circle-check"></i> Never log secret values — syncenv's logging respects this boundary.</li>
       <li><i class="fa-solid fa-circle-check"></i> Audit approved peers regularly in secure-peer mode.</li>
       <li><i class="fa-solid fa-circle-check"></i> Use backups and key lifecycle controls during membership changes.</li>
       <li><i class="fa-solid fa-circle-check"></i> Enable AGE encryption in trusted-owner mode for defense-in-depth.</li>
@@ -93,7 +93,7 @@ useHead({
   </section>
 
   <section class="cta-banner">
-    <h2>See how env-sync compares to centralized tools</h2>
+    <h2>See how syncenv compares to centralized tools</h2>
     <p>Understand the trade-offs between peer-to-peer sync and cloud-hosted secrets managers.</p>
     <div class="cta-row" style="justify-content:center;">
       <NuxtLink class="btn btn-primary" to="/comparisons">View comparisons</NuxtLink>

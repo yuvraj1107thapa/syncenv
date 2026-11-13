@@ -1,21 +1,21 @@
 <script setup lang="ts">
 useHead({
-  title: 'Security modes explained | env-sync',
+  title: 'Security modes explained | syncenv',
   meta: [
-    { name: 'description', content: 'Compare env-sync\'s three security modes: trusted-owner-ssh for personal fleets, secure-peer for cross-team collaboration, and dev-plaintext-http for debugging.' },
-    { property: 'og:title', content: 'Security modes explained | env-sync' },
-    { property: 'og:description', content: 'Compare env-sync\'s three security modes: trusted-owner-ssh for personal fleets, secure-peer for cross-team collaboration, dev-plaintext-http for debugging.' },
+    { name: 'description', content: 'Compare syncenv\'s three security modes: trusted-owner-ssh for personal fleets, secure-peer for cross-team collaboration, and dev-plaintext-http for debugging.' },
+    { property: 'og:title', content: 'Security modes explained | syncenv' },
+    { property: 'og:description', content: 'Compare syncenv\'s three security modes: trusted-owner-ssh for personal fleets, secure-peer for cross-team collaboration, dev-plaintext-http for debugging.' },
     { property: 'og:type', content: 'article' },
-    { property: 'og:url', content: 'https://envsync.yuvrajthapa.com/modes' },
-    { property: 'og:image', content: 'https://envsync.yuvrajthapa.com/assets/cover.png' },
+    { property: 'og:url', content: 'https://syncenv.yuvrajthapa.com/modes' },
+    { property: 'og:image', content: 'https://syncenv.yuvrajthapa.com/assets/cover.png' },
     { name: 'twitter:card', content: 'summary_large_image' },
-    { name: 'twitter:title', content: 'Security modes explained | env-sync' },
+    { name: 'twitter:title', content: 'Security modes explained | syncenv' },
     { name: 'twitter:description', content: 'Three security modes for different trust boundaries: SSH, mTLS+AGE, or plaintext debug. Pick the one that fits.' },
-    { name: 'twitter:image', content: 'https://envsync.yuvrajthapa.com/assets/cover.png' },
-    { name: 'keywords', content: 'env-sync modes, SSH sync, mTLS secrets, AGE encryption, trusted-owner, secure-peer, security modes' },
+    { name: 'twitter:image', content: 'https://syncenv.yuvrajthapa.com/assets/cover.png' },
+    { name: 'keywords', content: 'syncenv modes, SSH sync, mTLS secrets, AGE encryption, trusted-owner, secure-peer, security modes' },
   ],
   link: [
-    { rel: 'canonical', href: 'https://envsync.yuvrajthapa.com/modes' },
+    { rel: 'canonical', href: 'https://syncenv.yuvrajthapa.com/modes' },
   ],
 })
 </script>
@@ -23,7 +23,7 @@ useHead({
 <template>
   <div class="subpage-hero">
     <h1>Three modes, one CLI</h1>
-    <p>env-sync gives you explicit control over how secrets are stored, transported, and who gets access. Pick the security model that fits your scenario.</p>
+    <p>syncenv gives you explicit control over how secrets are stored, transported, and who gets access. Pick the security model that fits your scenario.</p>
   </div>
 
   <section class="panel">
@@ -43,7 +43,7 @@ useHead({
   <section class="panel">
     <h2>Mode A: dev-plaintext-http</h2>
     <p>Debug-only mode with <strong>no encryption</strong> at rest or in transit and <strong>no authentication</strong>. Use this exclusively for isolated local testing — never for real secrets.</p>
-    <pre><code>env-sync mode set dev-plaintext-http</code></pre>
+    <pre><code>syncenv mode set dev-plaintext-http</code></pre>
   </section>
 
   <section class="panel">
@@ -57,7 +57,7 @@ useHead({
       <li>Merge changes and write locally with automatic backup.</li>
     </ol>
     <p>Since v4, peers are identified per-user (<code>user@host</code>), so two OS users on one machine are distinct peers.</p>
-    <pre><code>env-sync mode set trusted-owner-ssh</code></pre>
+    <pre><code>syncenv mode set trusted-owner-ssh</code></pre>
   </section>
 
   <section class="panel">
@@ -73,7 +73,7 @@ useHead({
       <li>Replay signed membership events for offline catch-up.</li>
     </ol>
     <p>Since v4, approvals and the peer registry use per-user <code>user@host</code> peer IDs; endpoints accept an optional <code>:port</code>.</p>
-    <pre><code>env-sync mode set secure-peer</code></pre>
+    <pre><code>syncenv mode set secure-peer</code></pre>
   </section>
 
   <section class="panel">
@@ -99,7 +99,7 @@ useHead({
 
   <section class="cta-banner">
     <h2>Ready to get started?</h2>
-    <p>Install env-sync and initialize with your preferred security mode.</p>
+    <p>Install syncenv and initialize with your preferred security mode.</p>
     <div class="cta-row" style="justify-content:center;">
       <NuxtLink class="btn btn-primary" to="/installation">Install now</NuxtLink>
       <NuxtLink class="btn btn-secondary" to="/security">Security deep-dive</NuxtLink>

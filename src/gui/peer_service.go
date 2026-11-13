@@ -1,11 +1,11 @@
 package main
 
 import (
-	"envsync/internal/config"
-	"envsync/internal/identity"
-	"envsync/internal/keys"
-	"envsync/internal/mode"
-	"envsync/internal/peer"
+	"syncenv/internal/config"
+	"syncenv/internal/identity"
+	"syncenv/internal/keys"
+	"syncenv/internal/mode"
+	"syncenv/internal/peer"
 	"fmt"
 	"time"
 )
@@ -94,7 +94,7 @@ func (p *PeerService) CreateInvite(expiryHours int) (InviteInfo, error) {
 		CreatedBy:   hostname,
 		Fingerprint: fingerprint,
 		ExpiresAt:   invite.ExpiresAt,
-		Command:     fmt.Sprintf("env-sync peer request %s %s", hostname, invite.Token),
+		Command:     fmt.Sprintf("syncenv peer request %s %s", hostname, invite.Token),
 	}, nil
 }
 

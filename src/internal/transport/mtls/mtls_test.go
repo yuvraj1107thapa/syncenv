@@ -3,7 +3,7 @@ package mtlstransport
 import (
 	"testing"
 
-	"envsync/internal/identity"
+	"syncenv/internal/identity"
 )
 
 func TestNewServerTLSConfigRequiresIdentity(t *testing.T) {

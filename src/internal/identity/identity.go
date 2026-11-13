@@ -17,9 +17,9 @@ import (
 	"strings"
 	"time"
 
-	"envsync/internal/config"
-	"envsync/internal/logging"
-	"envsync/internal/secrets"
+	"syncenv/internal/config"
+	"syncenv/internal/logging"
+	"syncenv/internal/secrets"
 )
 
 // TransportIdentity holds the TLS transport keypair and certificate.
@@ -57,7 +57,7 @@ func GenerateTransportIdentity(peerID string) (*TransportIdentity, error) {
 		SerialNumber: serialNumber,
 		Subject: pkix.Name{
 			CommonName:   peerID,
-			Organization: []string{"env-sync"},
+			Organization: []string{"syncenv"},
 		},
 		NotBefore:             time.Now().Add(-1 * time.Hour),
 		NotAfter:              time.Now().Add(10 * 365 * 24 * time.Hour), // 10 years

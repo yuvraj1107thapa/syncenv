@@ -1,5 +1,5 @@
 // Package update implements self-update version checking and upgrading
-// for env-sync via GitHub releases and the remote install script.
+// for syncenv via GitHub releases and the remote install script.
 package update
 
 import (
@@ -15,22 +15,22 @@ import (
 	"strings"
 	"time"
 
-	"envsync/internal/config"
+	"syncenv/internal/config"
 )
 
 const (
 	// githubRepo is the "owner/repo" used for release checks.
-	githubRepo = "yuvraj1107thapa/envsync"
+	githubRepo = "yuvraj1107thapa/syncenv"
 	// latestReleaseAPI is the primary source for the latest version.
-	latestReleaseAPI = "https://api.github.com/repos/yuvraj1107thapa/envsync/releases/latest"
+	latestReleaseAPI = "https://api.github.com/repos/yuvraj1107thapa/syncenv/releases/latest"
 	// releasesPageBase links users to release notes/tags.
-	releasesPageBase = "https://github.com/yuvraj1107thapa/envsync/releases/tag"
+	releasesPageBase = "https://github.com/yuvraj1107thapa/syncenv/releases/tag"
 
 	// internalArg is the hidden subcommand argument the detached
 	// background checker re-executes this binary with.
 	internalArg = "__check-update-internal"
 	// internalEnv guards TriggerBackgroundCheck against recursion.
-	internalEnv = "ENV_SYNC_UPDATE_INTERNAL"
+	internalEnv = "SYNCENV_UPDATE_INTERNAL"
 
 	// checkInterval is how often a background check may run.
 	checkInterval = 12 * time.Hour
@@ -40,8 +40,8 @@ const (
 
 // installerURLs lists the install.sh sources in priority order.
 var installerURLs = []string{
-	"https://envsync.yuvrajthapa.com/install.sh",
-	"https://raw.githubusercontent.com/yuvraj1107thapa/envsync/main/install.sh",
+	"https://syncenv.yuvrajthapa.com/install.sh",
+	"https://raw.githubusercontent.com/yuvraj1107thapa/syncenv/main/install.sh",
 }
 
 // versionState is the JSON shape of the on-disk version-check cache:
@@ -84,7 +84,7 @@ func writeCache(st versionState) error {
 
 // isQuiet reports whether update output should be suppressed.
 func isQuiet(args []string) bool {
-	if strings.EqualFold(os.Getenv("ENV_SYNC_QUIET"), "true") {
+	if strings.EqualFold(os.Getenv("SYNCENV_QUIET"), "true") {
 		return true
 	}
 	for _, a := range args {
@@ -206,7 +206,7 @@ func fetchLatestVersion() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	req.Header.Set("User-Agent", "env-sync/"+config.Version)
+	req.Header.Set("User-Agent", "syncenv/"+config.Version)
 	req.Header.Set("Accept", "application/vnd.github+json")
 
 	resp, err := client.Do(req)
@@ -239,7 +239,7 @@ func fetchLatestVersion() (string, error) {
 // one is due (cache missing or older than 12h). It is non-blocking and
 // returns quickly (<50ms, file read only, no network). It never prints and
 // never fails hard; all errors are silently ignored. When the
-// ENV_SYNC_UPDATE_INTERNAL guard is set it is a no-op (no recursion).
+// SYNCENV_UPDATE_INTERNAL guard is set it is a no-op (no recursion).
 func TriggerBackgroundCheck() {
 	defer func() {
 		_ = recover()
@@ -278,7 +278,7 @@ func TriggerBackgroundCheck() {
 // latest version is newer than the running version. It performs only a
 // file read (no network) and stays silent when the cache is missing or
 // unparseable, when no newer version is cached, or in quiet mode
-// (ENV_SYNC_QUIET=true or -q/--quiet in args). It never fails.
+// (SYNCENV_QUIET=true or -q/--quiet in args). It never fails.
 func MaybeShowUpdateNotice(args []string) {
 	defer func() {
 		_ = recover()
@@ -294,8 +294,8 @@ func MaybeShowUpdateNotice(args []string) {
 	if isQuiet(args) {
 		return
 	}
-	fmt.Fprintf(os.Stderr, "A new version of env-sync is available: %s (you have %s)\n", latest, config.Version)
-	fmt.Fprintln(os.Stderr, "Run `env-sync update` to upgrade.")
+	fmt.Fprintf(os.Stderr, "A new version of syncenv is available: %s (you have %s)\n", latest, config.Version)
+	fmt.Fprintln(os.Stderr, "Run `syncenv update` to upgrade.")
 	fmt.Fprintln(os.Stderr, releaseTagURL(latest))
 }
 
@@ -327,7 +327,7 @@ func RunCheckNow() (err error) {
 	return nil
 }
 
-// RunUpdate implements `env-sync update`.
+// RunUpdate implements `syncenv update`.
 //
 // Supported flags: --check (print current vs latest), --yes/-y (skip the
 // confirm prompt), --user/--gui/--gui-only/--all (passed through to the
@@ -395,7 +395,7 @@ func RunUpdate(args []string) (code int) {
 			fmt.Fprintln(os.Stderr, "Not running interactively; re-run with --yes to update non-interactively.")
 			return 1
 		}
-		fmt.Fprintf(os.Stderr, "Update env-sync to %s? [y/N]: ", want)
+		fmt.Fprintf(os.Stderr, "Update syncenv to %s? [y/N]: ", want)
 		reader := bufio.NewReader(os.Stdin)
 		line, err := reader.ReadString('\n')
 		if err != nil && len(line) == 0 {
@@ -433,7 +433,7 @@ func RunUpdate(args []string) (code int) {
 	return 0
 }
 
-// runUpdateCheck implements `env-sync update --check`: a live fetch with a
+// runUpdateCheck implements `syncenv update --check`: a live fetch with a
 // short timeout plus a "Current vs Latest" report. It always returns 0.
 func runUpdateCheck() int {
 	current := config.Version
@@ -442,7 +442,7 @@ func runUpdateCheck() int {
 		if cached := cachedLatest(); cached != "" {
 			fmt.Printf("Current: %s, Latest: %s (cached, live check failed: %v)\n", current, cached, err)
 			if IsNewer(cached, current) {
-				fmt.Println("Update available: run `env-sync update` to upgrade.")
+				fmt.Println("Update available: run `syncenv update` to upgrade.")
 			} else {
 				fmt.Println("You are up to date.")
 			}
@@ -453,7 +453,7 @@ func runUpdateCheck() int {
 	}
 	fmt.Printf("Current: %s, Latest: %s\n", current, latest)
 	if IsNewer(latest, current) {
-		fmt.Println("Update available: run `env-sync update` to upgrade.")
+		fmt.Println("Update available: run `syncenv update` to upgrade.")
 	} else {
 		fmt.Println("You are up to date.")
 	}
@@ -480,7 +480,7 @@ func downloadInstaller() (string, error) {
 			lastErr = err
 			continue
 		}
-		req.Header.Set("User-Agent", "env-sync/"+config.Version)
+		req.Header.Set("User-Agent", "syncenv/"+config.Version)
 		resp, err := client.Do(req)
 		if err != nil {
 			lastErr = err
@@ -501,7 +501,7 @@ func downloadInstaller() (string, error) {
 			lastErr = fmt.Errorf("%s: empty installer", u)
 			continue
 		}
-		dir, err := os.MkdirTemp("", "env-sync-update-*")
+		dir, err := os.MkdirTemp("", "syncenv-update-*")
 		if err != nil {
 			return "", err
 		}
@@ -518,11 +518,11 @@ func downloadInstaller() (string, error) {
 	return "", fmt.Errorf("failed to download installer: %w", lastErr)
 }
 
-// printUpdateUsage prints `env-sync update` help text.
+// printUpdateUsage prints `syncenv update` help text.
 func printUpdateUsage() {
-	fmt.Println(`Usage: env-sync update [flags]
+	fmt.Println(`Usage: syncenv update [flags]
 
-Update env-sync to the latest release.
+Update syncenv to the latest release.
 
 Flags:
   --check      Show current vs latest version without updating

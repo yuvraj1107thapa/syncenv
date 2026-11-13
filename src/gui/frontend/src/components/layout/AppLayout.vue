@@ -52,7 +52,7 @@ onMounted(async () => {
       <div class="sidebar-header">
         <div class="logo" v-if="!collapsed">
           <span class="logo-icon">🔐</span>
-          <span class="logo-text">env-sync</span>
+          <span class="logo-text">syncenv</span>
         </div>
         <button class="btn-ghost toggle-btn" @click="collapsed = !collapsed">
           {{ collapsed ? '→' : '←' }}

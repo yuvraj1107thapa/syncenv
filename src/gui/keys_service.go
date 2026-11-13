@@ -1,8 +1,8 @@
 package main
 
 import (
-	"envsync/internal/config"
-	"envsync/internal/keys"
+	"syncenv/internal/config"
+	"syncenv/internal/keys"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -75,7 +75,7 @@ func (k *KeysService) ImportFromPeer(hostname string) error {
 	if pubkey != "" {
 		return fmt.Errorf("key already cached for %s", hostname)
 	}
-	return fmt.Errorf("import from peer requires SSH access; use CLI: env-sync key import --from %s", hostname)
+	return fmt.Errorf("import from peer requires SSH access; use CLI: syncenv key import --from %s", hostname)
 }
 
 // ListKeys returns all cached peer keys

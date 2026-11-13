@@ -1,29 +1,29 @@
 <script setup lang="ts">
 useHead({
-  title: 'Comparisons | env-sync vs alternatives',
+  title: 'Comparisons | syncenv vs alternatives',
   meta: [
-    { name: 'description', content: 'Compare env-sync with dotenvx, SOPS, HashiCorp Vault, Infisical, Doppler, and Syncthing — see where peer-to-peer LAN sync fits in your stack.' },
-    { name: 'keywords', content: 'env-sync comparison, Vault alternative, Infisical alternative, Doppler alternative, dotenvx alternative, SOPS alternative, Syncthing alternative, secrets management comparison' },
-    { property: 'og:title', content: 'env-sync vs alternatives | Vault, Infisical, Doppler, dotenvx, SOPS, Syncthing' },
-    { property: 'og:description', content: 'See how env-sync compares to HashiCorp Vault, Infisical, Doppler, dotenvx, SOPS, and Syncthing. Peer-to-peer LAN sync vs centralized secrets platforms and general file sync.' },
+    { name: 'description', content: 'Compare syncenv with dotenvx, SOPS, HashiCorp Vault, Infisical, Doppler, and Syncthing — see where peer-to-peer LAN sync fits in your stack.' },
+    { name: 'keywords', content: 'syncenv comparison, Vault alternative, Infisical alternative, Doppler alternative, dotenvx alternative, SOPS alternative, Syncthing alternative, secrets management comparison' },
+    { property: 'og:title', content: 'syncenv vs alternatives | Vault, Infisical, Doppler, dotenvx, SOPS, Syncthing' },
+    { property: 'og:description', content: 'See how syncenv compares to HashiCorp Vault, Infisical, Doppler, dotenvx, SOPS, and Syncthing. Peer-to-peer LAN sync vs centralized secrets platforms and general file sync.' },
     { property: 'og:type', content: 'article' },
-    { property: 'og:url', content: 'https://envsync.yuvrajthapa.com/comparisons' },
-    { property: 'og:image', content: 'https://envsync.yuvrajthapa.com/assets/cover.png' },
+    { property: 'og:url', content: 'https://syncenv.yuvrajthapa.com/comparisons' },
+    { property: 'og:image', content: 'https://syncenv.yuvrajthapa.com/assets/cover.png' },
     { name: 'twitter:card', content: 'summary_large_image' },
-    { name: 'twitter:title', content: 'env-sync vs alternatives | Vault, Infisical, Doppler, dotenvx, SOPS, Syncthing' },
-    { name: 'twitter:description', content: 'See how env-sync compares to HashiCorp Vault, Infisical, Doppler, dotenvx, SOPS, and Syncthing for secrets management.' },
-    { name: 'twitter:image', content: 'https://envsync.yuvrajthapa.com/assets/cover.png' },
+    { name: 'twitter:title', content: 'syncenv vs alternatives | Vault, Infisical, Doppler, dotenvx, SOPS, Syncthing' },
+    { name: 'twitter:description', content: 'See how syncenv compares to HashiCorp Vault, Infisical, Doppler, dotenvx, SOPS, and Syncthing for secrets management.' },
+    { name: 'twitter:image', content: 'https://syncenv.yuvrajthapa.com/assets/cover.png' },
   ],
   link: [
-    { rel: 'canonical', href: 'https://envsync.yuvrajthapa.com/comparisons' },
+    { rel: 'canonical', href: 'https://syncenv.yuvrajthapa.com/comparisons' },
   ],
 })
 </script>
 
 <template>
   <div class="subpage-hero">
-    <h1>How env-sync compares</h1>
-    <p>Most secrets tools are built for cloud-first, centralized workflows. env-sync fills the gap — peer-to-peer .env sync on local networks with explicit trust boundaries and zero cloud dependency.</p>
+    <h1>How syncenv compares</h1>
+    <p>Most secrets tools are built for cloud-first, centralized workflows. syncenv fills the gap — peer-to-peer .env sync on local networks with explicit trust boundaries and zero cloud dependency.</p>
   </div>
 
   <section class="panel">
@@ -31,13 +31,13 @@ useHead({
     <table>
       <thead><tr><th>Tool</th><th>Architecture</th><th>Primary use case</th><th>LAN / offline</th><th>Pricing</th></tr></thead>
       <tbody>
-        <tr><td data-label="Tool"><strong>env-sync</strong></td><td data-label="Architecture">Peer-to-peer</td><td data-label="Primary use case">Sync .env secrets across local machines</td><td data-label="LAN / offline">✅ Built for it</td><td data-label="Pricing">Free &amp; open source</td></tr>
-        <tr><td data-label="Tool"><NuxtLink to="/comparisons/dotenvx-vs-envsync">dotenvx</NuxtLink></td><td data-label="Architecture">CLI per-app</td><td data-label="Primary use case">Encrypted .env files &amp; runtime injection</td><td data-label="LAN / offline">Partial — local files only</td><td data-label="Pricing">Free &amp; open source</td></tr>
-        <tr><td data-label="Tool"><NuxtLink to="/comparisons/sops-vs-envsync">SOPS</NuxtLink></td><td data-label="Architecture">CLI / file-based</td><td data-label="Primary use case">Encrypted config files in Git / IaC</td><td data-label="LAN / offline">Partial — local files only</td><td data-label="Pricing">Free &amp; open source</td></tr>
-        <tr><td data-label="Tool"><NuxtLink to="/comparisons/vault-vs-envsync">HashiCorp Vault</NuxtLink></td><td data-label="Architecture">Centralized server</td><td data-label="Primary use case">Enterprise secrets, dynamic creds, PKI</td><td data-label="LAN / offline">❌ Needs server</td><td data-label="Pricing">OSS free / Enterprise paid</td></tr>
-        <tr><td data-label="Tool"><NuxtLink to="/comparisons/infisical-vs-envsync">Infisical</NuxtLink></td><td data-label="Architecture">Centralized platform</td><td data-label="Primary use case">Secrets management, RBAC, PKI</td><td data-label="LAN / offline">❌ Needs server</td><td data-label="Pricing">OSS free / Cloud paid</td></tr>
-        <tr><td data-label="Tool"><NuxtLink to="/comparisons/doppler-vs-envsync">Doppler</NuxtLink></td><td data-label="Architecture">Cloud SaaS</td><td data-label="Primary use case">Centralized config &amp; secret delivery</td><td data-label="LAN / offline">❌ Cloud-dependent</td><td data-label="Pricing">Free tier / Paid plans</td></tr>
-        <tr><td data-label="Tool"><NuxtLink to="/comparisons/syncthing-vs-envsync">Syncthing</NuxtLink></td><td data-label="Architecture">Peer-to-peer</td><td data-label="Primary use case">General-purpose file &amp; folder sync</td><td data-label="LAN / offline">✅ LAN + internet</td><td data-label="Pricing">Free &amp; open source</td></tr>
+        <tr><td data-label="Tool"><strong>syncenv</strong></td><td data-label="Architecture">Peer-to-peer</td><td data-label="Primary use case">Sync .env secrets across local machines</td><td data-label="LAN / offline">✅ Built for it</td><td data-label="Pricing">Free &amp; open source</td></tr>
+        <tr><td data-label="Tool"><NuxtLink to="/comparisons/dotenvx-vs-syncenv">dotenvx</NuxtLink></td><td data-label="Architecture">CLI per-app</td><td data-label="Primary use case">Encrypted .env files &amp; runtime injection</td><td data-label="LAN / offline">Partial — local files only</td><td data-label="Pricing">Free &amp; open source</td></tr>
+        <tr><td data-label="Tool"><NuxtLink to="/comparisons/sops-vs-syncenv">SOPS</NuxtLink></td><td data-label="Architecture">CLI / file-based</td><td data-label="Primary use case">Encrypted config files in Git / IaC</td><td data-label="LAN / offline">Partial — local files only</td><td data-label="Pricing">Free &amp; open source</td></tr>
+        <tr><td data-label="Tool"><NuxtLink to="/comparisons/vault-vs-syncenv">HashiCorp Vault</NuxtLink></td><td data-label="Architecture">Centralized server</td><td data-label="Primary use case">Enterprise secrets, dynamic creds, PKI</td><td data-label="LAN / offline">❌ Needs server</td><td data-label="Pricing">OSS free / Enterprise paid</td></tr>
+        <tr><td data-label="Tool"><NuxtLink to="/comparisons/infisical-vs-syncenv">Infisical</NuxtLink></td><td data-label="Architecture">Centralized platform</td><td data-label="Primary use case">Secrets management, RBAC, PKI</td><td data-label="LAN / offline">❌ Needs server</td><td data-label="Pricing">OSS free / Cloud paid</td></tr>
+        <tr><td data-label="Tool"><NuxtLink to="/comparisons/doppler-vs-syncenv">Doppler</NuxtLink></td><td data-label="Architecture">Cloud SaaS</td><td data-label="Primary use case">Centralized config &amp; secret delivery</td><td data-label="LAN / offline">❌ Cloud-dependent</td><td data-label="Pricing">Free tier / Paid plans</td></tr>
+        <tr><td data-label="Tool"><NuxtLink to="/comparisons/syncthing-vs-syncenv">Syncthing</NuxtLink></td><td data-label="Architecture">Peer-to-peer</td><td data-label="Primary use case">General-purpose file &amp; folder sync</td><td data-label="LAN / offline">✅ LAN + internet</td><td data-label="Pricing">Free &amp; open source</td></tr>
       </tbody>
     </table>
   </section>
@@ -49,42 +49,42 @@ useHead({
   <div class="grid">
     <article class="panel comparison-card">
       <div class="vs-badge">vs</div>
-      <h2><NuxtLink to="/comparisons/dotenvx-vs-envsync">dotenvx vs env-sync</NuxtLink></h2>
+      <h2><NuxtLink to="/comparisons/dotenvx-vs-syncenv">dotenvx vs syncenv</NuxtLink></h2>
       <p>Encrypted dotenv files with runtime injection compared to peer-to-peer LAN synchronization with mDNS discovery.</p>
     </article>
     <article class="panel comparison-card">
       <div class="vs-badge">vs</div>
-      <h2><NuxtLink to="/comparisons/sops-vs-envsync">SOPS vs env-sync</NuxtLink></h2>
+      <h2><NuxtLink to="/comparisons/sops-vs-syncenv">SOPS vs syncenv</NuxtLink></h2>
       <p>Git-native encrypted file workflows with KMS/AGE/PGP backends versus always-on local machine sync with merge behavior.</p>
     </article>
     <article class="panel comparison-card">
       <div class="vs-badge">vs</div>
-      <h2><NuxtLink to="/comparisons/vault-vs-envsync">HashiCorp Vault vs env-sync</NuxtLink></h2>
+      <h2><NuxtLink to="/comparisons/vault-vs-syncenv">HashiCorp Vault vs syncenv</NuxtLink></h2>
       <p>Enterprise central secrets platform with dynamic credentials versus lightweight decentralized sync — no server needed.</p>
     </article>
     <article class="panel comparison-card">
       <div class="vs-badge">vs</div>
-      <h2><NuxtLink to="/comparisons/infisical-vs-envsync">Infisical vs env-sync</NuxtLink></h2>
+      <h2><NuxtLink to="/comparisons/infisical-vs-syncenv">Infisical vs syncenv</NuxtLink></h2>
       <p>Open-source secrets platform with RBAC, PKI, and dynamic secrets versus local-first peer mesh for .env files.</p>
     </article>
     <article class="panel comparison-card">
       <div class="vs-badge">vs</div>
-      <h2><NuxtLink to="/comparisons/doppler-vs-envsync">Doppler vs env-sync</NuxtLink></h2>
+      <h2><NuxtLink to="/comparisons/doppler-vs-syncenv">Doppler vs syncenv</NuxtLink></h2>
       <p>Cloud-centric centralized secrets operations with integrations versus offline/LAN-first synchronization with explicit trust modes.</p>
     </article>
     <article class="panel comparison-card">
       <div class="vs-badge">vs</div>
-      <h2><NuxtLink to="/comparisons/syncthing-vs-envsync">Syncthing vs env-sync</NuxtLink></h2>
+      <h2><NuxtLink to="/comparisons/syncthing-vs-syncenv">Syncthing vs syncenv</NuxtLink></h2>
       <p>General-purpose peer-to-peer file synchronization versus secrets-focused LAN .env sync with per-key merging and at-rest encryption.</p>
     </article>
   </div>
 
   <section class="cta-banner">
-    <h2>Ready to try env-sync?</h2>
+    <h2>Ready to try syncenv?</h2>
     <p>Install in one command. No accounts, no cloud, no server. Just peer-to-peer .env sync that works.</p>
     <div class="cta-row" style="justify-content:center;">
-      <NuxtLink class="btn btn-primary" to="/installation">Install env-sync</NuxtLink>
-      <a class="btn btn-secondary" href="https://github.com/yuvraj1107thapa/envsync"><i class="fa-brands fa-github"></i> View on GitHub</a>
+      <NuxtLink class="btn btn-primary" to="/installation">Install syncenv</NuxtLink>
+      <a class="btn btn-secondary" href="https://github.com/yuvraj1107thapa/syncenv"><i class="fa-brands fa-github"></i> View on GitHub</a>
     </div>
   </section>
 </template>

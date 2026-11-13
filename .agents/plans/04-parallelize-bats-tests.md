@@ -14,8 +14,8 @@ Files reviewed:
 - `tests/bats/test_helper.bash`
 
 ## General Guidance for Parallelization
-- Prefer parallelizing read-only or independent network checks (e.g., `getent`, `ssh`, `env-sync show`).
-- Avoid parallel writes within the same container when the command modifies the same file or keyring (e.g., multiple `env-sync add` or `env-sync key import` in the same container at the same time).
+- Prefer parallelizing read-only or independent network checks (e.g., `getent`, `ssh`, `syncenv show`).
+- Avoid parallel writes within the same container when the command modifies the same file or keyring (e.g., multiple `syncenv add` or `syncenv key import` in the same container at the same time).
 - Use GNU parallel with failure propagation to keep test behavior consistent, for example:
   - `parallel --halt now,fail=1 -k ::: "cmd1" "cmd2" "cmd3"`
 - Use grouping to parallelize by container when each group still runs sequentially inside a container.
@@ -80,7 +80,7 @@ Parallelization candidates inside tests:
 
 Not recommended for parallelization:
 - **"Add multiple secrets to gamma"**
-  - Multiple `env-sync add` calls in the same container likely modify the same file and should remain sequential to avoid races.
+  - Multiple `syncenv add` calls in the same container likely modify the same file and should remain sequential to avoid races.
 
 ### `tests/bats/40_add_machine.bats`
 Parallelization candidates inside tests:
@@ -93,7 +93,7 @@ Parallelization candidates inside tests:
 
 Not recommended for parallelization:
 - **"Collect public keys on delta from existing machines"**
-  - Multiple `env-sync key import` commands into the same delta keyring should remain sequential to avoid conflicts.
+  - Multiple `syncenv key import` commands into the same delta keyring should remain sequential to avoid conflicts.
 - **"Add secret on delta and verify it syncs back to others"**
   - Each sync should complete before verifying; keep sequential per container.
 

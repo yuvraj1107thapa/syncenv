@@ -93,7 +93,7 @@ func EnsureEncryptedMetadata(file string, hostname string) error {
 	inserted := false
 
 	for _, line := range lines {
-		if strings.HasPrefix(line, "# === ENV_SYNC_METADATA ===") {
+		if strings.HasPrefix(line, "# === SYNCENV_METADATA ===") {
 			inMetadata = true
 			output = append(output, line)
 			continue
@@ -150,7 +150,7 @@ func EnsurePublicKeysMetadata(file string, publicKeysMap map[string]string) erro
 	inserted := false
 
 	for _, line := range lines {
-		if strings.HasPrefix(line, "# === ENV_SYNC_METADATA ===") {
+		if strings.HasPrefix(line, "# === SYNCENV_METADATA ===") {
 			inMetadata = true
 			output = append(output, line)
 			continue

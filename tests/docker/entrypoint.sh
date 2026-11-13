@@ -1,18 +1,18 @@
 #!/bin/bash
-# Entrypoint script for env-sync test containers
+# Entrypoint script for syncenv test containers
 # Note: We don't use 'set -e' because we want to handle errors gracefully
 
-USER_NAME="envsync"
-USER_HOME="/home/envsync"
+USER_NAME="syncenv"
+USER_HOME="/home/syncenv"
 SSH_WORK_DIR="/tmp/ssh-work"
 AVAHI_SERVICE_DIR="/etc/avahi/services"
-AVAHI_SERVICE_FILE="${AVAHI_SERVICE_DIR}/env-sync.service"
+AVAHI_SERVICE_FILE="${AVAHI_SERVICE_DIR}/syncenv.service"
 KNOWN_HOSTS_FILE="${USER_HOME}/.ssh/known_hosts"
 SSH_CONFIG_FILE="${USER_HOME}/.ssh/config"
-KEYSCAN_TIMEOUT="${ENV_SYNC_KEYSCAN_TIMEOUT:-1}"
-KEYSCAN_ATTEMPTS="${ENV_SYNC_KEYSCAN_ATTEMPTS:-3}"
+KEYSCAN_TIMEOUT="${SYNCENV_KEYSCAN_TIMEOUT:-1}"
+KEYSCAN_ATTEMPTS="${SYNCENV_KEYSCAN_ATTEMPTS:-3}"
 
-echo "[entrypoint] Starting env-sync test container: $HOSTNAME"
+echo "[entrypoint] Starting syncenv test container: $HOSTNAME"
 
 # Create a writable SSH directory since the mounted one is read-only
 echo "[entrypoint] Setting up writable SSH directory..."
@@ -83,8 +83,8 @@ fi
 mkdir -p /var/run/dbus 2>/dev/null || true
 dbus-daemon --system --fork 2>/dev/null || echo "[entrypoint] D-Bus note: non-fatal"
 
-# Register env-sync mDNS service for discovery
-echo "[entrypoint] Registering env-sync mDNS service..."
+# Register syncenv mDNS service for discovery
+echo "[entrypoint] Registering syncenv mDNS service..."
 mkdir -p ${AVAHI_SERVICE_DIR} 2>/dev/null || true
 cat > ${AVAHI_SERVICE_FILE} << EOF
 <?xml version="1.0" standalone='no'?><!--*-nxml-*-->
@@ -92,8 +92,8 @@ cat > ${AVAHI_SERVICE_FILE} << EOF
 <service-group>
   <name replace-wildcards="yes">%h</name>
   <service>
-    <type>_envsync._tcp</type>
-    <port>${ENV_SYNC_PORT:-5739}</port>
+    <type>_syncenv._tcp</type>
+    <port>${SYNCENV_PORT:-5739}</port>
   </service>
 </service-group>
 EOF
@@ -122,7 +122,7 @@ else
     echo "[entrypoint] WARNING: Avahi daemon may not be running"
 fi
 
-# Populate known_hosts with other containers (as envsync user)
+# Populate known_hosts with other containers (as syncenv user)
 echo "[entrypoint] Populating SSH known_hosts..."
 for host in alpha.local beta.local gamma.local; do
     if [ "$host" != "$HOSTNAME" ]; then
@@ -141,7 +141,7 @@ chmod 600 ${KNOWN_HOSTS_FILE} 2>/dev/null || true
 
 echo "[entrypoint] Container is ready: $HOSTNAME"
 
-# If no command provided or command is 'bash', keep container running as envsync user
+# If no command provided or command is 'bash', keep container running as syncenv user
 if [ $# -eq 0 ] || [ "$1" = "bash" ] || [ "$1" = "/bin/bash" ]; then
     echo "[entrypoint] Keeping container running as ${USER_NAME}..."
     su - ${USER_NAME} -c "tail -f /dev/null"

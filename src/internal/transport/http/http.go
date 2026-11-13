@@ -9,8 +9,8 @@ import (
 	"regexp"
 	"time"
 
-	"envsync/internal/config"
-	"envsync/internal/secrets"
+	"syncenv/internal/config"
+	"syncenv/internal/secrets"
 )
 
 var hostPattern = regexp.MustCompile(`^[a-zA-Z0-9._-]+$`)
@@ -28,7 +28,7 @@ func FetchHealth(dial string) (HealthResponse, error) {
 		return HealthResponse{}, err
 	}
 	if port == "" {
-		port = config.EnvSyncPort()
+		port = config.SyncEnvPort()
 	}
 	url := fmt.Sprintf("http://%s:%s/health", host, port)
 	client := &http.Client{Timeout: 2 * time.Second}
@@ -57,7 +57,7 @@ func FetchSecrets(dial string) ([]byte, error) {
 		return nil, err
 	}
 	if port == "" {
-		port = config.EnvSyncPort()
+		port = config.SyncEnvPort()
 	}
 	url := fmt.Sprintf("http://%s:%s/secrets.env", host, port)
 	client := &http.Client{Timeout: 10 * time.Second}

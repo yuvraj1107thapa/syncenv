@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"envsync/internal/config"
+	"syncenv/internal/config"
 )
 
 const (
@@ -24,14 +24,14 @@ func Log(level string, message string) {
 	timestamp := time.Now().Format("2006-01-02 15:04:05")
 
 	if err := os.MkdirAll(config.LogDir(), 0o700); err == nil {
-		logFile := filepath.Join(config.LogDir(), "env-sync.log")
+		logFile := filepath.Join(config.LogDir(), "syncenv.log")
 		if file, err := os.OpenFile(logFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o600); err == nil {
 			_, _ = fmt.Fprintf(file, "[%s] [%s] %s\n", timestamp, level, message)
 			_ = file.Close()
 		}
 	}
 
-	if strings.EqualFold(os.Getenv("ENV_SYNC_QUIET"), "true") {
+	if strings.EqualFold(os.Getenv("SYNCENV_QUIET"), "true") {
 		return
 	}
 

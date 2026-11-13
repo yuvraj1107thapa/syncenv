@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"envsync/internal/cli"
+	"syncenv/internal/cli"
 )
 
 func main() {

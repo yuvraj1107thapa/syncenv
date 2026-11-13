@@ -31,5 +31,5 @@ if (-not $installer) {
   throw "Windows installer not found in build/bin. Found: $($artifacts -join ', ')"
 }
 
-Copy-Item $installer.FullName (Join-Path $distDir 'env-sync-gui-windows-amd64-installer.exe')
-Compress-Archive -Path $portable.FullName -DestinationPath (Join-Path $distDir 'env-sync-gui-windows-amd64-portable.zip') -Force
+Copy-Item $installer.FullName (Join-Path $distDir 'syncenv-gui-windows-amd64-installer.exe')
+Compress-Archive -Path $portable.FullName -DestinationPath (Join-Path $distDir 'syncenv-gui-windows-amd64-portable.zip') -Force

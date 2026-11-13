@@ -1,6 +1,6 @@
 # Installation Guide
 
-Complete installation instructions for env-sync on Linux, macOS, and Windows (WSL2).
+Complete installation instructions for syncenv on Linux, macOS, and Windows (WSL2).
 
 ## Table of Contents
 
@@ -41,10 +41,10 @@ Download and install the latest release directly:
 
 ```bash
 # Install to /usr/local/bin (requires sudo)
-curl -fsSL https://envsync.yuvrajthapa.com/install.sh | sudo bash
+curl -fsSL https://syncenv.yuvrajthapa.com/install.sh | sudo bash
 
 # Or install to ~/.local/bin (user-only, no sudo)
-curl -fsSL https://envsync.yuvrajthapa.com/install.sh | bash -s -- --user
+curl -fsSL https://syncenv.yuvrajthapa.com/install.sh | bash -s -- --user
 ```
 
 ### What the Installer Does
@@ -55,7 +55,7 @@ curl -fsSL https://envsync.yuvrajthapa.com/install.sh | bash -s -- --user
 4. Installs the GUI to `/Applications` / `~/Applications` on macOS, or into XDG app locations on Linux
 5. If a CLI service is running, stops it, upgrades, and restarts automatically
 
-For macOS GUI releases, GitHub Releases publishes separate `amd64` and `arm64` DMG files containing `env-sync.app`.
+For macOS GUI releases, GitHub Releases publishes separate `amd64` and `arm64` DMG files containing `syncenv.app`.
 
 ### Manual Binary Install
 
@@ -63,15 +63,15 @@ Download the pre-built binary from releases:
 
 ```bash
 # Download latest release
-curl -L -o env-sync https://github.com/yuvraj1107thapa/envsync/releases/latest/download/env-sync-linux-amd64
-chmod +x env-sync
+curl -L -o syncenv https://github.com/yuvraj1107thapa/syncenv/releases/latest/download/syncenv-linux-amd64
+chmod +x syncenv
 
 # Install system-wide
-sudo mv env-sync /usr/local/bin/
+sudo mv syncenv /usr/local/bin/
 
 # Or install user-only
 mkdir -p ~/.local/bin
-mv env-sync ~/.local/bin/
+mv syncenv ~/.local/bin/
 ```
 
 ## Install from Source
@@ -79,8 +79,8 @@ mv env-sync ~/.local/bin/
 ### Clone Repository
 
 ```bash
-git clone https://github.com/yuvraj1107thapa/envsync.git
-cd envsync
+git clone https://github.com/yuvraj1107thapa/syncenv.git
+cd syncenv
 ```
 
 ### Build
@@ -132,8 +132,8 @@ For Linux GUI builds, use a machine or CI runner that matches the target archite
 sudo apt-get update
 sudo apt-get install -y avahi-daemon avahi-utils
 
-# Install env-sync
-curl -fsSL https://envsync.yuvrajthapa.com/install.sh | sudo bash
+# Install syncenv
+curl -fsSL https://syncenv.yuvrajthapa.com/install.sh | sudo bash
 ```
 
 #### Fedora/RHEL/CentOS
@@ -142,8 +142,8 @@ curl -fsSL https://envsync.yuvrajthapa.com/install.sh | sudo bash
 # Install mDNS dependencies
 sudo dnf install -y avahi avahi-tools
 
-# Install env-sync
-curl -fsSL https://envsync.yuvrajthapa.com/install.sh | sudo bash
+# Install syncenv
+curl -fsSL https://syncenv.yuvrajthapa.com/install.sh | sudo bash
 ```
 
 #### Arch Linux
@@ -152,8 +152,8 @@ curl -fsSL https://envsync.yuvrajthapa.com/install.sh | sudo bash
 # Install mDNS dependencies
 sudo pacman -S avahi
 
-# Install env-sync
-curl -fsSL https://envsync.yuvrajthapa.com/install.sh | sudo bash
+# Install syncenv
+curl -fsSL https://syncenv.yuvrajthapa.com/install.sh | sudo bash
 ```
 
 ### macOS
@@ -161,8 +161,8 @@ curl -fsSL https://envsync.yuvrajthapa.com/install.sh | sudo bash
 mDNS (Bonjour) is built-in, no additional dependencies needed.
 
 ```bash
-# Install env-sync
-curl -fsSL https://envsync.yuvrajthapa.com/install.sh | sudo bash
+# Install syncenv
+curl -fsSL https://syncenv.yuvrajthapa.com/install.sh | sudo bash
 ```
 
 For web installs, `install.sh` automatically selects the correct CLI binary for your OS/architecture. If you include `--gui`, it likewise downloads the matching GUI package for your platform (`.deb` on Linux, `.dmg` on macOS).
@@ -175,7 +175,7 @@ WSL2 has limitations with mDNS. You have two options:
 
 #### Option 1: Use Windows Host mDNS (Recommended)
 
-Install and run env-sync on Windows, then access from WSL2 via the Windows host.
+Install and run syncenv on Windows, then access from WSL2 via the Windows host.
 
 #### Option 2: mDNS Relay in WSL2
 
@@ -193,8 +193,8 @@ EOF
 # Restart avahi
 sudo service avahi-daemon restart
 
-# Install env-sync
-curl -fsSL https://envsync.yuvrajthapa.com/install.sh | sudo bash
+# Install syncenv
+curl -fsSL https://syncenv.yuvrajthapa.com/install.sh | sudo bash
 ```
 
 ## Post-Installation
@@ -212,20 +212,20 @@ export PATH="$HOME/.local/bin:$PATH"
 
 ```bash
 # 1. Check installation
-env-sync --version
+syncenv --version
 
 # 2. Check current mode (default: trusted-owner-ssh)
-env-sync mode get
+syncenv mode get
 
 # 3. Initialize secrets file
-env-sync init
+syncenv init
 
 # 4. Set up periodic sync (optional)
-env-sync cron --install
+syncenv cron --install
 
 # 5. Start background service (optional)
 # This enables mDNS advertising and periodic sync
-env-sync serve -d
+syncenv serve -d
 ```
 
 ## Verification
@@ -234,39 +234,39 @@ env-sync serve -d
 
 ```bash
 # Verify binary works
-env-sync --version
+syncenv --version
 
 # Check status
-env-sync status
+syncenv status
 
 # Discover peers (if any exist on network)
-env-sync discover
+syncenv discover
 ```
 
 ### Test Sync
 
 ```bash
 # Add a test secret
-env-sync add TEST_KEY="test_value"
+syncenv add TEST_KEY="test_value"
 
 # Sync (with verbose output)
-env-sync sync --verbose
+syncenv sync --verbose
 
 # View the secret
-env-sync show TEST_KEY
+syncenv show TEST_KEY
 
 # Remove test secret
-env-sync remove TEST_KEY
+syncenv remove TEST_KEY
 ```
 
 ### Verify Service (if running)
 
 ```bash
 # Linux
-systemctl --user status env-sync
+systemctl --user status syncenv
 
 # macOS
-launchctl print gui/$(id -u)/env-sync
+launchctl print gui/$(id -u)/syncenv
 ```
 
 ## Upgrading
@@ -299,34 +299,34 @@ sudo make install
 
 ```bash
 # System install
-sudo rm /usr/local/bin/env-sync
+sudo rm /usr/local/bin/syncenv
 
 # User install
-rm ~/.local/bin/env-sync
+rm ~/.local/bin/syncenv
 ```
 
 ### Remove Service
 
 ```bash
 # Stop and remove service
-env-sync service uninstall
+syncenv service uninstall
 ```
 
 ### Remove Configuration
 
 ```bash
 # Remove all config, secrets, and keys
-rm -rf ~/.config/env-sync
+rm -rf ~/.config/syncenv
 ```
 
 ### Complete Removal
 
 ```bash
 # One-liner to remove everything
-env-sync service uninstall 2>/dev/null; \
-  rm -rf ~/.config/env-sync; \
-  sudo rm -f /usr/local/bin/env-sync; \
-  rm -f ~/.local/bin/env-sync
+syncenv service uninstall 2>/dev/null; \
+  rm -rf ~/.config/syncenv; \
+  sudo rm -f /usr/local/bin/syncenv; \
+  rm -f ~/.local/bin/syncenv
 ```
 
 ## Troubleshooting Installation
@@ -335,7 +335,7 @@ env-sync service uninstall 2>/dev/null; \
 
 ```bash
 # Check if in PATH
-which env-sync
+which syncenv
 
 # If using user install, ensure ~/.local/bin is in PATH
 export PATH="$HOME/.local/bin:$PATH"
@@ -348,7 +348,7 @@ echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
 
 ```bash
 # Fix permissions on user install
-chmod +x ~/.local/bin/env-sync
+chmod +x ~/.local/bin/syncenv
 
 # Or use sudo for system install
 sudo ./install.sh
@@ -377,22 +377,22 @@ sudo systemctl status avahi-daemon
 avahi-browse -a  # List all services
 
 # macOS: Check dns-sd
-dns-sd -B _envsync._tcp
+dns-sd -B _syncenv._tcp
 ```
 
 ## Development Install
 
-For development work on env-sync itself:
+For development work on syncenv itself:
 
 ```bash
-git clone https://github.com/yuvraj1107thapa/envsync.git
-cd envsync
+git clone https://github.com/yuvraj1107thapa/syncenv.git
+cd syncenv
 
 # Build locally (doesn't install)
 make build
 
 # Test locally
-./target/env-sync --version
+./target/syncenv --version
 
 # Run tests
 make test
@@ -407,17 +407,17 @@ make test
 FROM golang:1.24-alpine AS builder
 WORKDIR /app
 COPY . .
-RUN cd src && go build -o ../target/env-sync ./cmd/env-sync
+RUN cd src && go build -o ../target/syncenv ./cmd/syncenv
 
 FROM alpine:latest
 RUN apk add --no-cache openssh-client avahi
-COPY --from=builder /app/target/env-sync /usr/local/bin/
-ENTRYPOINT ["env-sync"]
+COPY --from=builder /app/target/syncenv /usr/local/bin/
+ENTRYPOINT ["syncenv"]
 ```
 
 Build and run:
 
 ```bash
-docker build -t env-sync .
-docker run --rm -it env-sync --version
+docker build -t syncenv .
+docker run --rm -it syncenv --version
 ```

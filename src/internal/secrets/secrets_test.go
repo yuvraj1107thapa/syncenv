@@ -28,22 +28,22 @@ func TestCompareVersions(t *testing.T) {
 
 func TestMergeSecretsContent(t *testing.T) {
 	local := strings.Join([]string{
-		"BAR=\"local\" # ENVSYNC_UPDATED_AT=2025-01-01T00:00:00Z",
-		"FOO=\"local\" # ENVSYNC_UPDATED_AT=2025-01-01T00:00:00Z",
+		"BAR=\"local\" # SYNCENV_UPDATED_AT=2025-01-01T00:00:00Z",
+		"FOO=\"local\" # SYNCENV_UPDATED_AT=2025-01-01T00:00:00Z",
 		"# comment",
 		"",
 	}, "\n")
 	remote := strings.Join([]string{
-		"FOO=\"remote\" # ENVSYNC_UPDATED_AT=2025-01-02T00:00:00Z",
-		"BAZ=\"remote\" # ENVSYNC_UPDATED_AT=2025-01-03T00:00:00Z",
-		"BAR=\"remote\" # ENVSYNC_UPDATED_AT=2024-12-31T23:59:59Z",
+		"FOO=\"remote\" # SYNCENV_UPDATED_AT=2025-01-02T00:00:00Z",
+		"BAZ=\"remote\" # SYNCENV_UPDATED_AT=2025-01-03T00:00:00Z",
+		"BAR=\"remote\" # SYNCENV_UPDATED_AT=2024-12-31T23:59:59Z",
 	}, "\n")
 
 	got := MergeSecretsContent(local, remote)
 	expected := strings.Join([]string{
-		"BAR=\"local\" # ENVSYNC_UPDATED_AT=2025-01-01T00:00:00Z",
-		"BAZ=\"remote\" # ENVSYNC_UPDATED_AT=2025-01-03T00:00:00Z",
-		"FOO=\"remote\" # ENVSYNC_UPDATED_AT=2025-01-02T00:00:00Z",
+		"BAR=\"local\" # SYNCENV_UPDATED_AT=2025-01-01T00:00:00Z",
+		"BAZ=\"remote\" # SYNCENV_UPDATED_AT=2025-01-03T00:00:00Z",
+		"FOO=\"remote\" # SYNCENV_UPDATED_AT=2025-01-02T00:00:00Z",
 	}, "\n")
 
 	if got != expected {

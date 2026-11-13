@@ -1,8 +1,8 @@
-# env-sync V3 - Bash to Go Migration Plan
+# syncenv V3 - Bash to Go Migration Plan
 
 ## Overview
 
-Migrate the core env-sync logic from Bash to Go while preserving CLI behavior and keeping the repository layout intact. During migration, the Go binary will be emitted to `./target/env-sync` to avoid conflicting with the existing Bash entrypoint at `./bin/env-sync`. End-to-end tests remain in BATS and continue to invoke commands from Bash.
+Migrate the core syncenv logic from Bash to Go while preserving CLI behavior and keeping the repository layout intact. During migration, the Go binary will be emitted to `./target/syncenv` to avoid conflicting with the existing Bash entrypoint at `./bin/syncenv`. End-to-end tests remain in BATS and continue to invoke commands from Bash.
 
 ## Goals
 
@@ -22,16 +22,16 @@ Migrate the core env-sync logic from Bash to Go while preserving CLI behavior an
 
 - Go code lives under `./src`
 - Top-level `./Makefile` compiles and installs the Go binary
-- Final binary name is `env-sync`
-- During migration, build output goes to `./target/env-sync`
+- Final binary name is `syncenv`
+- During migration, build output goes to `./target/syncenv`
 - CLI must remain binary compatible with current Bash commands and subcommands
 - Progressive migration within this repo only
 
 ## Current CLI Surface (to preserve)
 
-- Primary command: `env-sync` with subcommands
+- Primary command: `syncenv` with subcommands
 - Subcommands: `sync`, `serve`, `discover`, `status`, `init`, `restore`, `cron`, `key`, `load`, `add`, `remove`, `list`, `show`, `help`
-- Existing companion scripts: `env-sync-client`, `env-sync-discover`, `env-sync-serve`, `env-sync-key`, `env-sync-load`
+- Existing companion scripts: `syncenv-client`, `syncenv-discover`, `syncenv-serve`, `syncenv-key`, `syncenv-load`
 - Key behaviors: metadata validation, backups, merge by per-line timestamps, SCP/SSH sync (default), HTTP sync (insecure), AGE encryption, mDNS discovery
 
 ## Target Go Code Structure
@@ -39,7 +39,7 @@ Migrate the core env-sync logic from Bash to Go while preserving CLI behavior an
 ```
 src/
   cmd/
-    env-sync/
+    syncenv/
       main.go
   internal/
     cli/                # argument parsing, help, usage
@@ -65,14 +65,14 @@ Notes:
 
 ## Migration Strategy
 
-Use a progressive replacement model that keeps the Bash entrypoints stable while routing implemented commands to Go. The Go binary will be built into `./target/env-sync`, and Bash scripts can delegate to it per-command when parity is achieved.
+Use a progressive replacement model that keeps the Bash entrypoints stable while routing implemented commands to Go. The Go binary will be built into `./target/syncenv`, and Bash scripts can delegate to it per-command when parity is achieved.
 
 ### Progressive Delegation Model
 
-1. Keep `bin/env-sync` as the stable shell entrypoint.
-2. Add a delegation layer inside `bin/env-sync` to detect `./target/env-sync` and forward subcommands that are already migrated.
+1. Keep `bin/syncenv` as the stable shell entrypoint.
+2. Add a delegation layer inside `bin/syncenv` to detect `./target/syncenv` and forward subcommands that are already migrated.
 3. Maintain fallback to existing Bash logic until each subcommand reaches parity.
-4. When all commands are migrated, flip `bin/env-sync` into a thin wrapper that `exec`s the Go binary, or replace it in install steps.
+4. When all commands are migrated, flip `bin/syncenv` into a thin wrapper that `exec`s the Go binary, or replace it in install steps.
 
 ## Phased Plan
 
@@ -95,16 +95,16 @@ Exit criteria:
 
 - Add `src/go.mod` and basic module layout
 - Create top-level `Makefile` targets:
-  - `build` (outputs `./target/env-sync`)
+  - `build` (outputs `./target/syncenv`)
   - `test` (Go tests plus BATS if desired)
   - `install` (copy binary to install location, optional)
   - `clean` (remove `./target`)
-- Create `cmd/env-sync/main.go` with minimal CLI skeleton and help output
+- Create `cmd/syncenv/main.go` with minimal CLI skeleton and help output
 - Add basic config and logging packages
 
 Exit criteria:
-- `make build` produces `./target/env-sync`
-- `./target/env-sync --help` matches existing help output (or is stubbed with clear TODO while not delegated)
+- `make build` produces `./target/syncenv`
+- `./target/syncenv --help` matches existing help output (or is stubbed with clear TODO while not delegated)
 
 ### Phase 2 - Core File and Metadata Logic
 
@@ -168,7 +168,7 @@ Exit criteria:
   - show/export/import/list
   - request-access/grant-access/approve-requests
   - remove/revoke
-- Keep cache format compatible (`~/.config/env-sync/keys`)
+- Keep cache format compatible (`~/.config/syncenv/keys`)
 - Preserve jq/qrencode optional behavior
 
 Exit criteria:
@@ -209,7 +209,7 @@ Exit criteria:
 
 - `./src` Go module with structured packages
 - `./Makefile` for build/test/install
-- `./target/env-sync` Go binary during migration
+- `./target/syncenv` Go binary during migration
 - Updated BATS test suite covering CLI compatibility
 - Updated documentation explaining the hybrid Bash/Go transition
 
@@ -218,4 +218,4 @@ Exit criteria:
 - All existing CLI commands behave identically to Bash implementation
 - BATS tests pass using the Go binary via Bash entrypoint
 - Go code owns core logic and Bash wrappers are minimal
-- No change required for users invoking `env-sync` from the shell
+- No change required for users invoking `syncenv` from the shell

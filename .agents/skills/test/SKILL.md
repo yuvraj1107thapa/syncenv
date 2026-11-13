@@ -1,8 +1,8 @@
 ---
-name: Testing env-sync
-description: Testing the mDNS discovery and sync logic of env-sync across multiple virtual machines.
+name: Testing syncenv
+description: Testing the mDNS discovery and sync logic of syncenv across multiple virtual machines.
 ---
-# Testing env-sync
+# Testing syncenv
 
 The project uses `bats-core` for integration testing within Docker containers. This ensures that the mDNS discovery and sync logic work across multiple virtual machines.
 

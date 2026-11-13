@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"envsync/internal/config"
+	"syncenv/internal/config"
 )
 
 func writeSSHScript(t *testing.T, dir string, output string) {
@@ -102,13 +102,13 @@ func TestEnsureRegisteredWithPeerSuccess(t *testing.T) {
 		t.Fatalf("WriteFile() error = %v", err)
 	}
 
-	// Create a mock ssh script that echoes ENVSYNC_REGISTER_SUCCESS
+	// Create a mock ssh script that echoes SYNCENV_REGISTER_SUCCESS
 	binDir := filepath.Join(tempDir, "bin")
 	if err := os.MkdirAll(binDir, 0o700); err != nil {
 		t.Fatalf("MkdirAll() error = %v", err)
 	}
 	sshScript := filepath.Join(binDir, "ssh")
-	script := "#!/bin/sh\necho 'ENVSYNC_REGISTER_SUCCESS'\n"
+	script := "#!/bin/sh\necho 'SYNCENV_REGISTER_SUCCESS'\n"
 	if err := os.WriteFile(sshScript, []byte(script), 0o700); err != nil {
 		t.Fatalf("WriteFile() error = %v", err)
 	}
@@ -242,7 +242,7 @@ func TestFindNewestPeerRegistersAndRefetchesWhenUndecryptable(t *testing.T) {
 }
 
 func mockEncryptedContent(host, publicKeys string) string {
-	return fmt.Sprintf(`# === ENV_SYNC_METADATA ===
+	return fmt.Sprintf(`# === SYNCENV_METADATA ===
 # VERSION: %s
 # TIMESTAMP: 2025-01-01T00:00:00Z
 # HOST: %s
@@ -251,9 +251,9 @@ func mockEncryptedContent(host, publicKeys string) string {
 # CHECKSUM: 
 # === END_METADATA ===
 
-KEY="cipher" # ENVSYNC_UPDATED_AT=2025-01-01T00:00:00Z
+KEY="cipher" # SYNCENV_UPDATED_AT=2025-01-01T00:00:00Z
 
-# === ENV_SYNC_FOOTER ===
+# === SYNCENV_FOOTER ===
 # VERSION: %s
 # TIMESTAMP: 2025-01-01T00:00:00Z
 # HOST: %s

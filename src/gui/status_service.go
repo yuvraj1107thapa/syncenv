@@ -1,11 +1,11 @@
 package main
 
 import (
-	"envsync/internal/config"
-	"envsync/internal/discovery"
-	"envsync/internal/keys"
-	"envsync/internal/metadata"
-	"envsync/internal/mode"
+	"syncenv/internal/config"
+	"syncenv/internal/discovery"
+	"syncenv/internal/keys"
+	"syncenv/internal/metadata"
+	"syncenv/internal/mode"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -105,7 +105,7 @@ func (s *StatusService) GetFileStatus() (FileStatus, error) {
 
 // GetServerStatus returns HTTP server status
 func (s *StatusService) GetServerStatus() (ServerStatus, error) {
-	status := ServerStatus{Port: config.EnvSyncPort()}
+	status := ServerStatus{Port: config.SyncEnvPort()}
 
 	pidFile := config.ServerPidFile()
 	data, err := os.ReadFile(pidFile)

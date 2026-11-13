@@ -7,7 +7,7 @@ import (
 	"os/exec"
 	"strings"
 
-	"envsync/internal/logging"
+	"syncenv/internal/logging"
 )
 
 func Install(executable string, interval int) error {
@@ -16,7 +16,7 @@ func Install(executable string, interval int) error {
 	}
 	cronLine := fmt.Sprintf("*/%d * * * * %s --quiet sync >/dev/null 2>&1", interval, executable)
 	existing := readCrontab()
-	filtered := filterEnvSync(existing)
+	filtered := filterSyncEnv(existing)
 	filtered = append(filtered, cronLine)
 	if err := writeCrontab(filtered); err != nil {
 		return err
@@ -28,7 +28,7 @@ func Install(executable string, interval int) error {
 
 func Remove() error {
 	existing := readCrontab()
-	filtered := filterEnvSync(existing)
+	filtered := filterSyncEnv(existing)
 	if len(filtered) == len(existing) {
 		logging.Log("INFO", "No cron job found")
 		return nil
@@ -42,15 +42,15 @@ func Remove() error {
 
 func Show() error {
 	existing := readCrontab()
-	filtered := filterEnvSync(existing)
+	filtered := filterSyncEnv(existing)
 	if len(filtered) == len(existing) {
 		logging.Log("INFO", "No cron job installed")
-		fmt.Println("Run 'env-sync cron --install' to set up periodic sync")
+		fmt.Println("Run 'syncenv cron --install' to set up periodic sync")
 		return nil
 	}
 	fmt.Println("Current cron job:")
 	for _, line := range existing {
-		if strings.Contains(line, "env-sync") {
+		if strings.Contains(line, "syncenv") {
 			fmt.Println(line)
 		}
 	}
@@ -79,10 +79,10 @@ func writeCrontab(lines []string) error {
 	return cmd.Run()
 }
 
-func filterEnvSync(lines []string) []string {
+func filterSyncEnv(lines []string) []string {
 	filtered := []string{}
 	for _, line := range lines {
-		if strings.Contains(line, "env-sync") {
+		if strings.Contains(line, "syncenv") {
 			continue
 		}
 		filtered = append(filtered, line)

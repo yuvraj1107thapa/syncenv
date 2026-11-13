@@ -5,8 +5,8 @@
   <header>
     <div class="nav">
       <NuxtLink class="brand" to="/">
-        <img src="/assets/logo.png" alt="env-sync logo" class="nav-logo" />
-        env-sync
+        <img src="/assets/logo.png" alt="syncenv logo" class="nav-logo" />
+        syncenv
       </NuxtLink>
       <nav><ul>
         <li class="dropdown"><NuxtLink to="/installation">Install</NuxtLink><ul class="dropdown-menu"><li><NuxtLink to="/download">Download</NuxtLink></li><li><NuxtLink to="/installation/quickstart">Quickstart</NuxtLink></li><li><NuxtLink to="/installation/trusted-peers">Trusted Peers Setup</NuxtLink></li><li><NuxtLink to="/installation/secure-peers">Secure Peers Setup</NuxtLink></li></ul></li>
@@ -15,7 +15,7 @@
         <li><NuxtLink to="/security">Security</NuxtLink></li>
         <li><NuxtLink to="/comparisons">Comparisons</NuxtLink></li>
       </ul></nav>
-      <a class="github-link" href="https://github.com/yuvraj1107thapa/envsync"><i class="fa-brands fa-github"></i> GitHub</a>
+      <a class="github-link" href="https://github.com/yuvraj1107thapa/syncenv"><i class="fa-brands fa-github"></i> GitHub</a>
     </div>
   </header>
 </template>

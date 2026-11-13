@@ -1,5 +1,5 @@
 #!/bin/bash
-# Installation script for env-sync
+# Installation script for syncenv
 
 set -euo pipefail
 
@@ -11,18 +11,18 @@ BLUE='\033[0;34m'
 NC='\033[0m'
 
 # Configuration
-ENV_SYNC_VERSION="4.0.0"
+SYNCENV_VERSION="4.0.0"
 USER_INSTALL=false
 INSTALL_PREFIX="/usr/local"
 BIN_DIR="$INSTALL_PREFIX/bin"
-ENV_SYNC_LOAD_LINE='eval "$(env-sync load --quiet 2>/dev/null)"'
+SYNCENV_LOAD_LINE='eval "$(syncenv load --quiet 2>/dev/null)"'
 INSTALL_GUI=false
 INSTALL_CLI=true
-GUI_BUNDLE_NAME="env-sync.app"
-GUI_BINARY_NAME="env-sync-gui"
+GUI_BUNDLE_NAME="syncenv.app"
+GUI_BINARY_NAME="syncenv-gui"
 
 # GitHub repository
-GITHUB_REPO="yuvraj1107thapa/envsync"
+GITHUB_REPO="yuvraj1107thapa/syncenv"
 GITHUB_RELEASES_URL="https://github.com/${GITHUB_REPO}/releases/latest/download"
 
 # Parse arguments
@@ -63,14 +63,14 @@ while [[ $# -gt 0 ]]; do
             echo ""
             echo "Examples:"
             echo "  # Quick install (web-based):"
-            echo "  curl -fsSL https://envsync.yuvrajthapa.com/install.sh | sudo bash"
+            echo "  curl -fsSL https://syncenv.yuvrajthapa.com/install.sh | sudo bash"
             echo ""
             echo "  # Install to user directory:"
-            echo "  curl -fsSL https://envsync.yuvrajthapa.com/install.sh | bash -s -- --user"
+            echo "  curl -fsSL https://syncenv.yuvrajthapa.com/install.sh | bash -s -- --user"
             echo ""
             echo "  # Local install from source:"
-            echo "  git clone https://github.com/yuvraj1107thapa/envsync.git"
-            echo "  cd envsync"
+            echo "  git clone https://github.com/yuvraj1107thapa/syncenv.git"
+            echo "  cd syncenv"
             echo "  sudo ./install.sh"
             exit 0
             ;;
@@ -166,7 +166,7 @@ download_artifact() {
 
 download_binary() {
     local platform="$1"
-    local artifact_name="env-sync-${platform}"
+    local artifact_name="syncenv-${platform}"
 
     if [[ "$platform" == windows-* ]]; then
         artifact_name="${artifact_name}.exe"
@@ -229,7 +229,7 @@ extract_deb_payload() {
     esac
 }
 
-echo -e "${BLUE}Installing env-sync v${ENV_SYNC_VERSION}...${NC}"
+echo -e "${BLUE}Installing syncenv v${SYNCENV_VERSION}...${NC}"
 
 # Detect OS
 OS=$(uname -s)
@@ -294,12 +294,12 @@ add_shell_integration() {
         fi
     fi
 
-    if grep -F "env-sync load" "$target_file" >/dev/null 2>&1; then
+    if grep -F "syncenv load" "$target_file" >/dev/null 2>&1; then
         echo "Shell integration already present in ${target_file/$HOME/~}"
         return
     fi
 
-    printf '\n%s\n' "$ENV_SYNC_LOAD_LINE" >> "$target_file"
+    printf '\n%s\n' "$SYNCENV_LOAD_LINE" >> "$target_file"
     echo "Added shell integration to ${target_file/$HOME/~}"
 }
 
@@ -315,12 +315,12 @@ configure_gui_paths() {
             ;;
         Linux)
             if [[ "$USER_INSTALL" == "true" ]]; then
-                GUI_INSTALL_DIR="$HOME/.local/lib/env-sync"
+                GUI_INSTALL_DIR="$HOME/.local/lib/syncenv"
                 GUI_DESKTOP_DIR="$HOME/.local/share/applications"
                 GUI_ICON_DIR="$HOME/.local/share/icons/hicolor/512x512/apps"
                 GUI_LAUNCHER="$HOME/.local/bin/$GUI_BINARY_NAME"
             else
-                GUI_INSTALL_DIR="/opt/env-sync"
+                GUI_INSTALL_DIR="/opt/syncenv"
                 GUI_DESKTOP_DIR="/usr/local/share/applications"
                 GUI_ICON_DIR="/usr/local/share/icons/hicolor/512x512/apps"
                 GUI_LAUNCHER="$BIN_DIR/$GUI_BINARY_NAME"
@@ -343,14 +343,14 @@ write_linux_gui_desktop_file() {
 [Desktop Entry]
 Version=1.0
 Type=Application
-Name=env-sync
+Name=syncenv
 Comment=Distributed secrets synchronization for local networks
 Exec=${exec_path}
 Icon=${icon_name}
 Terminal=false
 Categories=Utility;Development;
 Keywords=env;sync;secrets;
-StartupWMClass=env-sync-gui
+StartupWMClass=syncenv-gui
 EOF
 }
 
@@ -369,9 +369,9 @@ install_linux_gui_payload() {
 
     mkdir -p "$GUI_INSTALL_DIR" "$GUI_DESKTOP_DIR" "$GUI_ICON_DIR" "$(dirname "$GUI_LAUNCHER")"
     install -m 755 "$binary_source" "$GUI_INSTALL_TARGET"
-    install -m 644 "$icon_source" "$GUI_ICON_DIR/env-sync-gui.png"
+    install -m 644 "$icon_source" "$GUI_ICON_DIR/syncenv-gui.png"
     ln -sf "$GUI_INSTALL_TARGET" "$GUI_LAUNCHER"
-    write_linux_gui_desktop_file "$GUI_DESKTOP_DIR/env-sync-gui.desktop" "$GUI_LAUNCHER" "env-sync-gui"
+    write_linux_gui_desktop_file "$GUI_DESKTOP_DIR/syncenv-gui.desktop" "$GUI_LAUNCHER" "syncenv-gui"
     refresh_linux_desktop_cache
     echo -e "${GREEN}✓ GUI application installed to ${GUI_INSTALL_DIR}${NC}"
 }
@@ -381,7 +381,7 @@ create_macos_gui_bundle() {
     local bundle_target="$2"
     local contents_dir="$bundle_target/Contents"
     local resources_dir="$contents_dir/Resources"
-    local icon_source="$SCRIPT_DIR/src/gui/build/bin/env-sync.app/Contents/Resources/iconfile.icns"
+    local icon_source="$SCRIPT_DIR/src/gui/build/bin/syncenv.app/Contents/Resources/iconfile.icns"
 
     rm -rf "$bundle_target"
     mkdir -p "$contents_dir/MacOS" "$resources_dir"
@@ -398,15 +398,15 @@ create_macos_gui_bundle() {
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleName</key>
-    <string>env-sync</string>
+    <string>syncenv</string>
     <key>CFBundleExecutable</key>
     <string>${GUI_BINARY_NAME}</string>
     <key>CFBundleIdentifier</key>
-    <string>com.wails.env-sync</string>
+    <string>com.wails.syncenv</string>
     <key>CFBundleVersion</key>
-    <string>${ENV_SYNC_VERSION}</string>
+    <string>${SYNCENV_VERSION}</string>
     <key>CFBundleShortVersionString</key>
-    <string>${ENV_SYNC_VERSION}</string>
+    <string>${SYNCENV_VERSION}</string>
     <key>CFBundleGetInfoString</key>
     <string>Distributed secrets synchronization for local networks</string>
     <key>CFBundleIconFile</key>
@@ -454,9 +454,9 @@ fi
 echo "Installing files..."
 
 SERVICE_WAS_STOPPED=false
-if [[ "$INSTALL_CLI" == "true" ]] && command -v env-sync >/dev/null 2>&1; then
+if [[ "$INSTALL_CLI" == "true" ]] && command -v syncenv >/dev/null 2>&1; then
     echo "Checking for running service..."
-    if env-sync service stop 2>&1 | grep -q "Service stopped"; then
+    if syncenv service stop 2>&1 | grep -q "Service stopped"; then
         SERVICE_WAS_STOPPED=true
     fi
 fi
@@ -469,8 +469,8 @@ if [[ "$REMOTE_MODE" == "true" ]]; then
 
     if [[ "$INSTALL_CLI" == "true" ]]; then
         TEMP_BINARY=$(download_binary "$PLATFORM")
-        cp "$TEMP_BINARY" "$BIN_DIR/env-sync"
-        chmod +x "$BIN_DIR/env-sync"
+        cp "$TEMP_BINARY" "$BIN_DIR/syncenv"
+        chmod +x "$BIN_DIR/syncenv"
         rm -rf "$(dirname "$TEMP_BINARY")"
         CLI_INSTALLED=true
         echo -e "${GREEN}✓ CLI binary downloaded and installed${NC}"
@@ -479,7 +479,7 @@ if [[ "$REMOTE_MODE" == "true" ]]; then
     if [[ "$INSTALL_GUI" == "true" ]]; then
         case "$PLATFORM_OS" in
             macos)
-                TEMP_GUI_ARCHIVE=$(download_artifact "env-sync-gui-macos-${PLATFORM_ARCH}.dmg")
+                TEMP_GUI_ARCHIVE=$(download_artifact "syncenv-gui-macos-${PLATFORM_ARCH}.dmg")
                 TEMP_GUI_DIR="$(mktemp -d)"
                 MOUNT_POINT="$TEMP_GUI_DIR/mount"
                 mkdir -p "$MOUNT_POINT"
@@ -503,19 +503,19 @@ if [[ "$REMOTE_MODE" == "true" ]]; then
                 GUI_INSTALLED=true
                 ;;
             linux)
-                TEMP_GUI_ARCHIVE=$(download_artifact "env-sync-gui-linux-${PLATFORM_ARCH}.deb")
+                TEMP_GUI_ARCHIVE=$(download_artifact "syncenv-gui-linux-${PLATFORM_ARCH}.deb")
                 TEMP_GUI_DIR="$(mktemp -d)"
                 extract_deb_payload "$TEMP_GUI_ARCHIVE" "$TEMP_GUI_DIR"
 
-                if [[ ! -f "$TEMP_GUI_DIR/opt/env-sync/$GUI_BINARY_NAME" ]] || [[ ! -f "$TEMP_GUI_DIR/usr/share/icons/hicolor/512x512/apps/env-sync-gui.png" ]]; then
+                if [[ ! -f "$TEMP_GUI_DIR/opt/syncenv/$GUI_BINARY_NAME" ]] || [[ ! -f "$TEMP_GUI_DIR/usr/share/icons/hicolor/512x512/apps/syncenv-gui.png" ]]; then
                     echo -e "${RED}✗ Downloaded Linux GUI package is missing required files${NC}"
                     rm -rf "$(dirname "$TEMP_GUI_ARCHIVE")" "$TEMP_GUI_DIR"
                     exit 1
                 fi
 
                 install_linux_gui_payload \
-                    "$TEMP_GUI_DIR/opt/env-sync/$GUI_BINARY_NAME" \
-                    "$TEMP_GUI_DIR/usr/share/icons/hicolor/512x512/apps/env-sync-gui.png"
+                    "$TEMP_GUI_DIR/opt/syncenv/$GUI_BINARY_NAME" \
+                    "$TEMP_GUI_DIR/usr/share/icons/hicolor/512x512/apps/syncenv-gui.png"
                 rm -rf "$(dirname "$TEMP_GUI_ARCHIVE")" "$TEMP_GUI_DIR"
                 GUI_INSTALLED=true
                 ;;
@@ -533,13 +533,13 @@ else
         echo "Building CLI binary..."
         make build
 
-        if [[ ! -f "$SCRIPT_DIR/target/env-sync" ]]; then
+        if [[ ! -f "$SCRIPT_DIR/target/syncenv" ]]; then
             echo -e "${RED}✗ CLI build failed - binary not found${NC}"
             exit 1
         fi
 
-        cp "$SCRIPT_DIR/target/env-sync" "$BIN_DIR/env-sync"
-        chmod +x "$BIN_DIR/env-sync"
+        cp "$SCRIPT_DIR/target/syncenv" "$BIN_DIR/syncenv"
+        chmod +x "$BIN_DIR/syncenv"
         CLI_INSTALLED=true
         echo -e "${GREEN}✓ CLI binary installed${NC}"
     fi
@@ -554,7 +554,7 @@ else
 
         make build-gui
 
-        if [[ ! -f "$SCRIPT_DIR/target/env-sync-gui" ]]; then
+        if [[ ! -f "$SCRIPT_DIR/target/syncenv-gui" ]]; then
             echo -e "${RED}✗ GUI build failed - binary not found${NC}"
             exit 1
         fi
@@ -562,12 +562,12 @@ else
         case "$OS" in
             Darwin)
                 TEMP_GUI_DIR="$(mktemp -d)"
-                create_macos_gui_bundle "$SCRIPT_DIR/target/env-sync-gui" "$TEMP_GUI_DIR/$GUI_BUNDLE_NAME"
+                create_macos_gui_bundle "$SCRIPT_DIR/target/syncenv-gui" "$TEMP_GUI_DIR/$GUI_BUNDLE_NAME"
                 install_macos_gui_bundle "$TEMP_GUI_DIR/$GUI_BUNDLE_NAME"
                 rm -rf "$TEMP_GUI_DIR"
                 ;;
             Linux)
-                install_linux_gui_payload "$SCRIPT_DIR/target/env-sync-gui" "$SCRIPT_DIR/src/gui/build/appicon.png"
+                install_linux_gui_payload "$SCRIPT_DIR/target/syncenv-gui" "$SCRIPT_DIR/src/gui/build/appicon.png"
                 ;;
             *)
                 echo -e "${RED}✗ GUI installation is not available for ${OS} via install.sh${NC}"
@@ -582,9 +582,9 @@ fi
 # Restart service if it was stopped
 if [[ "$SERVICE_WAS_STOPPED" == "true" && "$CLI_INSTALLED" == "true" ]]; then
     echo "Restarting service..."
-    "$BIN_DIR/env-sync" service restart >/dev/null 2>&1 || {
+    "$BIN_DIR/syncenv" service restart >/dev/null 2>&1 || {
         echo -e "${YELLOW}Note: Service was stopped but could not be restarted automatically${NC}"
-        echo "Run 'env-sync serve -d' to start the service manually"
+        echo "Run 'syncenv serve -d' to start the service manually"
     }
 fi
 
@@ -607,17 +607,17 @@ fi
 # Post-install instructions
 echo "Next steps:"
 echo ""
-echo "env-sync v${ENV_SYNC_VERSION} has been installed!"
+echo "syncenv v${SYNCENV_VERSION} has been installed!"
 echo ""
 if [[ "$CLI_INSTALLED" == "true" ]]; then
     echo "1. Initialize your secrets file:"
-    echo "   env-sync init --encrypted"
+    echo "   syncenv init --encrypted"
     echo ""
     echo "2. Add your secrets:"
-    echo "   env-sync add OPENAI_API_KEY=\"sk-...\""
+    echo "   syncenv add OPENAI_API_KEY=\"sk-...\""
     echo ""
     echo "3. Set up periodic sync (optional):"
-    echo "   env-sync cron --install"
+    echo "   syncenv cron --install"
     echo ""
     echo "4. On other machines, repeat steps 1-3"
     echo ""
@@ -636,7 +636,7 @@ if [[ "$GUI_INSTALLED" == "true" ]]; then
             echo "GUI application location:"
             echo "  $GUI_INSTALL_TARGET"
             echo "Desktop launcher:"
-            echo "  $GUI_DESKTOP_DIR/env-sync-gui.desktop"
+            echo "  $GUI_DESKTOP_DIR/syncenv-gui.desktop"
             echo ""
             ;;
     esac
@@ -647,9 +647,9 @@ echo ""
 
 # Verify installation
 echo "Verifying installation..."
-if [[ "$CLI_INSTALLED" == "true" ]] && command -v env-sync >/dev/null 2>&1; then
-    echo -e "${GREEN}✓ env-sync installed successfully${NC}"
-    env-sync --help | head -20
+if [[ "$CLI_INSTALLED" == "true" ]] && command -v syncenv >/dev/null 2>&1; then
+    echo -e "${GREEN}✓ syncenv installed successfully${NC}"
+    syncenv --help | head -20
 elif [[ "$CLI_INSTALLED" == "true" ]]; then
     echo -e "${RED}✗ Installation verification failed${NC}"
     echo "Please ensure $BIN_DIR is in your PATH"
@@ -660,15 +660,15 @@ if [[ "$GUI_INSTALLED" == "true" ]]; then
     case "$OS" in
         Darwin)
             if [[ -d "$GUI_INSTALL_TARGET" ]]; then
-                echo -e "${GREEN}✓ env-sync GUI installed successfully${NC}"
+                echo -e "${GREEN}✓ syncenv GUI installed successfully${NC}"
             else
                 echo -e "${RED}✗ GUI installation verification failed${NC}"
                 exit 1
             fi
             ;;
         Linux)
-            if [[ -x "$GUI_INSTALL_TARGET" ]] && [[ -f "$GUI_DESKTOP_DIR/env-sync-gui.desktop" ]]; then
-                echo -e "${GREEN}✓ env-sync GUI installed successfully${NC}"
+            if [[ -x "$GUI_INSTALL_TARGET" ]] && [[ -f "$GUI_DESKTOP_DIR/syncenv-gui.desktop" ]]; then
+                echo -e "${GREEN}✓ syncenv GUI installed successfully${NC}"
             else
                 echo -e "${RED}✗ GUI installation verification failed${NC}"
                 exit 1

@@ -1,9 +1,9 @@
 package main
 
 import (
-	"envsync/internal/config"
-	"envsync/internal/server"
-	"envsync/internal/service"
+	"syncenv/internal/config"
+	"syncenv/internal/server"
+	"syncenv/internal/service"
 	"fmt"
 	"os"
 	"strings"
@@ -16,7 +16,7 @@ type ServiceMgmtService struct{}
 func (s *ServiceMgmtService) StartServer(port int, daemon bool) error {
 	portStr := fmt.Sprintf("%d", port)
 	if port <= 0 {
-		portStr = config.EnvSyncPort()
+		portStr = config.SyncEnvPort()
 	}
 
 	return server.Run(server.Options{
@@ -49,7 +49,7 @@ func (s *ServiceMgmtService) UninstallService() error {
 
 // GetServerPort returns the configured server port
 func (s *ServiceMgmtService) GetServerPort() int {
-	port := config.EnvSyncPort()
+	port := config.SyncEnvPort()
 	var p int
 	fmt.Sscanf(port, "%d", &p)
 	return p

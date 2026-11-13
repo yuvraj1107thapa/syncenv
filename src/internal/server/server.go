@@ -15,16 +15,16 @@ import (
 
 	"github.com/kardianos/service"
 
-	"envsync/internal/config"
-	"envsync/internal/discovery"
-	"envsync/internal/identity"
-	"envsync/internal/logging"
-	"envsync/internal/metadata"
-	"envsync/internal/mode"
-	"envsync/internal/peer"
-	"envsync/internal/secrets"
-	syncer "envsync/internal/sync"
-	mtlstransport "envsync/internal/transport/mtls"
+	"syncenv/internal/config"
+	"syncenv/internal/discovery"
+	"syncenv/internal/identity"
+	"syncenv/internal/logging"
+	"syncenv/internal/metadata"
+	"syncenv/internal/mode"
+	"syncenv/internal/peer"
+	"syncenv/internal/secrets"
+	syncer "syncenv/internal/sync"
+	mtlstransport "syncenv/internal/transport/mtls"
 )
 
 type Options struct {
@@ -40,11 +40,11 @@ type Options struct {
 
 func Run(opts Options) error {
 	if opts.Port == "" {
-		opts.Port = config.EnvSyncPort()
+		opts.Port = config.SyncEnvPort()
 	}
 	// Two OS users on one machine share the default port: the second
 	// user transparently bumps to a free per-user port (persisted).
-	// Never bump explicitly pinned ports (-p/--port or ENV_SYNC_PORT).
+	// Never bump explicitly pinned ports (-p/--port or SYNCENV_PORT).
 	if !opts.PortExplicit {
 		opts.Port = ensureLocalPort(opts.Port)
 	}
@@ -133,9 +133,9 @@ func runService(opts Options) error {
 func newService(opts Options) (service.Service, error) {
 	prg := &serviceProgram{opts: opts}
 	svcConfig := &service.Config{
-		Name:        "env-sync",
-		DisplayName: "env-sync",
-		Description: "env-sync server",
+		Name:        "syncenv",
+		DisplayName: "syncenv",
+		Description: "syncenv server",
 		Arguments:   serviceArgs(opts),
 		Option:      service.KeyValue{"UserService": true},
 	}
@@ -278,7 +278,7 @@ func buildPlaintextServer(opts Options) (*http.Server, error) {
 
 	mux.HandleFunc("/", notFoundHandler)
 
-	logging.Log("INFO", fmt.Sprintf("Starting env-sync server on port %s (mode: %s)", opts.Port, currentMode))
+	logging.Log("INFO", fmt.Sprintf("Starting syncenv server on port %s (mode: %s)", opts.Port, currentMode))
 	logging.Log("SUCCESS", fmt.Sprintf("Server listening on http://0.0.0.0:%s", opts.Port))
 	logging.Log("INFO", "Endpoints:")
 	logging.Log("INFO", "  - GET /health         - Health check")
@@ -322,7 +322,7 @@ func buildSecureServer(opts Options) (*http.Server, *tls.Config, error) {
 	mux.HandleFunc("/v2/secrets/request-reencrypt", v2RequestReencryptHandler)
 	mux.HandleFunc("/", notFoundHandler)
 
-	logging.Log("INFO", fmt.Sprintf("Starting env-sync secure server on port %s (mode: secure-peer)", opts.Port))
+	logging.Log("INFO", fmt.Sprintf("Starting syncenv secure server on port %s (mode: secure-peer)", opts.Port))
 	logging.Log("SUCCESS", fmt.Sprintf("Server listening on https://0.0.0.0:%s (mTLS)", opts.Port))
 	logging.Log("INFO", "v2 Endpoints (mTLS required):")
 	logging.Log("INFO", "  - GET  /v2/health                  - Health check")
@@ -370,10 +370,10 @@ func secretsHandler(w http.ResponseWriter, r *http.Request) {
 	checksum := metadata.GetFileChecksum(config.SecretsFile())
 	w.Header().Set("Content-Type", "text/plain")
 	w.Header().Set("Content-Length", fmt.Sprintf("%d", len(content)))
-	w.Header().Set("X-EnvSync-Version", version)
-	w.Header().Set("X-EnvSync-Timestamp", timestamp)
-	w.Header().Set("X-EnvSync-Host", host)
-	w.Header().Set("X-EnvSync-Checksum", checksum)
+	w.Header().Set("X-SyncEnv-Version", version)
+	w.Header().Set("X-SyncEnv-Timestamp", timestamp)
+	w.Header().Set("X-SyncEnv-Host", host)
+	w.Header().Set("X-SyncEnv-Checksum", checksum)
 	w.WriteHeader(http.StatusOK)
 	_, _ = w.Write(content)
 }
@@ -435,7 +435,7 @@ func v2SecretsHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "text/plain")
 	w.Header().Set("Content-Length", fmt.Sprintf("%d", len(content)))
-	w.Header().Set("X-EnvSync-Version", metadata.GetFileVersion(config.SecretsFile()))
+	w.Header().Set("X-SyncEnv-Version", metadata.GetFileVersion(config.SecretsFile()))
 	w.WriteHeader(http.StatusOK)
 	_, _ = w.Write(content)
 }
@@ -651,12 +651,12 @@ func isPeerAllowed(reg *peer.Registry, peerID string, cap peer.Capability) bool 
 }
 
 // ensureLocalPort returns a free port for this user. Explicitly pinned
-// ports (ENV_SYNC_PORT) are never bumped. Otherwise, if the wanted port
+// ports (SYNCENV_PORT) are never bumped. Otherwise, if the wanted port
 // is occupied (e.g. another OS user on this machine), the next free port
 // is picked and persisted as this user's port.
 func ensureLocalPort(want string) string {
 	if want == "" {
-		want = config.EnvSyncPort()
+		want = config.SyncEnvPort()
 	}
 	if config.ExplicitPort() {
 		return want

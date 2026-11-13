@@ -1,21 +1,21 @@
 <script setup lang="ts">
 useHead({
-  title: 'Installation guides | env-sync',
+  title: 'Installation guides | syncenv',
   meta: [
-    { name: 'description', content: 'Install env-sync on Linux, macOS, and WSL2. Choose from Quickstart, Trusted Peers (SSH), or Secure Peers (mTLS + AGE) setup guides.' },
-    { name: 'keywords', content: 'env-sync install, dotenv sync setup, Linux secrets sync, macOS secrets sync, WSL2, peer-to-peer sync install' },
-    { property: 'og:title', content: 'Install env-sync | Setup guides for every scenario' },
+    { name: 'description', content: 'Install syncenv on Linux, macOS, and WSL2. Choose from Quickstart, Trusted Peers (SSH), or Secure Peers (mTLS + AGE) setup guides.' },
+    { name: 'keywords', content: 'syncenv install, dotenv sync setup, Linux secrets sync, macOS secrets sync, WSL2, peer-to-peer sync install' },
+    { property: 'og:title', content: 'Install syncenv | Setup guides for every scenario' },
     { property: 'og:description', content: 'Quickstart in under a minute, or follow step-by-step guides for trusted-owner SSH or secure-peer mTLS setups.' },
     { property: 'og:type', content: 'article' },
-    { property: 'og:url', content: 'https://envsync.yuvrajthapa.com/installation' },
-    { property: 'og:image', content: 'https://envsync.yuvrajthapa.com/assets/cover.png' },
+    { property: 'og:url', content: 'https://syncenv.yuvrajthapa.com/installation' },
+    { property: 'og:image', content: 'https://syncenv.yuvrajthapa.com/assets/cover.png' },
     { name: 'twitter:card', content: 'summary_large_image' },
-    { name: 'twitter:title', content: 'Install env-sync | Setup guides for every scenario' },
+    { name: 'twitter:title', content: 'Install syncenv | Setup guides for every scenario' },
     { name: 'twitter:description', content: 'Quickstart in under a minute, or follow step-by-step guides for trusted-owner SSH or secure-peer mTLS setups.' },
-    { name: 'twitter:image', content: 'https://envsync.yuvrajthapa.com/assets/cover.png' },
+    { name: 'twitter:image', content: 'https://syncenv.yuvrajthapa.com/assets/cover.png' },
   ],
   link: [
-    { rel: 'canonical', href: 'https://envsync.yuvrajthapa.com/installation' },
+    { rel: 'canonical', href: 'https://syncenv.yuvrajthapa.com/installation' },
   ],
 })
 </script>
@@ -30,7 +30,7 @@ useHead({
     <article class="panel feature">
       <div class="icon"><i class="fa-solid fa-bolt"></i></div>
       <h3><NuxtLink to="/installation/quickstart">Quickstart</NuxtLink></h3>
-      <p>Install env-sync in under a minute. One command, no accounts, no server. Covers install, init, and first sync.</p>
+      <p>Install syncenv in under a minute. One command, no accounts, no server. Covers install, init, and first sync.</p>
       <div style="margin-top:1rem;">
         <NuxtLink class="btn btn-primary" to="/installation/quickstart">Quickstart →</NuxtLink>
       </div>
@@ -56,22 +56,22 @@ useHead({
   <section class="panel" style="max-width:720px;margin:0 auto 1rem;">
     <h2>Quick install (all modes)</h2>
     <pre><code># system-wide install
-curl -fsSL https://envsync.yuvrajthapa.com/install.sh | sudo bash
+curl -fsSL https://syncenv.yuvrajthapa.com/install.sh | sudo bash
 
 # user-only install (no sudo)
-curl -fsSL https://envsync.yuvrajthapa.com/install.sh | bash -s -- --user</code></pre>
+curl -fsSL https://syncenv.yuvrajthapa.com/install.sh | bash -s -- --user</code></pre>
     <p>The installer defaults to the CLI. Add <code>--all</code> to install both the CLI and desktop GUI, or use <code>--gui-only</code> if you only want the GUI app.</p>
     <pre><code># install both CLI + GUI
-curl -fsSL https://envsync.yuvrajthapa.com/install.sh | bash -s -- --user --all
+curl -fsSL https://syncenv.yuvrajthapa.com/install.sh | bash -s -- --user --all
 
 # install only the GUI
-curl -fsSL https://envsync.yuvrajthapa.com/install.sh | bash -s -- --user --gui-only</code></pre>
+curl -fsSL https://syncenv.yuvrajthapa.com/install.sh | bash -s -- --user --gui-only</code></pre>
   </section>
 
   <section class="panel" style="max-width:720px;margin:0 auto 1rem;">
     <h2>Prefer a desktop app?</h2>
-    <p>env-sync also ships an optional desktop GUI built with Wails. It uses the same configuration, secrets, keys, and peer registry as the CLI, so you can install one or both and switch between them at any time.</p>
-    <p>For the full GUI walkthrough, platform notes, and development details, see <a href="https://github.com/yuvraj1107thapa/envsync/blob/main/docs/GUI.md">GUI.md</a>.</p>
+    <p>syncenv also ships an optional desktop GUI built with Wails. It uses the same configuration, secrets, keys, and peer registry as the CLI, so you can install one or both and switch between them at any time.</p>
+    <p>For the full GUI walkthrough, platform notes, and development details, see <a href="https://github.com/yuvraj1107thapa/syncenv/blob/main/docs/GUI.md">GUI.md</a>.</p>
   </section>
 
   <section class="panel" style="max-width:720px;margin:0 auto 1rem;">

@@ -11,17 +11,17 @@ import (
 	"strings"
 	"time"
 
-	"envsync/internal/config"
-	"envsync/internal/logging"
-	"envsync/internal/metadata"
+	"syncenv/internal/config"
+	"syncenv/internal/logging"
+	"syncenv/internal/metadata"
 )
 
 var (
-	headerStart          = "# === ENV_SYNC_METADATA ==="
+	headerStart          = "# === SYNCENV_METADATA ==="
 	headerEnd            = "# === END_METADATA ==="
-	footerStart          = "# === ENV_SYNC_FOOTER ==="
+	footerStart          = "# === SYNCENV_FOOTER ==="
 	footerEnd            = "# === END_FOOTER ==="
-	lineTimestampPattern = regexp.MustCompile(`ENVSYNC_UPDATED_AT=([0-9TZ:.-]+)`)
+	lineTimestampPattern = regexp.MustCompile(`SYNCENV_UPDATED_AT=([0-9TZ:.-]+)`)
 	lineKeyPattern       = regexp.MustCompile(`^([A-Za-z_][A-Za-z0-9_]*)=`)
 )
 
@@ -30,7 +30,7 @@ func InitSecretsFile(file string, initTimestamp string) error {
 		initTimestamp = config.InitTimestamp()
 	}
 	hostname := GetHostname()
-	content := fmt.Sprintf(`# === ENV_SYNC_METADATA ===
+	content := fmt.Sprintf(`# === SYNCENV_METADATA ===
 # VERSION: %s
 # TIMESTAMP: %s
 # HOST: %s
@@ -42,7 +42,7 @@ func InitSecretsFile(file string, initTimestamp string) error {
 # Example:
 # OPENAI_API_KEY="sk-..."
 
-# === ENV_SYNC_FOOTER ===
+# === SYNCENV_FOOTER ===
 # VERSION: %s
 # TIMESTAMP: %s
 # HOST: %s
@@ -400,9 +400,9 @@ func getLineKey(line string) string {
 }
 
 func GetHostname() string {
-	// ENV_SYNC_HOSTNAME overrides the machine hostname (useful for tests
+	// SYNCENV_HOSTNAME overrides the machine hostname (useful for tests
 	// and for simulating multiple machines on one host).
-	if override := strings.TrimSpace(os.Getenv("ENV_SYNC_HOSTNAME")); override != "" {
+	if override := strings.TrimSpace(os.Getenv("SYNCENV_HOSTNAME")); override != "" {
 		return override
 	}
 	if output, err := execCommand("hostname", "-f"); err == nil {
@@ -448,11 +448,11 @@ func sortStrings(values []string) {
 }
 
 // WriteFileAtomic writes data to path via a temp file in the same directory
-// followed by a rename, so concurrent readers (daemon, cron sync, `env-sync show`)
+// followed by a rename, so concurrent readers (daemon, cron sync, `syncenv show`)
 // never observe a truncated or half-written secrets file.
 func WriteFileAtomic(path string, data []byte, perm os.FileMode) error {
 	dir := filepath.Dir(path)
-	tmp, err := os.CreateTemp(dir, ".env-sync-tmp-")
+	tmp, err := os.CreateTemp(dir, ".syncenv-tmp-")
 	if err != nil {
 		return err
 	}

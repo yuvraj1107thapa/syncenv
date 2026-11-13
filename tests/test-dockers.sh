@@ -3,7 +3,7 @@
 # test-dockers.sh - Main entry point for Docker-based integration tests
 #
 # This script sets up bats-core and runs all Docker-based integration tests
-# to verify env-sync functionality across multiple containers.
+# to verify syncenv functionality across multiple containers.
 #
 # Usage: ./tests/test-dockers.sh [options]
 #   --no-cleanup    Keep containers running after tests (for debugging)
@@ -83,7 +83,7 @@ done
 
 # Show help
 if [ $SHOW_HELP -eq 1 ]; then
-    echo "env-sync Docker Integration Tests (v3.0 — 3-mode support)"
+    echo "syncenv Docker Integration Tests (v3.0 — 3-mode support)"
     echo ""
     echo "Usage: ./tests/test-dockers.sh [options]"
     echo ""
@@ -114,11 +114,11 @@ if [ $SHOW_HELP -eq 1 ]; then
 fi
 
 # Set up binary paths
-ENV_SYNC_GO_BIN="${ENV_SYNC_GO_BIN:-target/env-sync}"
-ENV_SYNC_BIN="$ENV_SYNC_GO_BIN"
+SYNCENV_GO_BIN="${SYNCENV_GO_BIN:-target/syncenv}"
+SYNCENV_BIN="$SYNCENV_GO_BIN"
 
-export ENV_SYNC_GO_BIN
-export ENV_SYNC_BIN
+export SYNCENV_GO_BIN
+export SYNCENV_BIN
 
 # Function to print colored messages
 print_info() {
@@ -180,7 +180,7 @@ check_prerequisites() {
 
 # Function to build Go binary with Docker
 build_go_binary() {
-    local go_image="${ENV_SYNC_GO_DOCKER_IMAGE:-golang:1.24}"
+    local go_image="${SYNCENV_GO_DOCKER_IMAGE:-golang:1.24}"
 
     print_info "Building Go binary with Docker (${go_image})..."
     mkdir -p "$SCRIPT_DIR/target"
@@ -195,7 +195,7 @@ build_go_binary() {
         -v "$SCRIPT_DIR":/workspace \
         -w /workspace/src \
         "$go_image" \
-        bash -c 'mkdir -p /workspace/target && /usr/local/go/bin/go build -o /workspace/target/env-sync ./cmd/env-sync'
+        bash -c 'mkdir -p /workspace/target && /usr/local/go/bin/go build -o /workspace/target/syncenv ./cmd/syncenv'
 }
 
 # Function to setup test environment
@@ -277,15 +277,15 @@ cleanup() {
     print_info "Cleaning up..."
     cd "$TESTS_DIR"
     $DOCKER_COMPOSE -f "$TESTS_DIR/docker/docker-compose.yml" down -v 2>/dev/null || true
-    docker stop env-sync-delta 2>/dev/null || true
-    docker rm env-sync-delta 2>/dev/null || true
+    docker stop syncenv-delta 2>/dev/null || true
+    docker rm syncenv-delta 2>/dev/null || true
     print_success "Cleanup complete"
 }
 
 # Main execution
 echo ""
 echo "=============================================="
-echo "env-sync Docker Integration Tests (v3.0)"
+echo "syncenv Docker Integration Tests (v3.0)"
 echo "=============================================="
 echo ""
 

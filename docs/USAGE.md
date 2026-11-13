@@ -1,6 +1,6 @@
 # Usage Guide
 
-Complete guide for using env-sync in all operation modes.
+Complete guide for using syncenv in all operation modes.
 
 ## Table of Contents
 
@@ -17,45 +17,45 @@ Complete guide for using env-sync in all operation modes.
 
 ```bash
 # Sync with peers (works in all modes)
-env-sync
+syncenv
 
 # Check current status
-env-sync status
+syncenv status
 
 # Discover peers on network
-env-sync discover
+syncenv discover
 
 # Show help
-env-sync --help
+syncenv --help
 ```
 
 ## Mode Management
 
-env-sync operates in three distinct security modes. See [SECURITY-MODES.md](./SECURITY-MODES.md) for detailed security information.
+syncenv operates in three distinct security modes. See [SECURITY-MODES.md](./SECURITY-MODES.md) for detailed security information.
 
 ### View Current Mode
 
 ```bash
-env-sync mode get
+syncenv mode get
 ```
 
 ### Switch Modes
 
 ```bash
 # Switch to trusted-owner-ssh mode (default)
-env-sync mode set trusted-owner-ssh
+syncenv mode set trusted-owner-ssh
 
 # Switch to secure-peer mode (for cross-owner collaboration)
-env-sync mode set secure-peer
+syncenv mode set secure-peer
 
 # Switch to dev mode (insecure, for debugging only)
-env-sync mode set dev-plaintext-http
+syncenv mode set dev-plaintext-http
 
 # Force mode switch without confirmation (non-interactive)
-env-sync mode set secure-peer --yes
+syncenv mode set secure-peer --yes
 
 # Switch and clean up old mode's data
-env-sync mode set trusted-owner-ssh --prune-old-material --yes
+syncenv mode set trusted-owner-ssh --prune-old-material --yes
 ```
 
 **Important**: Mode switches are non-destructive by default. Your keys, secrets, and peer data are preserved. Use `--prune-old-material` to clean up.
@@ -72,13 +72,13 @@ On an existing trusted peer:
 
 ```bash
 # Create an enrollment invitation
-env-sync peer invite
+syncenv peer invite
 
 # Create invitation that expires in 1 hour
-env-sync peer invite --expires 1h
+syncenv peer invite --expires 1h
 
 # Create invitation with description
-env-sync peer invite --expires 30m --description "John's laptop"
+syncenv peer invite --expires 30m --description "John's laptop"
 ```
 
 The command outputs:
@@ -92,39 +92,39 @@ On the new machine:
 
 ```bash
 # 1. Set mode to secure-peer
-env-sync mode set secure-peer
+syncenv mode set secure-peer
 
 # 2. Request access using the token from invitation (peer IDs are user@host)
-env-sync peer request alice@hostname.local <token>
+syncenv peer request alice@hostname.local <token>
 
 # 3. Wait for approval, then sync
-env-sync
+syncenv
 ```
 
 #### Approve Pending Peers
 
 ```bash
 # List pending requests
-env-sync peer list --pending
+syncenv peer list --pending
 
 # Approve a peer (peer IDs are user@host)
-env-sync peer approve bob@new-host.local
+syncenv peer approve bob@new-host.local
 
 # Revoke a peer's access
-env-sync peer revoke mallory@compromised-host.local
+syncenv peer revoke mallory@compromised-host.local
 
 # List all peers
-env-sync peer list
+syncenv peer list
 ```
 
 #### View Peer Trust Information
 
 ```bash
 # Show trust details for a specific peer (peer ID: user@host)
-env-sync peer trust show alice@hostname.local
+syncenv peer trust show alice@hostname.local
 
 # List all trusted fingerprints
-env-sync peer trust list
+syncenv peer trust list
 ```
 
 ### Trusted-Owner-SSH Mode
@@ -133,18 +133,18 @@ In `trusted-owner-ssh` mode, any peer with SSH access can sync. No explicit appr
 
 ```bash
 # Discover peers (also filters by SSH reachability)
-env-sync discover
+syncenv discover
 
 # Collect public keys from discovered peers
-env-sync discover --collect-keys
+syncenv discover --collect-keys
 ```
 
 ### Multiple Users on One Machine (v4.0+)
 
 Peer IDs are per-user `user@host` (username + hostname, overridable via
-`ENV_SYNC_USER` / `ENV_SYNC_HOSTNAME`). Each OS user gets their own port:
-default `5739`, else `ENV_SYNC_PORT`, else `~/.config/env-sync/port`
-(auto-bumped when taken). `serve -p/--port` or `ENV_SYNC_PORT` pins an
+`SYNCENV_USER` / `SYNCENV_HOSTNAME`). Each OS user gets their own port:
+default `5739`, else `SYNCENV_PORT`, else `~/.config/syncenv/port`
+(auto-bumped when taken). `serve -p/--port` or `SYNCENV_PORT` pins an
 explicit port that is never bumped. Endpoints accept `host`, `host:port`, or
 `user@host[:port]`; `user@host` auto-resolves the right port when reachable.
 Legacy bare-hostname peers keep working via fallback.
@@ -157,14 +157,14 @@ Manage your secrets with these commands. All commands work in both encrypted and
 
 ```bash
 # Add a new secret
-env-sync add OPENAI_API_KEY="sk-abc123xyz"
+syncenv add OPENAI_API_KEY="sk-abc123xyz"
 
 # Add secret with spaces (use quotes)
-env-sync add DATABASE_URL="postgres://user:pass@localhost/db"
+syncenv add DATABASE_URL="postgres://user:pass@localhost/db"
 
 # Add multiple secrets
-env-sync add API_KEY="value1"
-env-sync add AWS_ACCESS_KEY="AKIA..."
+syncenv add API_KEY="value1"
+syncenv add AWS_ACCESS_KEY="AKIA..."
 ```
 
 **Features:**
@@ -177,17 +177,17 @@ env-sync add AWS_ACCESS_KEY="AKIA..."
 
 ```bash
 # Remove a secret
-env-sync remove OPENAI_API_KEY
+syncenv remove OPENAI_API_KEY
 
 # Safe to run - warns if key doesn't exist
-env-sync remove NONEXISTENT_KEY
+syncenv remove NONEXISTENT_KEY
 ```
 
 ### List Secrets
 
 ```bash
 # List all secret keys (values hidden)
-env-sync list
+syncenv list
 
 # Output example:
 # Secrets keys:
@@ -202,7 +202,7 @@ env-sync list
 
 ```bash
 # Show value of a specific key
-env-sync show OPENAI_API_KEY
+syncenv show OPENAI_API_KEY
 
 # Output: sk-abc123xyz
 ```
@@ -211,10 +211,10 @@ env-sync show OPENAI_API_KEY
 
 ```bash
 # Output secrets as export statements
-env-sync load
+syncenv load
 
 # Typical usage in shell profile
-eval "$(env-sync load 2>/dev/null)"
+eval "$(syncenv load 2>/dev/null)"
 ```
 
 ## Sync Operations
@@ -223,17 +223,17 @@ eval "$(env-sync load 2>/dev/null)"
 
 ```bash
 # Sync with all discovered peers
-env-sync
+syncenv
 
 # Same as:
-env-sync sync
+syncenv sync
 ```
 
 ### Sync from Specific Host
 
 ```bash
 # Sync from a specific peer only (peer IDs are user@host; port optional)
-env-sync sync alice@hostname.local
+syncenv sync alice@hostname.local
 ```
 
 ### Force Pull
@@ -242,7 +242,7 @@ Forcefully overwrite local secrets with those from a specific host:
 
 ```bash
 # Force pull from specific peer
-env-sync sync --force-pull alice@hostname.local
+syncenv sync --force-pull alice@hostname.local
 ```
 
 **Use when:**
@@ -256,7 +256,7 @@ env-sync sync --force-pull alice@hostname.local
 
 ```bash
 # Preview what would happen without making changes
-env-sync sync --dry-run
+syncenv sync --dry-run
 ```
 
 ## Service Management
@@ -267,33 +267,33 @@ The background service handles mDNS advertising and periodic sync.
 
 ```bash
 # Start as background service
-env-sync serve -d
+syncenv serve -d
 ```
 
 ### Stop Service
 
 ```bash
-env-sync service stop
+syncenv service stop
 ```
 
 ### Restart Service
 
 ```bash
-env-sync service restart
+syncenv service restart
 ```
 
 ### Check Service Status
 
 ```bash
 # Native OS commands
-systemctl --user status env-sync      # Linux
-launchctl print gui/$(id -u)/env-sync # macOS
+systemctl --user status syncenv      # Linux
+launchctl print gui/$(id -u)/syncenv # macOS
 ```
 
 ### Uninstall Service
 
 ```bash
-env-sync service uninstall
+syncenv service uninstall
 ```
 
 ## Shell Integration
@@ -302,11 +302,11 @@ Add to your shell profile (`~/.bashrc`, `~/.zshrc`, etc.):
 
 ```bash
 # Auto-load secrets on shell startup (decrypts automatically if encrypted)
-eval "$(env-sync load 2>/dev/null)"
+eval "$(syncenv load 2>/dev/null)"
 
 # Auto-sync in background on shell startup
-if command -v env-sync &> /dev/null; then
-    (env-sync --quiet &)
+if command -v syncenv &> /dev/null; then
+    (syncenv --quiet &)
 fi
 ```
 
@@ -316,23 +316,23 @@ fi
 
 ```bash
 # Install with default 30-minute interval
-env-sync cron --install
+syncenv cron --install
 
 # Install with custom interval (minutes)
-env-sync cron --install --interval 10
-env-sync cron --install --interval 60
+syncenv cron --install --interval 10
+syncenv cron --install --interval 60
 ```
 
 ### View Cron Job
 
 ```bash
-env-sync cron --show
+syncenv cron --show
 ```
 
 ### Remove Cron Job
 
 ```bash
-env-sync cron --remove
+syncenv cron --remove
 ```
 
 ## Backups
@@ -342,18 +342,18 @@ Backups are created automatically before any modification.
 ### View Backups
 
 ```bash
-ls ~/.config/env-sync/backups/
+ls ~/.config/syncenv/backups/
 ```
 
 ### Restore from Backup
 
 ```bash
 # Restore from most recent backup
-env-sync restore
+syncenv restore
 
 # Restore from specific backup (1-5, where 1 is most recent)
-env-sync restore 1
-env-sync restore 3
+syncenv restore 1
+syncenv restore 3
 ```
 
 ## Troubleshooting
@@ -362,11 +362,11 @@ env-sync restore 3
 
 ```bash
 # In trusted-owner-ssh mode
-env-sync key request-access --trigger alice@hostname.local
+syncenv key request-access --trigger alice@hostname.local
 
 # In secure-peer mode
 # Ensure you've been approved by a trusted peer
-env-sync peer list
+syncenv peer list
 ```
 
 ### SSH Connection Fails (Trusted-Owner Mode)
@@ -383,45 +383,45 @@ ssh-copy-id user@hostname.local
 
 ```bash
 # Check status
-env-sync status
+syncenv status
 
 # View logs
-tail -f ~/.config/env-sync/logs/env-sync.log
+tail -f ~/.config/syncenv/logs/syncenv.log
 
 # Test discovery
-env-sync discover
+syncenv discover
 ```
 
 ### Certificate/Trust Issues (Secure-Peer Mode)
 
 ```bash
 # View peer trust status (peer ID: user@host)
-env-sync peer trust show alice@hostname.local
+syncenv peer trust show alice@hostname.local
 
 # Check for pending approvals
-env-sync peer list --pending
+syncenv peer list --pending
 
 # Verify your transport identity
-env-sync key show --transport
+syncenv key show --transport
 ```
 
 ### Mode Switch Issues
 
 ```bash
 # View current mode
-env-sync mode get
+syncenv mode get
 
 # Check if old mode material exists
-ls ~/.config/env-sync/
+ls ~/.config/syncenv/
 
 # Force mode switch with cleanup
-env-sync mode set trusted-owner-ssh --prune-old-material --yes
+syncenv mode set trusted-owner-ssh --prune-old-material --yes
 ```
 
 ## File Locations
 
 ```
-~/.config/env-sync/
+~/.config/syncenv/
 ├── config                      # Config file
 ├── .secrets.env                # Secrets (encrypted or plaintext)
 ├── .secrets.env.backup.1..5    # Backups
@@ -439,5 +439,5 @@ env-sync mode set trusted-owner-ssh --prune-old-material --yes
 ├── events/
 │   └── membership.log          # Signed membership events
 └── logs/
-    └── env-sync.log            # Application logs
+    └── syncenv.log            # Application logs
 ```

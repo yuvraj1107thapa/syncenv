@@ -3,7 +3,7 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-05-10',
 
   site: {
-    url: 'https://envsync.yuvrajthapa.com',
+    url: 'https://syncenv.yuvrajthapa.com',
   },
 
   css: ['~/assets/css/main.css'],
@@ -13,12 +13,12 @@ export default defineNuxtConfig({
       charset: 'utf-8',
       viewport: 'width=device-width, initial-scale=1',
       meta: [
-        { name: 'author', content: 'env-sync contributors' },
+        { name: 'author', content: 'syncenv contributors' },
         { name: 'keywords', content: 'env sync, dotenv sync, secrets management, peer-to-peer, local network, mDNS, SSH, mTLS, AGE encryption, open source' },
-        { property: 'og:site_name', content: 'env-sync' },
-        { property: 'og:image', content: 'https://envsync.yuvrajthapa.com/assets/cover.png' },
+        { property: 'og:site_name', content: 'syncenv' },
+        { property: 'og:image', content: 'https://syncenv.yuvrajthapa.com/assets/cover.png' },
         { name: 'twitter:card', content: 'summary_large_image' },
-        { name: 'twitter:image', content: 'https://envsync.yuvrajthapa.com/assets/cover.png' },
+        { name: 'twitter:image', content: 'https://syncenv.yuvrajthapa.com/assets/cover.png' },
       ],
       link: [
         { rel: 'icon', type: 'image/x-icon', href: '/assets/favicon.ico' },
@@ -45,12 +45,12 @@ export default defineNuxtConfig({
       routes: [
         '/',
         '/comparisons',
-        '/comparisons/doppler-vs-envsync',
-        '/comparisons/dotenvx-vs-envsync',
-        '/comparisons/infisical-vs-envsync',
-        '/comparisons/sops-vs-envsync',
-        '/comparisons/syncthing-vs-envsync',
-        '/comparisons/vault-vs-envsync',
+        '/comparisons/doppler-vs-syncenv',
+        '/comparisons/dotenvx-vs-syncenv',
+        '/comparisons/infisical-vs-syncenv',
+        '/comparisons/sops-vs-syncenv',
+        '/comparisons/syncthing-vs-syncenv',
+        '/comparisons/vault-vs-syncenv',
         '/download',
         '/installation',
         '/installation/quickstart',

@@ -1,13 +1,13 @@
 # GUI Application
 
-env-sync includes an optional graphical desktop application built with [Wails v2](https://wails.io/) and Vue 3. The GUI provides the same capabilities as the CLI in a visual interface.
+syncenv includes an optional graphical desktop application built with [Wails v2](https://wails.io/) and Vue 3. The GUI provides the same capabilities as the CLI in a visual interface.
 
 ## Overview
 
-The GUI (`env-sync-gui`) is a standalone desktop application that operates on the **same** configuration files, secrets, keys, and peer registry as the CLI. Both can be installed and used side-by-side — changes in one are immediately reflected in the other.
+The GUI (`syncenv-gui`) is a standalone desktop application that operates on the **same** configuration files, secrets, keys, and peer registry as the CLI. Both can be installed and used side-by-side — changes in one are immediately reflected in the other.
 
 - **Not a replacement** — the CLI remains the primary interface
-- **Same state** — both read/write `~/.config/env-sync/`
+- **Same state** — both read/write `~/.config/syncenv/`
 - **Independent binary** — install one or both
 - **Native desktop app** — uses system WebView (not Electron/Chromium)
 
@@ -42,9 +42,9 @@ sudo ./install.sh --all
 ./install.sh
 ```
 
-- **macOS**: installs `env-sync.app` to `/Applications` or `~/Applications` with `--user`
+- **macOS**: installs `syncenv.app` to `/Applications` or `~/Applications` with `--user`
 - **macOS releases**: ship separate Apple Silicon and Intel GUI binaries and DMG files
-- **Linux releases**: ship separate `amd64`/`arm64` GUI binaries and `.deb` packages; install.sh installs the GUI payload under `/opt/env-sync` or `~/.local/lib/env-sync`, plus a desktop launcher and icon
+- **Linux releases**: ship separate `amd64`/`arm64` GUI binaries and `.deb` packages; install.sh installs the GUI payload under `/opt/syncenv` or `~/.local/lib/syncenv`, plus a desktop launcher and icon
 - **Windows**: use the release installer executable from GitHub Releases
 
 ### Prerequisites
@@ -133,7 +133,7 @@ All service methods call the same `internal/` packages that the CLI uses — the
 ### Design Decisions
 
 1. **Separate `src/gui/` package** — GUI code lives in its own directory, cleanly isolated from CLI code
-2. **No build tags** — directory separation means `go build ./cmd/env-sync` never touches GUI code
+2. **No build tags** — directory separation means `go build ./cmd/syncenv` never touches GUI code
 3. **Embedded frontend** — `//go:embed all:frontend/dist` bundles the built Vue app into the Go binary
 4. **System WebView** — Wails uses the OS-native WebView, keeping binary size small (~10-20MB)
 5. **First-run wizard** — guides new users through mode selection and initialization

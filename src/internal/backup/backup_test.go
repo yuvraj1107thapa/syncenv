@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"envsync/internal/config"
+	"syncenv/internal/config"
 )
 
 func TestCreateBackupRotation(t *testing.T) {

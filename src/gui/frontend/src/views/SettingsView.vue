@@ -55,10 +55,10 @@ async function removeCron() {
   }
 }
 
-async function initEnvSync() {
+async function initSyncEnv() {
   try {
     await settings.initialize(initEncrypted.value)
-    toast.success('env-sync initialized')
+    toast.success('syncenv initialized')
     showInitialize.value = false
     await status.fetchStatus()
   } catch (e) {
@@ -115,9 +115,9 @@ async function stopServer() {
         <span class="card-title">⚠️ Setup Required</span>
       </div>
       <p class="text-muted" style="margin-bottom: 12px">
-        env-sync has not been initialized on this machine.
+        syncenv has not been initialized on this machine.
       </p>
-      <button class="btn btn-primary" @click="showInitialize = true">Initialize env-sync</button>
+      <button class="btn btn-primary" @click="showInitialize = true">Initialize syncenv</button>
     </div>
 
     <!-- Mode Settings -->
@@ -279,7 +279,7 @@ async function stopServer() {
     <!-- Initialize Modal -->
     <div class="modal-overlay" v-if="showInitialize" @click.self="showInitialize = false">
       <div class="modal">
-        <h2 class="modal-title">Initialize env-sync</h2>
+        <h2 class="modal-title">Initialize syncenv</h2>
         <p class="text-muted" style="margin-bottom: 12px">
           This will create the secrets file and generate encryption keys.
         </p>
@@ -291,7 +291,7 @@ async function stopServer() {
         </div>
         <div class="modal-actions">
           <button class="btn btn-secondary" @click="showInitialize = false">Cancel</button>
-          <button class="btn btn-primary" @click="initEnvSync">Initialize</button>
+          <button class="btn btn-primary" @click="initSyncEnv">Initialize</button>
         </div>
       </div>
     </div>

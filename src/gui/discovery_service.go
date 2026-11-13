@@ -1,8 +1,8 @@
 package main
 
 import (
-	"envsync/internal/discovery"
-	"envsync/internal/keys"
+	"syncenv/internal/discovery"
+	"syncenv/internal/keys"
 	"time"
 )
 
